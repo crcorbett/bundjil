@@ -1,5 +1,5 @@
 import { mkdir } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
+import nodePath from "node:path";
 
 import { Clock, Console, Effect, Schema } from "effect";
 
@@ -13,6 +13,8 @@ import {
   FeedbackPromotionJson,
 } from "./control-policy.js";
 import { FreshnessCandidateJson } from "./documentation/freshness-candidate.js";
+
+const { dirname, resolve } = nodePath;
 
 const repositoryRoot = resolve(import.meta.dirname, "..");
 const detailPath = "tmp/control-policy-report.json";

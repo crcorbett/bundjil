@@ -1,7 +1,7 @@
 import { Schema } from "effect";
 
-const Digest = Schema.String.check(Schema.isPattern(/^[a-f0-9]{64}$/));
-const Revision = Schema.String.check(Schema.isPattern(/^[a-f0-9]{40}$/));
+const Digest = Schema.String.check(Schema.isPattern(/^[a-f0-9]{64}$/u));
+const Revision = Schema.String.check(Schema.isPattern(/^[a-f0-9]{40}$/u));
 const OptionalText = Schema.NullOr(Schema.NonEmptyString);
 
 export const FreshnessCandidate = Schema.Struct({

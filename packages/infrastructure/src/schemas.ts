@@ -164,7 +164,7 @@ export type InfrastructureStateRevisionEncoded =
   typeof InfrastructureStateRevision.Encoded;
 
 export const AdoptionManifestDigest = Schema.String.pipe(
-  Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/)),
+  Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/u)),
   Schema.brand("@bundjil/infrastructure/AdoptionManifestDigest")
 );
 export type AdoptionManifestDigest = typeof AdoptionManifestDigest.Type;

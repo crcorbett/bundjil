@@ -10,7 +10,7 @@ export const ProductionProject = Schema.Literals(["agent", "proxy"]);
 export type ProductionProject = typeof ProductionProject.Type;
 
 export const ProductionDeploymentUrl = Schema.NonEmptyString.pipe(
-  Schema.check(Schema.isPattern(/^https:\/\/[a-z0-9-]+\.vercel\.app$/)),
+  Schema.check(Schema.isPattern(/^https:\/\/[a-z0-9-]+\.vercel\.app$/u)),
   Schema.brand("@bundjil/infrastructure/vercel/ProductionDeploymentUrl")
 );
 export type ProductionDeploymentUrl = typeof ProductionDeploymentUrl.Type;

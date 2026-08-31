@@ -25,7 +25,7 @@ import type {
   PhotonSdkPhase,
 } from "./sdk-observed-failure.js";
 
-export interface PhotonClientShape {
+export interface PhotonClientContract {
   readonly sendMessage: (
     participantId: ChannelParticipantIdType,
     text: ChannelOutboundTextType
@@ -43,7 +43,7 @@ export interface PhotonClientShape {
 
 export class PhotonClient extends Context.Service<
   PhotonClient,
-  PhotonClientShape
+  PhotonClientContract
 >()("@bundjil/photon/PhotonClient") {}
 
 export interface PhotonSdkSpace {

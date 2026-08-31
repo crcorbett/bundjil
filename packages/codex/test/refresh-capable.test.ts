@@ -90,20 +90,24 @@ const makeRefreshResult = (
     accountId: string;
     expiresAtEpochMillis: number;
   }> = {}
-) =>
-  Schema.decodeUnknownEffect(CodexOAuthTokenRefreshResult)({
+) => {
+  const requiredResult = {
     subject: value,
     accessToken: overrides.accessToken ?? "access-token-new-secret",
-    ...(overrides.refreshToken === undefined
-      ? {}
-      : { refreshToken: overrides.refreshToken }),
-    ...(overrides.accountId === undefined
-      ? {}
-      : { accountId: overrides.accountId }),
     expiresAtEpochMillis:
       overrides.expiresAtEpochMillis ?? validProfileExpiryEpochMillis,
     updatedAtEpochMillis: fixtureUpdatedAtEpochMillis,
-  });
+  };
+  const refreshResult =
+    overrides.refreshToken === undefined
+      ? requiredResult
+      : { ...requiredResult, refreshToken: overrides.refreshToken };
+  const result =
+    overrides.accountId === undefined
+      ? refreshResult
+      : { ...refreshResult, accountId: overrides.accountId };
+  return Schema.decodeUnknownEffect(CodexOAuthTokenRefreshResult)(result);
+};
 
 it.effect(
   "returns one atomic credential without refreshing a valid profile",

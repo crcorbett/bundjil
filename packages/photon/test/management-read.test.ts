@@ -98,6 +98,27 @@ const liveLayer = (client: HttpClient.HttpClient) =>
     )
   );
 
+const photonFailureResponse = (
+  status: number,
+  body: unknown,
+  onRequest: () => void = () => {}
+) =>
+  HttpClient.make((request) =>
+    Effect.sync(() => {
+      onRequest();
+      return HttpClientResponse.fromWeb(
+        request,
+        Response.json(body, {
+          status,
+          headers: {
+            "content-type": "application/json",
+            "retry-after": "1",
+          },
+        })
+      );
+    })
+  );
+
 it.effect(
   "observes the complete Photon topology with paged users and no writes",
   () =>
@@ -304,27 +325,6 @@ it.effect(
   "fails safely for malformed, conflict, rate-limited, transient and unavailable responses",
   () =>
     Effect.gen(function* () {
-      const responseFor = (
-        status: number,
-        body: unknown,
-        onRequest: () => void = () => {}
-      ) =>
-        HttpClient.make((request) =>
-          Effect.sync(() => {
-            onRequest();
-            return HttpClientResponse.fromWeb(
-              request,
-              Response.json(body, {
-                status,
-                headers: {
-                  "content-type": "application/json",
-                  "retry-after": "1",
-                },
-              })
-            );
-          })
-        );
-
       const malformed = yield* Effect.gen(function* () {
         const projects = yield* PhotonProjects;
         return yield* projects.observeProject(
@@ -332,7 +332,12 @@ it.effect(
         );
       }).pipe(
         Effect.provide(
-          liveLayer(responseFor(200, { succeed: true, data: { slug: 1 } }))
+          liveLayer(
+            photonFailureResponse(200, {
+              succeed: true,
+              data: { slug: 1 },
+            })
+          )
         ),
         Effect.flip
       );
@@ -352,7 +357,7 @@ it.effect(
         }).pipe(
           Effect.provide(
             liveLayer(
-              responseFor(
+              photonFailureResponse(
                 status,
                 {
                   succeed: false,
@@ -394,7 +399,7 @@ it.effect(
       }).pipe(
         Effect.provide(
           liveLayer(
-            responseFor(404, {
+            photonFailureResponse(404, {
               succeed: false,
               data: null,
               code: "not-found",

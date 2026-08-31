@@ -23,15 +23,15 @@ type ExpectedVariableBinding = readonly [
 ];
 
 const ImmutableDeploymentReference = Schema.String.pipe(
-  Schema.check(Schema.isPattern(/^dpl_[A-Za-z0-9]+$/))
+  Schema.check(Schema.isPattern(/^dpl_[A-Za-z0-9]+$/u))
 );
 
 const ImmutableSourceReference = Schema.String.pipe(
-  Schema.check(Schema.isPattern(/^[a-f0-9]{40}$/))
+  Schema.check(Schema.isPattern(/^[a-f0-9]{40}$/u))
 );
 
 const OpaqueIdentityFingerprint = Schema.String.pipe(
-  Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/))
+  Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/u))
 );
 
 const PersonalVercelTeamId = Schema.Literal("team_1LX7ZujbijowTv8J9k0aU7nD");
@@ -420,7 +420,7 @@ export type ProductionPreflightClassification =
 const ProductionPreflightDetailArtifact = Schema.Struct({
   path: Schema.NonEmptyString,
   sha256: Schema.NullOr(
-    Schema.String.pipe(Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/)))
+    Schema.String.pipe(Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/u)))
   ),
   state: Schema.Literals(["available", "unavailable"]),
 });

@@ -1,8 +1,10 @@
 import { spawnSync } from "node:child_process";
 import { chmodSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
-import { dirname, join, relative } from "node:path";
+import nodePath from "node:path";
 
 import { describe, expect, it } from "vitest";
+
+const { dirname, join, relative } = nodePath;
 
 const packageRoot = dirname(import.meta.dirname);
 const commandFixtureTimeoutMilliseconds = 120_000;

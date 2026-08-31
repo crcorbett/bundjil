@@ -1,6 +1,8 @@
-import { posix } from "node:path";
+import nodePath from "node:path";
 
 import { Result, Schema } from "effect";
+
+const { posix } = nodePath;
 
 export interface DocumentationFile {
   readonly content: string;
@@ -195,7 +197,7 @@ const parseFrontmatter = (file: DocumentationFile): Frontmatter | undefined => {
             line
               .slice(separator + 1)
               .trim()
-              .replaceAll(/^['"]|['"]$/g, ""),
+              .replaceAll(/^['"]|['"]$/gu, ""),
           ] as const,
         ];
       })
@@ -209,13 +211,13 @@ const isCurrentMetadataOwner = (path: string) =>
   path === "docs/operations/authority-model.md" ||
   path === "docs/product-specs/index.md" ||
   path === "docs/product-specs/harness-governance-documentation.md" ||
-  /^docs\/architecture\/(?!legacy-atlas\.md$).+\.md$/.test(path) ||
-  /^docs\/exec-plans\/active\/.+\.md$/.test(path) ||
+  /^docs\/architecture\/(?!legacy-atlas\.md$).+\.md$/u.test(path) ||
+  /^docs\/exec-plans\/active\/.+\.md$/u.test(path) ||
   path === "docs/exec-plans/completed/README.md" ||
-  /^apps\/(agent|codex-proxy)\/runbooks\/.+\.md$/.test(path);
+  /^apps\/(?:agent|codex-proxy)\/runbooks\/.+\.md$/u.test(path);
 
 const validDate = (value: string) => {
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  const match = /^(?:\d{4})-(?:\d{2})-(?:\d{2})$/u.exec(value);
   if (!match) {
     return false;
   }
@@ -319,7 +321,7 @@ const metadataFindings = (
     });
 
 const stripCodeFences = (content: string) =>
-  content.replaceAll(/```[\s\S]*?```/g, "");
+  content.replaceAll(/```[\s\S]*?```/gu, "");
 
 const linkFindings = (
   files: readonly DocumentationFile[],
@@ -332,22 +334,22 @@ const linkFindings = (
     }
     const issues: DocumentationFinding[] = [];
     for (const match of stripCodeFences(file.content).matchAll(
-      /(?<!!)\[[^\]]*\]\(([^)]+)\)/g
+      /(?<!!)\[[^\]]*\]\((?<target>[^)]+)\)/gu
     )) {
       const raw = match[1]?.trim() ?? "";
-      const target = raw.split(/[?#]/)[0] ?? "";
+      const target = raw.split(/[?#]/u)[0] ?? "";
       if (
         !target ||
         target.startsWith("#") ||
         target.startsWith("/") ||
-        /^[a-z]+:/i.test(target) ||
+        /^[a-z]+:/iu.test(target) ||
         target.includes("<")
       ) {
         continue;
       }
       const resolved = posix
         .normalize(posix.join(posix.dirname(file.path), target))
-        .replace(/\/$/, "");
+        .replace(/\/$/u, "");
       const exists =
         paths.has(resolved) ||
         repositoryPaths.some((path) => path.startsWith(`${resolved}/`));
@@ -392,7 +394,7 @@ const indexCoverage = (
     .flatMap((file) => {
       const relative = posix.relative(posix.dirname(indexPath), file.path);
       const occurrences = [
-        ...index.content.matchAll(/\]\(([^)#?]+)(?:[?#][^)]*)?\)/g),
+        ...index.content.matchAll(/\]\((?<target>[^)#?]+)(?:[?#][^)]*)?\)/gu),
       ].filter((match) => posix.normalize(match[1] ?? "") === relative).length;
       return occurrences === 1
         ? []
@@ -415,7 +417,7 @@ const lifecycleFindings = (
   files
     .filter(
       (file) =>
-        /^docs\/exec-plans\/active\/.+\.md$/.test(file.path) &&
+        /^docs\/exec-plans\/active\/.+\.md$/u.test(file.path) &&
         !file.path.endsWith("/README.md")
     )
     .flatMap((file) => {
@@ -439,13 +441,13 @@ const crossOwnerLifecycleFindings = (
 ): readonly DocumentationFinding[] => {
   const activePlans = files.filter(
     (file) =>
-      /^docs\/exec-plans\/active\/.+\.md$/.test(file.path) &&
+      /^docs\/exec-plans\/active\/.+\.md$/u.test(file.path) &&
       !file.path.endsWith("/README.md")
   );
   const currentSpecFindings = files
     .filter(
       (file) =>
-        /^docs\/product-specs\/(?!index\.md$).+\.md$/.test(file.path) &&
+        /^docs\/product-specs\/(?!index\.md$).+\.md$/u.test(file.path) &&
         parseFrontmatter(file)?.["lifecycle"] === "current" &&
         parseFrontmatter(file)?.["task_ledger"] !== undefined
     )
@@ -474,7 +476,7 @@ const crossOwnerLifecycleFindings = (
   const completedPlanFindings = files
     .filter(
       (file) =>
-        /^docs\/exec-plans\/completed\/.+\.md$/.test(file.path) &&
+        /^docs\/exec-plans\/completed\/.+\.md$/u.test(file.path) &&
         !file.path.endsWith("/README.md") &&
         parseFrontmatter(file)?.["task_ledger"] !== undefined
     )
@@ -623,10 +625,10 @@ const readmeFindings = (
 ): readonly DocumentationFinding[] => {
   const paths = new Set(snapshot.repositoryPaths);
   return snapshot.manifests.flatMap((manifest) => {
-    if (!/^(apps|packages)\/[^/]+\/package\.json$/.test(manifest.path)) {
+    if (!/^(?:apps|packages)\/[^/]+\/package\.json$/u.test(manifest.path)) {
       return [];
     }
-    const readme = manifest.path.replace(/package\.json$/, "README.md");
+    const readme = manifest.path.replace(/package\.json$/u, "README.md");
     return paths.has(readme)
       ? []
       : [
@@ -651,9 +653,9 @@ const commandFindings = (
   return snapshot.files.flatMap((file) => {
     if (
       !snapshot.ownerPolicy.owners.includes(file.path) &&
-      !/^(apps|packages)\/[^/]+\/README\.md$/.test(file.path) &&
-      !/^apps\/(agent|codex-proxy)\/runbooks\/.+\.md$/.test(file.path) &&
-      !/^\.agents\/skills\/(effect-client-wrapper|package-structure|prd-implementer|prd-review|prd-writer)\/SKILL\.md$/.test(
+      !/^(?:apps|packages)\/[^/]+\/README\.md$/u.test(file.path) &&
+      !/^apps\/(?:agent|codex-proxy)\/runbooks\/.+\.md$/u.test(file.path) &&
+      !/^\.agents\/skills\/(?:effect-client-wrapper|package-structure|prd-implementer|prd-review|prd-writer)\/SKILL\.md$/u.test(
         file.path
       )
     ) {
@@ -661,7 +663,7 @@ const commandFindings = (
     }
     const issues: DocumentationFinding[] = [];
     for (const match of file.content.matchAll(
-      /\bbun run (?!--filter\b)([a-zA-Z0-9:_-]+)/g
+      /\bbun run (?!--filter\b)(?<command>[a-zA-Z0-9:_-]+)/gu
     )) {
       const command = match[1] ?? "";
       if (!root?.scripts[command]) {
@@ -678,7 +680,7 @@ const commandFindings = (
       }
     }
     for (const match of file.content.matchAll(
-      /\bbun run --filter ([^\s`]+) ([a-zA-Z0-9:_-]+)/g
+      /\bbun run --filter (?<packageName>[^\s`]+) (?<command>[a-zA-Z0-9:_-]+)/gu
     )) {
       const packageName = match[1] ?? "";
       const command = match[2] ?? "";
@@ -711,11 +713,11 @@ const portabilityFindings = (
     .filter(
       (file) =>
         snapshot.ownerPolicy.owners.includes(file.path) ||
-        /^\.agents\/skills\/.+\.md$/.test(file.path) ||
-        /^apps\/(agent|codex-proxy)\/runbooks\/.+\.md$/.test(file.path)
+        /^\.agents\/skills\/.+\.md$/u.test(file.path) ||
+        /^apps\/(?:agent|codex-proxy)\/runbooks\/.+\.md$/u.test(file.path)
     )
     .flatMap((file) =>
-      (file.content.match(/\/Users\/[^/\s]+\//g) ?? []).map((value) =>
+      (file.content.match(/\/Users\/[^/\s]+\//gu) ?? []).map((value) =>
         finding(
           "DOC-PORTABILITY",
           "Current documentation and skills avoid personal absolute paths",
@@ -730,13 +732,13 @@ const portabilityFindings = (
 const semanticSegments = (content: string) =>
   content
     .replace(/^---\n[\s\S]*?\n---\n/u, "")
-    .replaceAll(/```[\s\S]*?```/g, "")
+    .replaceAll(/```[\s\S]*?```/gu, "")
     .split(/\n|(?<=[.!?;])\s+/u)
     .map((segment) =>
       segment
         .toLocaleLowerCase("en")
-        .replaceAll(/[`*_]/g, "")
-        .replaceAll(/\s+/g, " ")
+        .replaceAll(/[`*_]/gu, "")
+        .replaceAll(/\s+/gu, " ")
         .trim()
     )
     .filter(Boolean);
@@ -989,13 +991,13 @@ const runbookIndexFindings = (
   ...indexCoverage(
     files,
     "apps/agent/runbooks/README.md",
-    /^apps\/agent\/runbooks\/(?!README\.md$).+\.md$/,
+    /^apps\/agent\/runbooks\/(?!README\.md$).+\.md$/u,
     "Agent runbook inventory"
   ),
   ...indexCoverage(
     files,
     "apps/codex-proxy/runbooks/README.md",
-    /^apps\/codex-proxy\/runbooks\/(?!README\.md$).+\.md$/,
+    /^apps\/codex-proxy\/runbooks\/(?!README\.md$).+\.md$/u,
     "Codex proxy runbook inventory"
   ),
 ];
@@ -1197,19 +1199,19 @@ export const auditDocumentation = (
     ...indexCoverage(
       snapshot.files,
       "docs/product-specs/index.md",
-      /^docs\/product-specs\/(?!index\.md$).+\.md$/,
+      /^docs\/product-specs\/(?!index\.md$).+\.md$/u,
       "Product-spec inventory"
     ),
     ...indexCoverage(
       snapshot.files,
       "docs/exec-plans/active/README.md",
-      /^docs\/exec-plans\/active\/(?!README\.md$).+\.md$/,
+      /^docs\/exec-plans\/active\/(?!README\.md$).+\.md$/u,
       "Active-plan inventory"
     ),
     ...indexCoverage(
       snapshot.files,
       "docs/exec-plans/completed/README.md",
-      /^docs\/exec-plans\/completed\/(?!README\.md$).+\.md$/,
+      /^docs\/exec-plans\/completed\/(?!README\.md$).+\.md$/u,
       "Completed-plan inventory"
     ),
     ...lifecycleFindings(snapshot.files),

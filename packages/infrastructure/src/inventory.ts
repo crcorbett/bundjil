@@ -61,7 +61,7 @@ import {
 } from "./vercel/services.js";
 
 export const InfrastructureInventoryPrincipalFingerprint = Schema.String.pipe(
-  Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/)),
+  Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/u)),
   Schema.brand(
     "@bundjil/infrastructure/InfrastructureInventoryPrincipalFingerprint"
   )
@@ -72,7 +72,7 @@ export type InfrastructureInventoryPrincipalFingerprintEncoded =
   typeof InfrastructureInventoryPrincipalFingerprint.Encoded;
 
 export const InfrastructureInventorySourceSha = Schema.String.pipe(
-  Schema.check(Schema.isPattern(/^[a-f0-9]{40}$/)),
+  Schema.check(Schema.isPattern(/^[a-f0-9]{40}$/u)),
   Schema.brand("@bundjil/infrastructure/InfrastructureInventorySourceSha")
 );
 export type InfrastructureInventorySourceSha =
@@ -81,7 +81,7 @@ export type InfrastructureInventorySourceShaEncoded =
   typeof InfrastructureInventorySourceSha.Encoded;
 
 export const InfrastructureInventoryDigest = Schema.String.pipe(
-  Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/)),
+  Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/u)),
   Schema.brand("@bundjil/infrastructure/InfrastructureInventoryDigest")
 );
 export type InfrastructureInventoryDigest =
@@ -153,7 +153,7 @@ export const InfrastructureInventoryArtifact = Schema.Struct({
   principalFingerprint: InfrastructureInventoryPrincipalFingerprint,
   observedAt: Schema.String.pipe(
     Schema.check(
-      Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/)
+      Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/u)
     )
   ),
   manifestDigest: InfrastructureInventoryDigest,
@@ -230,7 +230,7 @@ export class InfrastructureInventoryReadError extends Schema.TaggedErrorClass<In
   }
 ) {}
 
-export interface InfrastructureInventoryShape {
+export interface InfrastructureInventoryContract {
   readonly read: (
     target: InfrastructureInventoryTarget
   ) => EffectType.Effect<
@@ -252,7 +252,7 @@ export interface InfrastructureInventoryShape {
 
 export class InfrastructureInventory extends Context.Service<
   InfrastructureInventory,
-  InfrastructureInventoryShape
+  InfrastructureInventoryContract
 >()("@bundjil/infrastructure/InfrastructureInventory") {}
 
 export const InfrastructureInventoryLive = Layer.effect(

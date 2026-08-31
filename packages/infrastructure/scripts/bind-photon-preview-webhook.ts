@@ -1,4 +1,4 @@
-import { isAbsolute } from "node:path";
+import nodePath from "node:path";
 
 import {
   PhotonProjectId,
@@ -38,6 +38,8 @@ import {
   VercelTeamId,
 } from "../src/vercel/index.js";
 import type { VercelEnvironmentVariableAttributes } from "../src/vercel/index.js";
+
+const { isAbsolute } = nodePath;
 
 declare const process: {
   exitCode: number | undefined;

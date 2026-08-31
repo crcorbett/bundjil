@@ -1,8 +1,9 @@
 import { Redis } from "@upstash/redis";
 import { Redacted } from "effect";
 
-import { makeUpstashPersistenceLayer } from "./upstash-layer.internal.js";
+import { buildUpstashPersistenceLayer } from "./upstash-layer.internal.js";
 import type { UpstashPersistenceOptions as UpstashPersistenceOptionsType } from "./upstash-options.js";
+
 export {
   UpstashPersistenceKeyPrefix,
   UpstashPersistenceOptions,
@@ -11,7 +12,7 @@ export {
 export const UpstashPersistenceLive = (
   options: UpstashPersistenceOptionsType
 ) =>
-  makeUpstashPersistenceLayer(
+  buildUpstashPersistenceLayer(
     options,
     () =>
       new Redis({

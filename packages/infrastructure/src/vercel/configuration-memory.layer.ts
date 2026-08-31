@@ -55,7 +55,7 @@ export const VercelPreviewFeedbackDrift = Schema.Struct({
 });
 export type VercelPreviewFeedbackDrift = typeof VercelPreviewFeedbackDrift.Type;
 
-export interface VercelPreviewConfigurationMemoryControlShape {
+export interface VercelPreviewConfigurationMemoryControlContract {
   readonly setFailureMode: (
     mode: VercelPreviewConfigurationMemoryFailureMode
   ) => Effect.Effect<void>;
@@ -69,7 +69,7 @@ export interface VercelPreviewConfigurationMemoryControlShape {
 
 export class VercelPreviewConfigurationMemoryControl extends Context.Service<
   VercelPreviewConfigurationMemoryControl,
-  VercelPreviewConfigurationMemoryControlShape
+  VercelPreviewConfigurationMemoryControlContract
 >()("@bundjil/infrastructure/vercel/VercelPreviewConfigurationMemoryControl") {}
 
 const noFailure = VercelPreviewConfigurationMemoryFailureMode.make("none");

@@ -27,7 +27,7 @@ export type VercelEnvironmentVariableIdEncoded =
   typeof VercelEnvironmentVariableId.Encoded;
 
 export const VercelEnvironmentVariableKey = Schema.NonEmptyString.pipe(
-  Schema.check(Schema.isPattern(/^[A-Z][A-Z0-9_]*$/)),
+  Schema.check(Schema.isPattern(/^[A-Z][A-Z0-9_]*$/u)),
   Schema.brand("@bundjil/infrastructure/vercel/VercelEnvironmentVariableKey")
 );
 export type VercelEnvironmentVariableKey =
@@ -54,7 +54,9 @@ export type VercelGitBranchEncoded = typeof VercelGitBranch.Encoded;
 
 export const VercelCanonicalDomain = Schema.NonEmptyString.pipe(
   Schema.check(
-    Schema.isPattern(/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/)
+    Schema.isPattern(
+      /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/u
+    )
   ),
   Schema.brand("@bundjil/infrastructure/vercel/VercelCanonicalDomain")
 );
@@ -100,7 +102,7 @@ export type VercelDeploymentId = typeof VercelDeploymentId.Type;
 export type VercelDeploymentIdEncoded = typeof VercelDeploymentId.Encoded;
 
 export const VercelGitSha = Schema.String.pipe(
-  Schema.check(Schema.isPattern(/^[a-f0-9]{40}$/)),
+  Schema.check(Schema.isPattern(/^[a-f0-9]{40}$/u)),
   Schema.brand("@bundjil/infrastructure/vercel/VercelGitSha")
 );
 export type VercelGitSha = typeof VercelGitSha.Type;

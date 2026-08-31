@@ -51,7 +51,7 @@ export const ChannelReplayKey = Schema.NonEmptyString.pipe(
 export type ChannelReplayKey = typeof ChannelReplayKey.Type;
 
 const ChannelHandoffFingerprint = Schema.String.pipe(
-  Schema.check(Schema.isPattern(/^[0-9a-f]{64}$/))
+  Schema.check(Schema.isPattern(/^[0-9a-f]{64}$/u))
 );
 
 export const ChannelWorkFingerprint = ChannelHandoffFingerprint.pipe(

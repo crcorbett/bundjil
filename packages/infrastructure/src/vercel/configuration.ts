@@ -217,7 +217,7 @@ export type DeleteVercelPreviewEnvironmentMetadata =
 export type DeleteVercelPreviewEnvironmentMetadataEncoded =
   typeof DeleteVercelPreviewEnvironmentMetadata.Encoded;
 
-export interface VercelPreviewConfigurationShape {
+export interface VercelPreviewConfigurationContract {
   readonly observePreviewFeedback: (
     input: ObserveVercelPreviewFeedback
   ) => Effect.Effect<
@@ -249,5 +249,5 @@ export interface VercelPreviewConfigurationShape {
 
 export class VercelPreviewConfiguration extends Context.Service<
   VercelPreviewConfiguration,
-  VercelPreviewConfigurationShape
+  VercelPreviewConfigurationContract
 >()("@bundjil/infrastructure/vercel/VercelPreviewConfiguration") {}

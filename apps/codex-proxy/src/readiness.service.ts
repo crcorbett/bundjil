@@ -1,12 +1,12 @@
 import { Context, Layer } from "effect";
 
-export interface CodexProxyReadinessShape {
+export interface CodexProxyReadinessContract {
   readonly ready: boolean;
 }
 
 export class CodexProxyReadiness extends Context.Service<
   CodexProxyReadiness,
-  CodexProxyReadinessShape
+  CodexProxyReadinessContract
 >()("@bundjil/codex-proxy/CodexProxyReadiness") {}
 
 export const CodexProxyReadyLive = Layer.succeed(

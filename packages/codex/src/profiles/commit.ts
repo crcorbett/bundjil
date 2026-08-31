@@ -10,7 +10,7 @@ import type {
 } from "./contracts.js";
 import type { CodexOAuthProfileCommitFailure } from "./errors.js";
 
-export interface CodexOAuthProfileCommitShape {
+export interface CodexOAuthProfileCommitContract {
   readonly initialWrite: (
     profile: CodexSubscriptionProfile
   ) => Effect.Effect<CodexSubscriptionProfile, CodexOAuthProfileCommitFailure>;
@@ -30,7 +30,7 @@ export interface CodexOAuthProfileCommitShape {
 
 export class CodexOAuthProfileCommit extends Context.Service<
   CodexOAuthProfileCommit,
-  CodexOAuthProfileCommitShape
+  CodexOAuthProfileCommitContract
 >()("@bundjil/codex/CodexOAuthProfileCommit") {}
 
 const unsupportedCommit = (operation: "completeLogin" | "refresh") => () =>

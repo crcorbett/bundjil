@@ -12,7 +12,7 @@ import {
   writeFileSync,
 } from "node:fs";
 import { createServer } from "node:http";
-import { join, relative } from "node:path";
+import nodePath from "node:path";
 import process from "node:process";
 
 import {
@@ -26,6 +26,8 @@ import {
   CodexProxyErrorResponse,
   CodexProxyHealthResponse,
 } from "../src/schemas.js";
+
+const { join, relative } = nodePath;
 
 const encodeHealthResponse = Schema.encodeSync(
   Schema.fromJsonString(CodexProxyHealthResponse)
@@ -230,6 +232,7 @@ describe("preview proof", () => {
   beforeAll(() => {
     vi.setConfig({ testTimeout: previewProofTestTimeoutMilliseconds });
   });
+
   afterAll(() => {
     vi.resetConfig();
   });
@@ -238,32 +241,32 @@ describe("preview proof", () => {
     const result = await runProofFixture(200);
 
     assert.equal(result.exitCode, 0, result.stderr);
-    assert.match(result.stdout, /"status":"proved"/);
+    assert.match(result.stdout, /"status":"proved"/u);
     assert.match(
       result.stdout,
-      /"command":"bun run --filter @bundjil\/codex-proxy proof:preview"/
+      /"command":"bun run --filter @bundjil\/codex-proxy proof:preview"/u
     );
-    assert.match(result.stdout, /"journeyId":"BND-J03-proxy-health-auth-sse"/);
+    assert.match(result.stdout, /"journeyId":"BND-J03-proxy-health-auth-sse"/u);
     assert.match(
       result.stdout,
-      /"target":"bundjil-codex-proxy Preview candidate"/
+      /"target":"bundjil-codex-proxy Preview candidate"/u
     );
-    assert.match(result.stdout, /"invariant":"Health, auth oracles/);
-    assert.match(result.stdout, /"recoveryHint":"For a blocked receipt/);
-    assert.match(result.stdout, /"postcondition":"A bounded receipt/);
-    assert.match(result.stdout, /"limitation":"This receipt proves only/);
-    assert.match(result.stdout, /"nonClaim":"No URL, secret/);
-    assert.match(result.stdout, /"intendedExitCode":0/);
-    assert.match(result.stdout, /"observedExitCode":0/);
-    assert.match(result.stdout, /"healthReasoningEffortHigh":true/);
-    assert.match(result.stdout, /"requestedModelTerra":true/);
+    assert.match(result.stdout, /"invariant":"Health, auth oracles/u);
+    assert.match(result.stdout, /"recoveryHint":"For a blocked receipt/u);
+    assert.match(result.stdout, /"postcondition":"A bounded receipt/u);
+    assert.match(result.stdout, /"limitation":"This receipt proves only/u);
+    assert.match(result.stdout, /"nonClaim":"No URL, secret/u);
+    assert.match(result.stdout, /"intendedExitCode":0/u);
+    assert.match(result.stdout, /"observedExitCode":0/u);
+    assert.match(result.stdout, /"healthReasoningEffortHigh":true/u);
+    assert.match(result.stdout, /"requestedModelTerra":true/u);
     assert.match(
       result.stdout,
-      /"detail":\{"path":".*detail.json","sha256":"[a-f0-9]{64}"\}/
+      /"detail":\{"path":".*detail.json","sha256":"[a-f0-9]{64}"\}/u
     );
-    assert.doesNotMatch(result.stdout, /preview-proof-test-token/);
-    assert.doesNotMatch(result.stdout, /Reply only: OK\./);
-    assert.doesNotMatch(result.stdout, /fixture model body/);
+    assert.doesNotMatch(result.stdout, /preview-proof-test-token/u);
+    assert.doesNotMatch(result.stdout, /Reply only: OK\./u);
+    assert.doesNotMatch(result.stdout, /fixture model body/u);
     assert.equal(result.stderr, "");
     assert.deepEqual(result.bypassHeaders, [
       undefined,
@@ -275,7 +278,7 @@ describe("preview proof", () => {
     for (const body of result.requestBodies.slice(1)) {
       const payload = decodeChatCompletionRequest(body);
       assert.equal(payload.model, "gpt-5.6-terra");
-      assert.doesNotMatch(body, /"reasoning"/);
+      assert.doesNotMatch(body, /"reasoning"/u);
     }
     const detailPath = join(
       result.outputDirectory,
@@ -284,7 +287,7 @@ describe("preview proof", () => {
     const detail = readFileSync(detailPath, "utf-8");
     assert.doesNotMatch(
       detail,
-      /preview-proof-test-token|Reply only: OK\.|fixture model body/
+      /preview-proof-test-token|Reply only: OK\.|fixture model body/u
     );
     rmSync(result.outputDirectory, { force: true, recursive: true });
   });
@@ -299,7 +302,7 @@ describe("preview proof", () => {
       "preview-proof-bypass-token",
       "preview-proof-bypass-token",
     ]);
-    assert.doesNotMatch(result.stdout, /preview-proof-bypass-token/);
+    assert.doesNotMatch(result.stdout, /preview-proof-bypass-token/u);
     assert.equal(result.stderr, "");
     rmSync(result.outputDirectory, { force: true, recursive: true });
   });
@@ -312,7 +315,7 @@ describe("preview proof", () => {
     );
 
     assert.equal(result.exitCode, 0);
-    assert.match(result.stdout, /"streamContentTypeSse":true/);
+    assert.match(result.stdout, /"streamContentTypeSse":true/u);
     assert.equal(result.stderr, "");
     rmSync(result.outputDirectory, { force: true, recursive: true });
   });
@@ -323,14 +326,14 @@ describe("preview proof", () => {
 
     assert.equal(result.exitCode, 1);
     assert.equal(result.stdout, "");
-    assert.match(result.stderr, /"status":"blocked"/);
-    assert.match(result.stderr, /"journeyId":"BND-J03-proxy-health-auth-sse"/);
-    assert.match(result.stderr, /"intendedExitCode":1/);
-    assert.match(result.stderr, /"observedExitCode":1/);
-    assert.doesNotMatch(result.stderr, /preview-proof-test-token/);
-    assert.doesNotMatch(result.stdout, /preview-proof-blocked-bypass-token/);
-    assert.doesNotMatch(result.stderr, /preview-proof-blocked-bypass-token/);
-    assert.doesNotMatch(result.stderr, /fixture model body/);
+    assert.match(result.stderr, /"status":"blocked"/u);
+    assert.match(result.stderr, /"journeyId":"BND-J03-proxy-health-auth-sse"/u);
+    assert.match(result.stderr, /"intendedExitCode":1/u);
+    assert.match(result.stderr, /"observedExitCode":1/u);
+    assert.doesNotMatch(result.stderr, /preview-proof-test-token/u);
+    assert.doesNotMatch(result.stdout, /preview-proof-blocked-bypass-token/u);
+    assert.doesNotMatch(result.stderr, /preview-proof-blocked-bypass-token/u);
+    assert.doesNotMatch(result.stderr, /fixture model body/u);
     rmSync(result.outputDirectory, { force: true, recursive: true });
   });
 
@@ -350,13 +353,13 @@ describe("preview proof", () => {
 
     assert.equal(first.exitCode, 0, first.stderr);
     assert.equal(retry.exitCode, 1);
-    assert.match(retry.stderr, /"classification":"rerun_avoided"/);
+    assert.match(retry.stderr, /"classification":"rerun_avoided"/u);
     assert.match(
       retry.stderr,
-      /"target":"bundjil-codex-proxy Preview candidate"/
+      /"target":"bundjil-codex-proxy Preview candidate"/u
     );
-    assert.match(retry.stderr, /"observedExitCode":1/);
-    assert.match(retry.stderr, /"detail":\{"path":".*\.detail\.json"/);
+    assert.match(retry.stderr, /"observedExitCode":1/u);
+    assert.match(retry.stderr, /"detail":\{"path":".*\.detail\.json"/u);
     assert.equal(retry.requestBodies.length, 0);
     assert.equal(readFileSync(detailPath, "utf-8"), retainedBeforeRetry);
     rmSync(first.outputDirectory, { force: true, recursive: true });
@@ -383,10 +386,13 @@ describe("preview proof", () => {
 
     assert.equal(missing.exitCode, 1);
     assert.equal(missing.requestBodies.length, 0);
-    assert.match(missing.stderr, /"classification":"config_failed"/);
-    assert.match(missing.stderr, /"requestAttempted":false/);
-    assert.match(missing.stderr, /"journeyId":"BND-J03-proxy-health-auth-sse"/);
-    assert.match(missing.stderr, /"intendedExitCode":1/);
+    assert.match(missing.stderr, /"classification":"config_failed"/u);
+    assert.match(missing.stderr, /"requestAttempted":false/u);
+    assert.match(
+      missing.stderr,
+      /"journeyId":"BND-J03-proxy-health-auth-sse"/u
+    );
+    assert.match(missing.stderr, /"intendedExitCode":1/u);
     assert.equal(corrected.exitCode, 0, corrected.stderr);
     assert.equal(corrected.requestBodies.length, 4);
     rmSync(missing.outputDirectory, { force: true, recursive: true });
@@ -414,10 +420,10 @@ describe("preview proof", () => {
     );
 
     assert.equal(missing.exitCode, 1);
-    assert.match(missing.stderr, /"classification":"detail_artifact_failed"/);
+    assert.match(missing.stderr, /"classification":"detail_artifact_failed"/u);
     assert.equal(missing.requestBodies.length, 0);
     assert.equal(corrupt.exitCode, 1);
-    assert.match(corrupt.stderr, /"classification":"detail_artifact_failed"/);
+    assert.match(corrupt.stderr, /"classification":"detail_artifact_failed"/u);
     assert.equal(corrupt.requestBodies.length, 0);
     rmSync(first.outputDirectory, { force: true, recursive: true });
   });
@@ -434,15 +440,15 @@ describe("preview proof", () => {
 
     assert.equal(result.exitCode, 1);
     assert.equal(result.stdout, "");
-    assert.match(result.stderr, /"classification":"request_failed"/);
-    assert.doesNotMatch(result.stderr, /fixture model body/);
+    assert.match(result.stderr, /"classification":"request_failed"/u);
+    assert.doesNotMatch(result.stderr, /fixture model body/u);
     const detailPath = join(
       result.outputDirectory,
       "candidate-preview-proof--packet-preview-proof.detail.json"
     );
     assert.doesNotMatch(
       readFileSync(detailPath, "utf-8"),
-      /fixture model body/
+      /fixture model body/u
     );
     rmSync(result.outputDirectory, { force: true, recursive: true });
   });
@@ -458,17 +464,17 @@ describe("preview proof", () => {
     );
 
     assert.equal(result.exitCode, 1, result.stderr);
-    assert.match(result.stderr, /"classification":"output_closed"/);
-    assert.match(result.stderr, /\.output-closed\.detail\.json/);
-    assert.match(result.stderr, /"journeyId":"BND-J03-proxy-health-auth-sse"/);
-    assert.match(result.stderr, /"observedExitCode":1/);
-    assert.doesNotMatch(result.stderr, /fixture model body/);
+    assert.match(result.stderr, /"classification":"output_closed"/u);
+    assert.match(result.stderr, /\.output-closed\.detail\.json/u);
+    assert.match(result.stderr, /"journeyId":"BND-J03-proxy-health-auth-sse"/u);
+    assert.match(result.stderr, /"observedExitCode":1/u);
+    assert.doesNotMatch(result.stderr, /fixture model body/u);
     const detailPath = join(
       result.outputDirectory,
       "candidate-preview-proof--packet-preview-proof.detail.json"
     );
     const retainedProof = readFileSync(detailPath, "utf-8");
-    assert.match(retainedProof, /"classification":"proved"/);
+    assert.match(retainedProof, /"classification":"proved"/u);
     const outputClosedDetail = readFileSync(
       join(
         result.outputDirectory,
@@ -476,11 +482,11 @@ describe("preview proof", () => {
       ),
       "utf-8"
     );
-    assert.match(outputClosedDetail, /"classification":"output_closed"/);
-    assert.match(outputClosedDetail, /"priorDetail":\{/);
+    assert.match(outputClosedDetail, /"classification":"output_closed"/u);
+    assert.match(outputClosedDetail, /"priorDetail":\{/u);
     assert.match(
       outputClosedDetail,
-      new RegExp(createHash("sha256").update(retainedProof).digest("hex"))
+      new RegExp(createHash("sha256").update(retainedProof).digest("hex"), "u")
     );
     rmSync(result.outputDirectory, { force: true, recursive: true });
   });
@@ -501,17 +507,17 @@ describe("preview proof", () => {
     assert.ok(Date.now() - startedAt < 2000);
     assert.equal(result.exitCode, 1, result.stderr);
     assert.equal(result.requestBodies.length, 4);
-    assert.match(result.stderr, /"classification":"interrupted"/);
-    assert.match(result.stderr, /"journeyId":"BND-J03-proxy-health-auth-sse"/);
-    assert.match(result.stderr, /"intendedExitCode":1/);
-    assert.doesNotMatch(result.stderr, /fixture model body|Reply only: OK\./);
+    assert.match(result.stderr, /"classification":"interrupted"/u);
+    assert.match(result.stderr, /"journeyId":"BND-J03-proxy-health-auth-sse"/u);
+    assert.match(result.stderr, /"intendedExitCode":1/u);
+    assert.doesNotMatch(result.stderr, /fixture model body|Reply only: OK\./u);
     const detailPath = join(
       result.outputDirectory,
       "candidate-preview-proof--packet-preview-proof.detail.json"
     );
     assert.match(
       readFileSync(detailPath, "utf-8"),
-      /"classification":"interrupted"/
+      /"classification":"interrupted"/u
     );
     rmSync(result.outputDirectory, { force: true, recursive: true });
   });

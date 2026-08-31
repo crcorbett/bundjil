@@ -14,12 +14,12 @@ import {
   WorkspaceStatusSuccess,
   defaultWorkspacePackages,
   getWorkspaceStatus,
-  makeWorkspaceSummary,
+  loadWorkspaceSummary,
 } from "../src/index.js";
 
 it.effect("creates the default workspace summary", () =>
   Effect.gen(function* testDefaultSummary() {
-    const summary = yield* makeWorkspaceSummary();
+    const summary = yield* loadWorkspaceSummary();
 
     assert.strictEqual(summary.name, "bundjil");
     assert.strictEqual(
@@ -33,7 +33,7 @@ it.effect("allows a custom workspace name", () =>
   Effect.gen(function* testCustomName() {
     const name =
       yield* Schema.decodeUnknownEffect(BundjilWorkspaceName)("example");
-    const summary = yield* makeWorkspaceSummary(name);
+    const summary = yield* loadWorkspaceSummary(name);
 
     assert.strictEqual(summary.name, "example");
   })

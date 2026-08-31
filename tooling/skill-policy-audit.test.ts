@@ -1,11 +1,13 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, lstatSync, readFileSync, readlinkSync } from "node:fs";
-import { posix, resolve } from "node:path";
+import nodePath from "node:path";
 
 import { describe, expect, it } from "vitest";
 
 import { auditSkills, boundedSkillFindings } from "./skill-policy.js";
 import type { SkillFile, SkillSnapshot } from "./skill-policy.js";
+
+const { posix, resolve } = nodePath;
 
 const repositoryRoot = resolve(import.meta.dirname, "..");
 
@@ -31,7 +33,7 @@ const repositorySnapshot = (): SkillSnapshot => {
       path === "AGENTS.md" ||
       path === "docs/architecture/effect-patterns.md" ||
       path === "docs/architecture/frontend-composition.md" ||
-      (path.startsWith(".agents/skills/") && /\.(?:md|mdx|ya?ml)$/.test(path))
+      (path.startsWith(".agents/skills/") && /\.(?:md|mdx|ya?ml)$/u.test(path))
   );
   const files = selected.map(
     (path): SkillFile => ({
@@ -40,7 +42,7 @@ const repositorySnapshot = (): SkillSnapshot => {
     })
   );
   const links = repositoryPaths
-    .filter((path) => /^\.claude\/skills\/[^/]+$/.test(path))
+    .filter((path) => /^\.claude\/skills\/[^/]+$/u.test(path))
     .map((path) => {
       const absolute = resolve(repositoryRoot, path);
       const isSymbolicLink = lstatSync(absolute).isSymbolicLink();
@@ -203,47 +205,47 @@ describe("HGI-310 documentation-maintenance policy", () => {
     }[] = [
       {
         path: "AGENTS.md",
-        pattern: /\.agents\/skills\/docs-maintainer/g,
+        pattern: /\.agents\/skills\/docs-maintainer/gu,
         replacement: "missing-route",
       },
       {
         path: ".agents/skills/prd-writer/SKILL.md",
-        pattern: /impact design|downstream-impact ledger/g,
+        pattern: /impact design|downstream-impact ledger/gu,
         replacement: "drafting",
       },
       {
         path: ".agents/skills/prd-review/SKILL.md",
-        pattern: /classifying documentation impact/g,
+        pattern: /classifying documentation impact/gu,
         replacement: "checking prose",
       },
       {
         path: ".agents/skills/prd-implementer/SKILL.md",
-        pattern: /before and after|every material implementation slice/g,
+        pattern: /before and after|every material implementation slice/gu,
         replacement: "eventually",
       },
       {
         path: ".agents/skills/docs-maintainer/references/repository-profile.md",
-        pattern: /apps\/agent\/runbooks\/\*\*/g,
+        pattern: /apps\/agent\/runbooks\/\*\*/gu,
         replacement: "missing-agent-runbooks",
       },
       {
         path: ".agents/skills/docs-maintainer/SKILL.md",
-        pattern: /observed data/g,
+        pattern: /observed data/gu,
         replacement: "unclassified data",
       },
       {
         path: ".agents/skills/docs-maintainer/SKILL.md",
-        pattern: /Scheduled or background|background freshness/g,
+        pattern: /Scheduled or background|background freshness/gu,
         replacement: "Unattended",
       },
       {
         path: ".agents/skills/docs-maintainer/SKILL.md",
-        pattern: /clean clone/g,
+        pattern: /clean clone/gu,
         replacement: "checkout",
       },
       {
         path: ".agents/skills/docs-maintainer/SKILL.md",
-        pattern: /lifecycle transition/g,
+        pattern: /lifecycle transition/gu,
         replacement: "document move",
       },
     ];
@@ -302,22 +304,22 @@ describe("HGI-310 documentation-maintenance policy", () => {
     }[] = [
       {
         path: ".agents/skills/docs-maintainer/SKILL.md",
-        pattern: /false green/g,
+        pattern: /false green/gu,
         replacement: "review issue",
       },
       {
         path: ".agents/skills/prd-writer/SKILL.md",
-        pattern: /plausible false green/g,
+        pattern: /plausible false green/gu,
         replacement: "possible issue",
       },
       {
         path: ".agents/skills/prd-review/SKILL.md",
-        pattern: /requirement-to-proof/g,
+        pattern: /requirement-to-proof/gu,
         replacement: "requirements",
       },
       {
         path: ".agents/skills/prd-implementer/SKILL.md",
-        pattern: /proof by proxy/g,
+        pattern: /proof by proxy/gu,
         replacement: "indirect proof",
       },
     ];

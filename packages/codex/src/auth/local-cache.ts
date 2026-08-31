@@ -19,7 +19,7 @@ const decodeCodexCliAuthCache = (input: typeof CodexCliAuthCache.Encoded) =>
     )
   );
 
-export interface CodexLocalAuthCacheSourceShape {
+export interface CodexLocalAuthCacheSourceContract {
   readonly readCache: () => Effect.Effect<
     CodexCliAuthCacheType,
     CodexLocalProfileImportError
@@ -28,7 +28,7 @@ export interface CodexLocalAuthCacheSourceShape {
 
 export class CodexLocalAuthCacheSource extends Context.Service<
   CodexLocalAuthCacheSource,
-  CodexLocalAuthCacheSourceShape
+  CodexLocalAuthCacheSourceContract
 >()("@bundjil/codex/CodexLocalAuthCacheSource") {}
 
 export const CodexLocalAuthCacheSourceLive = Layer.effect(

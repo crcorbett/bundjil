@@ -725,7 +725,7 @@ export type CodexDirectProviderInput = typeof CodexDirectProviderInput.Type;
 
 const OpenAICompatibleProxyHeaderSecret = Schema.NonEmptyString.check(
   Schema.isMaxLength(16_384),
-  Schema.isPattern(/^[\u0021-\u007E]+$/)
+  Schema.isPattern(/^[\u0021-\u007E]+$/u)
 );
 
 export const OpenAICompatibleProxyInternalToken = Schema.RedactedFromValue(
@@ -741,7 +741,7 @@ export const OpenAICompatibleProxyAuthorizationHeader =
   Schema.RedactedFromValue(
     Schema.NonEmptyString.check(
       Schema.isMaxLength(16_391),
-      Schema.isPattern(/^[\u0020-\u007E]+$/)
+      Schema.isPattern(/^[\u0020-\u007E]+$/u)
     ).pipe(Schema.brand("OpenAICompatibleProxyAuthorizationHeader"))
   );
 export type OpenAICompatibleProxyAuthorizationHeader =

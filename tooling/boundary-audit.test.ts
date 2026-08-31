@@ -1,11 +1,13 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import nodePath from "node:path";
 
 import { afterEach, describe, expect, it } from "vitest";
 
 import { auditBoundaryProvenance } from "./boundary-audit.js";
 import type { BoundaryException } from "./boundary-exceptions.js";
+
+const { dirname, join } = nodePath;
 
 const directories: string[] = [];
 const fixture = (source: string, relativePath = "fixture.ts") => {

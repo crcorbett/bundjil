@@ -1,7 +1,7 @@
 import { Schema } from "effect";
 
 export const UpstashPersistenceKeyPrefix = Schema.String.pipe(
-  Schema.check(Schema.isPattern(/^[^*?[\]\\]+$/))
+  Schema.check(Schema.isPattern(/^[^*?[\]\\]+$/u))
 );
 export type UpstashPersistenceKeyPrefix =
   typeof UpstashPersistenceKeyPrefix.Type;

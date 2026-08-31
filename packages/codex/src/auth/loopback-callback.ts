@@ -37,7 +37,7 @@ import type {
 import { CodexSubscriptionAuthError } from "./errors.js";
 import { CodexSubscriptionAuthProtocolConfigService } from "./protocol.js";
 
-export interface CodexLoopbackCallbackShape {
+export interface CodexLoopbackCallbackContract {
   readonly open: (
     expectedState: CodexOAuthState
   ) => Effect.Effect<
@@ -59,7 +59,7 @@ export interface CodexLoopbackCallbackSession {
 
 export class CodexLoopbackCallback extends Context.Service<
   CodexLoopbackCallback,
-  CodexLoopbackCallbackShape
+  CodexLoopbackCallbackContract
 >()("@bundjil/codex/CodexLoopbackCallback") {}
 
 export const decodeCodexOAuthCallbackRequest = Effect.fn(

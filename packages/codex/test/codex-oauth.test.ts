@@ -212,7 +212,7 @@ it.effect("derives stable hashed profile storage keys", () =>
     assert.strictEqual(firstKey, secondKey);
     assert.match(
       firstKey,
-      /^bundjil\/oauth\/v1\/provider\/codex\/profile\/[a-f0-9]{64}$/
+      /^bundjil\/oauth\/v1\/provider\/codex\/profile\/[a-f0-9]{64}$/u
     );
     assert.notInclude(firstKey, subject.principal.id);
     assert.notInclude(firstKey, "access-token-secret");

@@ -1,6 +1,6 @@
 export { AtomicKeyValueStore } from "./atomic-key-value-store.service.js";
 export { AtomicKeyValueStoreError } from "./errors.js";
-export type { AtomicKeyValueStoreShape } from "./atomic-key-value-store.service.js";
+export type { AtomicKeyValueStoreContract } from "./atomic-key-value-store.service.js";
 export {
   AtomicKeyValueStoreCondition,
   AtomicKeyValueStoreKey,

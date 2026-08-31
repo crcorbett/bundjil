@@ -304,7 +304,7 @@ const automationFindings = (
   if (
     freshness !== undefined &&
     (!freshness.selfFeedbackExcluded ||
-      !/separate|approval|not authorized/i.test(freshness.publication))
+      !/separate|approval|not authorized/iu.test(freshness.publication))
   ) {
     findings.push(
       finding(

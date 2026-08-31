@@ -7,7 +7,7 @@ import type {
   AtomicKeyValueStoreTransaction as AtomicKeyValueStoreTransactionType,
 } from "./schemas.js";
 
-export interface AtomicKeyValueStoreShape {
+export interface AtomicKeyValueStoreContract {
   readonly transact: (
     transaction: AtomicKeyValueStoreTransactionType
   ) => Effect.Effect<
@@ -18,7 +18,7 @@ export interface AtomicKeyValueStoreShape {
 
 export class AtomicKeyValueStore extends Context.Service<
   AtomicKeyValueStore,
-  AtomicKeyValueStoreShape
+  AtomicKeyValueStoreContract
 >()("@bundjil/store/AtomicKeyValueStore") {}
 
 /** Internal shared public-boundary validation for both adapters. */

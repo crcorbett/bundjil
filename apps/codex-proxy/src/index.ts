@@ -4,8 +4,8 @@ export {
   CodexProxyAppLive,
   CodexProxyRoutesLive,
   codexProxyWebHandler,
-  makeCodexProxyAppLayer,
-  makeCodexProxyWebHandler,
+  buildCodexProxyAppLayer,
+  createCodexProxyWebHandler,
 } from "./server.js";
 export {
   CodexProxyOpenAICompatibleProxyLive,
@@ -14,17 +14,17 @@ export {
 } from "./live.layer.js";
 export {
   CodexProxyOpenAICompatibleProxyLocalUnavailableLive,
-  makeCodexProxyOpenAICompatibleProxyLocal,
+  buildCodexProxyOpenAICompatibleProxyLocal,
 } from "./local.layer.js";
 export {
   CodexProxyConfig,
   CodexProxyConfigLayer,
   CodexProxyConfigLive,
+  decodeCodexProxyConfig,
   loadCodexProxyConfig,
   loadCodexProxyConfigFromEnv,
   loadCodexProxyDevServerConfig,
   loadCodexProxyDevServerConfigFromEnv,
-  makeCodexProxyConfig,
 } from "./env.js";
 export {
   CodexProxyDevServerConfig,

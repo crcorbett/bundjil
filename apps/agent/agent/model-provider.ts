@@ -79,19 +79,22 @@ export const createAgentModel = (
     Match.when(
       { provider: "codex-proxy" },
       ({ baseURL, internalToken, model, protectionBypass }) => {
-        const provider = createOpenAICompatible({
+        const providerConfig = {
           apiKey: Redacted.value(internalToken),
           baseURL: new URL("/v1", baseURL).toString(),
-          ...(protectionBypass === undefined
-            ? {}
+          name: "bundjil-codex-proxy",
+        };
+        const provider = createOpenAICompatible(
+          protectionBypass === undefined
+            ? providerConfig
             : {
+                ...providerConfig,
                 headers: {
                   "x-vercel-protection-bypass":
                     Redacted.value(protectionBypass),
                 },
-              }),
-          name: "bundjil-codex-proxy",
-        });
+              }
+        );
 
         return provider(model);
       }

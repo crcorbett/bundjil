@@ -30,7 +30,7 @@ const DetailPath = Schema.String.pipe(
   Schema.check(Schema.isMaxLength(200)),
   Schema.check(
     Schema.isPattern(
-      /^docs\/evidence\/verification\/details\/[A-Za-z0-9][A-Za-z0-9._/-]*\.json$/
+      /^docs\/evidence\/verification\/details\/[A-Za-z0-9][A-Za-z0-9._/-]*\.json$/u
     )
   ),
   Schema.check(
@@ -45,7 +45,7 @@ const PacketPath = Schema.String.pipe(
   Schema.check(Schema.isMaxLength(200)),
   Schema.check(
     Schema.isPattern(
-      /^docs\/evidence\/verification\/packets\/[A-Za-z0-9][A-Za-z0-9._/-]*\.json$/
+      /^docs\/evidence\/verification\/packets\/[A-Za-z0-9][A-Za-z0-9._/-]*\.json$/u
     )
   ),
   Schema.check(
@@ -120,7 +120,7 @@ export const EvidenceIndex = Schema.Struct({
   ]),
   owner: BoundedText,
   packetRoot: Schema.String.check(
-    Schema.isPattern(/^docs\/evidence\/verification\/packets\/$/)
+    Schema.isPattern(/^docs\/evidence\/verification\/packets\/$/u)
   ),
   redactionRule: BoundedText,
   requiredProvenance: Texts,
@@ -131,9 +131,9 @@ export const EvidenceIndex = Schema.Struct({
 export const EvidenceIndexJson = Schema.fromJsonString(EvidenceIndex);
 
 const Candidate = Schema.Struct({
-  artifactDigest: Schema.String.check(Schema.isPattern(/^[a-f0-9]{64}$/)),
-  repositoryCommit: Schema.String.check(Schema.isPattern(/^[a-f0-9]{40}$/)),
-  sourceDigest: Schema.String.check(Schema.isPattern(/^[a-f0-9]{64}$/)),
+  artifactDigest: Schema.String.check(Schema.isPattern(/^[a-f0-9]{64}$/u)),
+  repositoryCommit: Schema.String.check(Schema.isPattern(/^[a-f0-9]{40}$/u)),
+  sourceDigest: Schema.String.check(Schema.isPattern(/^[a-f0-9]{64}$/u)),
 });
 const Authority = Schema.Struct({
   approvalReceipt: Schema.NullOr(BoundedText),
@@ -153,7 +153,7 @@ const JourneyResult = Schema.Struct({
 });
 const CommandReceipt = Schema.Struct({
   detailPath: DetailPath,
-  detailSha256: Schema.String.check(Schema.isPattern(/^[a-f0-9]{64}$/)),
+  detailSha256: Schema.String.check(Schema.isPattern(/^[a-f0-9]{64}$/u)),
   exitCode: Schema.NullOr(Schema.Int),
   invariant: BoundedText,
   invocation: BoundedText,
@@ -204,7 +204,7 @@ const Rollback = Schema.Struct({
 const Evidence = Schema.Struct({
   path: DetailPath,
   provenance: BoundedText,
-  sha256: Schema.String.check(Schema.isPattern(/^[a-f0-9]{64}$/)),
+  sha256: Schema.String.check(Schema.isPattern(/^[a-f0-9]{64}$/u)),
 });
 export const ProofPacket = Schema.Struct({
   authority: Authority,
@@ -293,9 +293,9 @@ const expectedJourneyIds = [
 ] as const;
 
 const prohibitedOutput =
-  /(?:authorization:\s*(?:sk-|eyJ|[A-Fa-f0-9]{32,})\S*|bearer\s+(?:sk-|eyJ|[A-Fa-f0-9]{32,})\S*|(?:token|secret)\s*[:=]\s*\S+|\/Users\/|\/home\/)/i;
+  /(?:authorization:\s*(?:sk-|eyJ|[A-Fa-f0-9]{32,})\S*|bearer\s+(?:sk-|eyJ|[A-Fa-f0-9]{32,})\S*|(?:token|secret)\s*[:=]\s*\S+|\/Users\/|\/home\/)/iu;
 const insideEvidenceRoot = (path: string) =>
-  /^docs\/evidence\/verification\/details\/[A-Za-z0-9][A-Za-z0-9._/-]*\.json$/.test(
+  /^docs\/evidence\/verification\/details\/[A-Za-z0-9][A-Za-z0-9._/-]*\.json$/u.test(
     path
   ) && !path.includes("..");
 const maximumDetailBytes = 256_000;
@@ -660,7 +660,7 @@ const auditPacketLifecycle = (packet: ProofPacket, add: AddFinding) => {
     );
   }
   if (
-    !/^\d{4}-\d{2}-\d{2}T.*Z$/.test(packet.observedAt) ||
+    !/^\d{4}-\d{2}-\d{2}T.*Z$/u.test(packet.observedAt) ||
     Number.isNaN(Date.parse(packet.observedAt))
   ) {
     add(

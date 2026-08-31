@@ -7,7 +7,7 @@ import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
 import type { CodexOAuthSubjectHash } from "../auth/credentials.js";
 import { CodexOAuthProfileCipher } from "../profiles/cipher.js";
-import type { CodexOAuthProfileCipherShape } from "../profiles/cipher.js";
+import type { CodexOAuthProfileCipherContract } from "../profiles/cipher.js";
 import { CodexOAuthProfileCommit } from "../profiles/commit.js";
 import {
   CodexAccessTokenImportProfile,
@@ -36,7 +36,7 @@ import {
   codexOAuthRefreshLockStorageKey,
 } from "../profiles/keys.js";
 import { CodexOAuthObserver } from "../profiles/observer.js";
-import type { CodexOAuthObserverShape } from "../profiles/observer.js";
+import type { CodexOAuthObserverContract } from "../profiles/observer.js";
 import { CodexOAuthRefreshLock } from "../profiles/refresh-lock.js";
 
 const encryptedCodexOAuthProfileV2Json = Schema.fromJsonString(
@@ -77,8 +77,8 @@ const profileCommitError = (
 
 const transactProfileCommit = (
   atomic: AtomicKeyValueStore["Service"],
-  cipher: CodexOAuthProfileCipherShape,
-  observer: Option.Option<CodexOAuthObserverShape>,
+  cipher: CodexOAuthProfileCipherContract,
+  observer: Option.Option<CodexOAuthObserverContract>,
   operation: CodexOAuthProfileCommitOperation,
   profile: CodexSubscriptionProfile,
   expectedRevision?: string,

@@ -26,7 +26,7 @@ import {
   decodeCodexAccountMetadata,
 } from "./token-metadata.js";
 
-export interface CodexSubscriptionLoginShape {
+export interface CodexSubscriptionLoginContract {
   readonly run: (
     input: CodexSubscriptionLoginInput
   ) => Effect.Effect<
@@ -37,7 +37,7 @@ export interface CodexSubscriptionLoginShape {
 
 export class CodexSubscriptionLogin extends Context.Service<
   CodexSubscriptionLogin,
-  CodexSubscriptionLoginShape
+  CodexSubscriptionLoginContract
 >()("@bundjil/codex/CodexSubscriptionLogin") {}
 
 export const makeCodexSubscriptionLogin = Effect.gen(

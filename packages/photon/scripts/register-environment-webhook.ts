@@ -1,4 +1,4 @@
-import { dirname, isAbsolute } from "node:path";
+import nodePath from "node:path";
 
 import * as BunFileSystem from "@effect/platform-bun/BunFileSystem";
 import * as BunHttpClient from "@effect/platform-bun/BunHttpClient";
@@ -31,6 +31,8 @@ import { PhotonProviderProofError } from "../src/provider-proof.error.js";
 import { loadPhotonEnvironmentWebhookProviderConfig } from "../src/provider-proof.js";
 import { PhotonWebhookId } from "../src/schemas.js";
 
+const { dirname, isAbsolute } = nodePath;
+
 declare const process: { exitCode: number | undefined };
 
 const PhotonWebhookBindingPath = Schema.NonEmptyString.pipe(
@@ -47,7 +49,7 @@ const PhotonWebhookAuthorityPath = Schema.String.pipe(
     Schema.makeFilter((value) =>
       value.length > 0 &&
       value.length <= 240 &&
-      /^[A-Za-z0-9._/-]+$/.test(value) &&
+      /^[A-Za-z0-9._/-]+$/u.test(value) &&
       !isAbsolute(value) &&
       !value.split("/").includes("..")
         ? undefined

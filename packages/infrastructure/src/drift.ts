@@ -23,7 +23,7 @@ export const InfrastructureDriftArtifactPath = Schema.String.pipe(
     Schema.makeFilter((value) =>
       value.length > 0 &&
       value.length <= 240 &&
-      /^[A-Za-z0-9._/-]+$/.test(value) &&
+      /^[A-Za-z0-9._/-]+$/u.test(value) &&
       !value.startsWith("/") &&
       !value.split("/").includes("..")
         ? undefined
@@ -38,7 +38,7 @@ export type InfrastructureDriftArtifactPathEncoded =
   typeof InfrastructureDriftArtifactPath.Encoded;
 
 export const InfrastructureDriftResourceFingerprint = Schema.String.pipe(
-  Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/)),
+  Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/u)),
   Schema.brand("@bundjil/infrastructure/InfrastructureDriftResourceFingerprint")
 );
 export type InfrastructureDriftResourceFingerprint =
@@ -47,7 +47,7 @@ export type InfrastructureDriftResourceFingerprintEncoded =
   typeof InfrastructureDriftResourceFingerprint.Encoded;
 
 export const InfrastructureDriftSourceSha = Schema.String.pipe(
-  Schema.check(Schema.isPattern(/^[a-f0-9]{40}$/)),
+  Schema.check(Schema.isPattern(/^[a-f0-9]{40}$/u)),
   Schema.brand("@bundjil/infrastructure/InfrastructureDriftSourceSha")
 );
 export type InfrastructureDriftSourceSha =
@@ -58,7 +58,7 @@ export type InfrastructureDriftSourceShaEncoded =
 export const InfrastructureDriftRunIdentity = Schema.String.pipe(
   Schema.check(
     Schema.isPattern(
-      /^github-actions:crcorbett\/bundjil:[1-9][0-9]*:[1-9][0-9]*$/
+      /^github-actions:crcorbett\/bundjil:[1-9][0-9]*:[1-9][0-9]*$/u
     )
   ),
   Schema.brand("@bundjil/infrastructure/InfrastructureDriftRunIdentity")
@@ -243,7 +243,7 @@ export const InfrastructureDriftReportInput = Schema.Struct({
   manifestDigest: AdoptionManifestDigest,
   observedAt: Schema.String.pipe(
     Schema.check(
-      Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/)
+      Schema.isPattern(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/u)
     )
   ),
   desiredPlan: InfrastructureDriftDesiredPlan,

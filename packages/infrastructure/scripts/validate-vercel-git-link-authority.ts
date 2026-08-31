@@ -1,4 +1,4 @@
-import { isAbsolute } from "node:path";
+import nodePath from "node:path";
 
 import * as BunFileSystem from "@effect/platform-bun/BunFileSystem";
 import { Ajv2020 } from "ajv/dist/2020.js";
@@ -16,6 +16,8 @@ import {
 import authorityEnvelopeSchema from "../../../.agents/skills/docs-maintainer/assets/harness/authority-envelope.schema.json" with { type: "json" };
 import vercelGitLinkAuthorityPolicy from "../schemas/vercel-git-link-authority.schema.json" with { type: "json" };
 
+const { isAbsolute } = nodePath;
+
 declare const process: {
   exitCode: number | undefined;
 };
@@ -25,7 +27,7 @@ const VercelGitLinkAuthorityPath = Schema.String.pipe(
     Schema.makeFilter((value) =>
       value.length > 0 &&
       value.length <= 240 &&
-      /^[A-Za-z0-9._/-]+$/.test(value) &&
+      /^[A-Za-z0-9._/-]+$/u.test(value) &&
       !isAbsolute(value) &&
       !value.split("/").includes("..")
         ? undefined

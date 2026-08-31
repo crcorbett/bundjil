@@ -77,4 +77,4 @@ export type {
   ChannelWebhookResultEncoded,
 } from "./schemas.js";
 export { ChannelTransport } from "./service.js";
-export type { ChannelTransportShape } from "./service.js";
+export type { ChannelTransportContract } from "./service.js";

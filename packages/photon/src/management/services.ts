@@ -36,7 +36,7 @@ import type {
   PhotonWebhookObservation,
 } from "./schemas.js";
 
-export interface PhotonProjectsShape {
+export interface PhotonProjectsContract {
   readonly observeProject: (
     input: ObservePhotonProject
   ) => Effect.Effect<PhotonProjectObservation, PhotonProjectsReadError>;
@@ -44,10 +44,10 @@ export interface PhotonProjectsShape {
 
 export class PhotonProjects extends Context.Service<
   PhotonProjects,
-  PhotonProjectsShape
+  PhotonProjectsContract
 >()("@bundjil/photon/management/PhotonProjects") {}
 
-export interface PhotonPlatformsShape {
+export interface PhotonPlatformsContract {
   readonly observePlatform: (
     input: ObservePhotonPlatform
   ) => Effect.Effect<PhotonPlatformObservation, PhotonPlatformsReadError>;
@@ -55,10 +55,10 @@ export interface PhotonPlatformsShape {
 
 export class PhotonPlatforms extends Context.Service<
   PhotonPlatforms,
-  PhotonPlatformsShape
+  PhotonPlatformsContract
 >()("@bundjil/photon/management/PhotonPlatforms") {}
 
-export interface PhotonSharedUsersShape {
+export interface PhotonSharedUsersContract {
   readonly listSharedUsers: (
     input: ListPhotonSharedUsers
   ) => Effect.Effect<ListedPhotonSharedUsers, PhotonSharedUsersReadError>;
@@ -72,10 +72,10 @@ export interface PhotonSharedUsersShape {
 
 export class PhotonSharedUsers extends Context.Service<
   PhotonSharedUsers,
-  PhotonSharedUsersShape
+  PhotonSharedUsersContract
 >()("@bundjil/photon/management/PhotonSharedUsers") {}
 
-export interface PhotonWebhooksShape {
+export interface PhotonWebhooksContract {
   readonly listWebhooks: (
     input: ListPhotonWebhooks
   ) => Effect.Effect<ListedPhotonWebhooks, PhotonWebhooksReadError>;
@@ -89,10 +89,10 @@ export interface PhotonWebhooksShape {
 
 export class PhotonWebhooks extends Context.Service<
   PhotonWebhooks,
-  PhotonWebhooksShape
+  PhotonWebhooksContract
 >()("@bundjil/photon/management/PhotonWebhooks") {}
 
-export interface PhotonLinesShape {
+export interface PhotonLinesContract {
   readonly listLines: (
     input: ListPhotonLines
   ) => Effect.Effect<ListedPhotonLines, PhotonLinesReadError>;
@@ -103,10 +103,10 @@ export interface PhotonLinesShape {
 
 export class PhotonLines extends Context.Service<
   PhotonLines,
-  PhotonLinesShape
+  PhotonLinesContract
 >()("@bundjil/photon/management/PhotonLines") {}
 
-export interface PhotonBillingShape {
+export interface PhotonBillingContract {
   readonly observeBilling: (
     input: ObservePhotonBilling
   ) => Effect.Effect<PhotonBillingObservation, PhotonBillingReadError>;
@@ -114,5 +114,5 @@ export interface PhotonBillingShape {
 
 export class PhotonBilling extends Context.Service<
   PhotonBilling,
-  PhotonBillingShape
+  PhotonBillingContract
 >()("@bundjil/photon/management/PhotonBilling") {}

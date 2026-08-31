@@ -42,7 +42,7 @@ import {
 } from "./services.js";
 import type { UpdateVercelStableEnvironmentVariable } from "./stable-environment.js";
 
-export interface VercelMemoryControlShape {
+export interface VercelMemoryControlContract {
   readonly snapshot: Effect.Effect<VercelReadOnlyInventoryType>;
   readonly providerWriteCount: Effect.Effect<number>;
   readonly stableEnvironmentAttemptCount: Effect.Effect<number>;
@@ -57,7 +57,7 @@ export interface VercelMemoryControlShape {
 
 export class VercelMemoryControl extends Context.Service<
   VercelMemoryControl,
-  VercelMemoryControlShape
+  VercelMemoryControlContract
 >()("@bundjil/infrastructure/vercel/VercelMemoryControl") {}
 
 export const layerVercelMemory = (inventory: VercelReadOnlyInventoryType) =>

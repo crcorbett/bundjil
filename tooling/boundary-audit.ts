@@ -1,11 +1,13 @@
 import { readdirSync } from "node:fs";
-import { relative, resolve, sep } from "node:path";
+import nodePath from "node:path";
 
 import { Console, Data, Effect, pipe } from "effect";
 import ts from "typescript";
 
 import { boundaryExceptions } from "./boundary-exceptions.js";
 import type { BoundaryException, BoundaryRule } from "./boundary-exceptions.js";
+
+const { relative, resolve, sep } = nodePath;
 
 export type BoundaryDiagnostic = Readonly<{
   file: string;
@@ -23,7 +25,7 @@ type AuditOptions = Readonly<{
 }>;
 
 const productionFile = (file: string) =>
-  /\.(?:[cm]?ts|tsx)$/.test(file) &&
+  /\.(?:[cm]?ts|tsx)$/u.test(file) &&
   !file.includes(`${sep}test${sep}`) &&
   !file.endsWith(".test.ts") &&
   !file.includes(`${sep}node_modules${sep}`) &&
@@ -188,7 +190,7 @@ const occurrence = (node: ts.Node) => {
   if (ts.isParameter(node) && ts.isIdentifier(node.name)) {
     return `parameter:${node.name.text}`;
   }
-  return `${ts.SyntaxKind[node.kind]}:${node.getText().replaceAll(/\s+/g, " ")}`;
+  return `${ts.SyntaxKind[node.kind]}:${node.getText().replaceAll(/\s+/gu, " ")}`;
 };
 
 const isSchemaSideType = (
@@ -371,7 +373,7 @@ const codecMisuse = (
     : undefined;
   const annotationSide =
     inputAnnotation !== undefined && ts.isIndexedAccessTypeNode(inputAnnotation)
-      ? inputAnnotation.indexType.getText().replaceAll(/["']/g, "")
+      ? inputAnnotation.indexType.getText().replaceAll(/["']/gu, "")
       : null;
   return annotationSide === expectedSide &&
     checker.isTypeAssignableTo(inputType, expected)

@@ -14,7 +14,7 @@ import type {
   ChannelWebhookResult,
 } from "./schemas.js";
 
-export interface ChannelTransportShape {
+export interface ChannelTransportContract {
   readonly decodeWebhook: (
     request: Request
   ) => Effect.Effect<ChannelWebhookResult, ChannelWebhookError>;
@@ -28,5 +28,5 @@ export interface ChannelTransportShape {
 
 export class ChannelTransport extends Context.Service<
   ChannelTransport,
-  ChannelTransportShape
+  ChannelTransportContract
 >()("@bundjil/channel/ChannelTransport") {}

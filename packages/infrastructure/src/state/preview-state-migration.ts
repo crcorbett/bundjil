@@ -1,6 +1,6 @@
 /* oxlint-disable max-classes-per-file, unicorn/no-array-method-this-argument -- The exact migration, backup capability and safe failure form one state-only boundary; Effect.forEach is not Array.prototype.forEach. */
 import { createHash } from "node:crypto";
-import { dirname, isAbsolute } from "node:path";
+import nodePath from "node:path";
 
 import { State } from "alchemy/State";
 import {
@@ -21,11 +21,13 @@ import {
   InfrastructureStage,
 } from "../schemas.js";
 
+const { dirname, isAbsolute } = nodePath;
+
 const sha256 = (value: string) =>
   createHash("sha256").update(value).digest("hex");
 
 export const PreviewStateResourceFingerprint = Schema.String.pipe(
-  Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/)),
+  Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/u)),
   Schema.brand("@bundjil/infrastructure/state/PreviewStateResourceFingerprint")
 );
 export type PreviewStateResourceFingerprint =
@@ -38,7 +40,7 @@ export const PreviewStateBackupPath = Schema.String.pipe(
     Schema.makeFilter((value) =>
       value.length > 0 &&
       value.length <= 240 &&
-      /^[A-Za-z0-9._/-]+$/.test(value) &&
+      /^[A-Za-z0-9._/-]+$/u.test(value) &&
       !isAbsolute(value) &&
       !value.split("/").includes("..")
         ? undefined
@@ -226,16 +228,16 @@ const migrationError = (
     readonly expectedCount: number;
   }
 ) =>
-  new PreviewStateMigrationError({
-    reason,
-    message: PreviewStateMigrationErrorMessage.make(message),
-    ...(counts === undefined
-      ? {}
+  new PreviewStateMigrationError(
+    counts === undefined
+      ? { reason, message: PreviewStateMigrationErrorMessage.make(message) }
       : {
+          reason,
+          message: PreviewStateMigrationErrorMessage.make(message),
           observedCount: PreviewStateMigrationCount.make(counts.observedCount),
           expectedCount: PreviewStateMigrationCount.make(counts.expectedCount),
-        }),
-  });
+        }
+  );
 
 export class PreviewStateBackupStore extends Context.Service<
   PreviewStateBackupStore,
@@ -668,7 +670,7 @@ export const makePreviewStateMigrationLayer = (
           yield* Effect.forEach(
             backup.resources,
             (resource) => {
-              const value = {
+              const requiredValue = {
                 resourceType: resource.resourceType,
                 namespace: resource.namespace,
                 fqn: resource.fqn,
@@ -684,8 +686,11 @@ export const makePreviewStateMigrationLayer = (
                 props: { ...resource.props },
                 attr: { ...resource.attr },
                 removalPolicy: resource.removalPolicy,
-                ...(resource.kind === undefined ? {} : { kind: resource.kind }),
               };
+              const value =
+                resource.kind === undefined
+                  ? requiredValue
+                  : { ...requiredValue, kind: resource.kind };
               return state
                 .set({
                   stack: backup.stack,
@@ -814,7 +819,7 @@ export const makePreviewStateBackupStoreMemory = () => {
   );
 };
 
-export const makePreviewStateBackupStoreLive = (
+export const buildPreviewStateBackupStoreLive = (
   path: PreviewStateBackupPath,
   forbiddenValues: readonly PreviewStateForbiddenValue[]
 ) =>

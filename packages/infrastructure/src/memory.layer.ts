@@ -75,7 +75,7 @@ export type SyntheticMemoryWriteCount = typeof SyntheticMemoryWriteCount.Type;
 export type SyntheticMemoryWriteCountEncoded =
   typeof SyntheticMemoryWriteCount.Encoded;
 
-export interface SyntheticResourcesMemoryControlShape {
+export interface SyntheticResourcesMemoryControlContract {
   readonly setFailureMode: (
     mode: SyntheticMemoryFailureMode
   ) => Effect.Effect<void>;
@@ -89,7 +89,7 @@ export interface SyntheticResourcesMemoryControlShape {
 
 export class SyntheticResourcesMemoryControl extends Context.Service<
   SyntheticResourcesMemoryControl,
-  SyntheticResourcesMemoryControlShape
+  SyntheticResourcesMemoryControlContract
 >()("@bundjil/infrastructure/SyntheticResourcesMemoryControl") {}
 
 export const layerMemory = (config: SyntheticMemoryConfig) =>

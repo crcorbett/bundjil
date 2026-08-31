@@ -11,7 +11,7 @@ import type {
   ChannelPreparedInbound,
 } from "./schemas.js";
 
-export interface EveChannelDispatchShape {
+export interface EveChannelDispatchContract {
   readonly dispatch: (
     input: ChannelPreparedInbound,
     attempt: ChannelHandoffAttempt
@@ -20,7 +20,7 @@ export interface EveChannelDispatchShape {
 
 export class EveChannelDispatch extends Context.Service<
   EveChannelDispatch,
-  EveChannelDispatchShape
+  EveChannelDispatchContract
 >()("@bundjil/agent/EveChannelDispatch") {}
 
 export const layerMemory = Layer.effect(

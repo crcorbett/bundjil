@@ -296,6 +296,23 @@ const liveLayer = (client: HttpClient.HttpClient) =>
     )
   );
 
+const vercelFailureResponse = (status: number, body: unknown) =>
+  HttpClient.make((request) =>
+    Effect.succeed(
+      HttpClientResponse.fromWeb(
+        request,
+        Response.json(body, {
+          status,
+          headers: {
+            "retry-after": "2",
+            "x-ratelimit-remaining": "0",
+            "x-ratelimit-reset": "10",
+          },
+        })
+      )
+    )
+  );
+
 it.effect(
   "routes project-scoped token bindings by branded project ID and rejects team-wide project enumeration",
   () => {
@@ -731,29 +748,13 @@ it.effect("classifies 404, 429, and malformed live envelopes safely", () =>
     if (project === undefined) {
       return yield* Effect.die("The Vercel failure fixture is incomplete.");
     }
-    const responseFor = (status: number, body: unknown) =>
-      HttpClient.make((request) =>
-        Effect.succeed(
-          HttpClientResponse.fromWeb(
-            request,
-            Response.json(body, {
-              status,
-              headers: {
-                "retry-after": "2",
-                "x-ratelimit-remaining": "0",
-                "x-ratelimit-reset": "10",
-              },
-            })
-          )
-        )
-      );
     const missing = yield* Effect.gen(function* observeMissingProject() {
       const projects = yield* VercelProjects;
       return yield* projects.observeProject(ObserveVercelProject.make(project));
     }).pipe(
       Effect.provide(
         liveLayer(
-          responseFor(404, {
+          vercelFailureResponse(404, {
             error: { code: "not_found", message: "sentinel raw body" },
           })
         )
@@ -767,7 +768,7 @@ it.effect("classifies 404, 429, and malformed live envelopes safely", () =>
     }).pipe(
       Effect.provide(
         liveLayer(
-          responseFor(429, {
+          vercelFailureResponse(429, {
             error: { code: "rate_limited", message: "sentinel raw body" },
           })
         )
@@ -784,7 +785,9 @@ it.effect("classifies 404, 429, and malformed live envelopes safely", () =>
       const projects = yield* VercelProjects;
       return yield* projects.listProjects(ListVercelProjects.make(project));
     }).pipe(
-      Effect.provide(liveLayer(responseFor(200, { projects: "wrong" }))),
+      Effect.provide(
+        liveLayer(vercelFailureResponse(200, { projects: "wrong" }))
+      ),
       Effect.exit
     );
     assert.strictEqual(Exit.isFailure(malformed), true);
@@ -795,7 +798,7 @@ it.effect("classifies 404, 429, and malformed live envelopes safely", () =>
     }).pipe(
       Effect.provide(
         liveLayer(
-          responseFor(503, {
+          vercelFailureResponse(503, {
             error: { code: "unavailable", message: "sentinel raw body" },
           })
         )

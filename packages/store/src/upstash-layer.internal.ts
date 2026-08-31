@@ -33,6 +33,12 @@ const UpstashScanPage = Schema.Tuple([
   Schema.Array(Schema.String),
 ]);
 const UpstashTransactionResponse = Schema.Literals([0, 1]);
+
+const persistenceError = (method: string) =>
+  new KeyValueStore.KeyValueStoreError({
+    method,
+    message: "Unable to access the persistence store.",
+  });
 const UpstashAtomicCommand = Schema.Struct({
   keys: Schema.Array(Schema.String),
   args: Schema.Array(Schema.String),
@@ -135,18 +141,13 @@ export const serializeUpstashAtomicCommand = Effect.fn(
   return yield* Schema.decodeEffect(UpstashAtomicCommand)(command);
 });
 
-export const makeUpstashPersistenceLayer = (
+export const buildUpstashPersistenceLayer = (
   options: UpstashPersistenceOptions,
   clientFactory: UpstashPersistenceClientFactory
 ) =>
   Layer.effectContext(
     Effect.sync(() => {
       const client = clientFactory();
-      const error = (method: string) =>
-        new KeyValueStore.KeyValueStoreError({
-          method,
-          message: "Unable to access the persistence store.",
-        });
       const scanKeys = Effect.fn("UpstashPersistence.scanKeys")(function* () {
         let cursor = "0";
         let keys = HashSet.empty<string>();
@@ -190,7 +191,7 @@ export const makeUpstashPersistenceLayer = (
           }).pipe(
             Effect.flatMap(Schema.decodeUnknownEffect(UpstashGetResponse)),
             Effect.map((value) => value ?? undefined),
-            Effect.mapError(() => error("get")),
+            Effect.mapError(() => persistenceError("get")),
             Effect.withSpan("UpstashPersistence.get")
           ),
         set: (logical, value) =>
@@ -200,7 +201,7 @@ export const makeUpstashPersistenceLayer = (
             catch: (cause) => new UpstashPersistenceProviderError({ cause }),
           }).pipe(
             Effect.asVoid,
-            Effect.mapError(() => error("set")),
+            Effect.mapError(() => persistenceError("set")),
             Effect.withSpan("UpstashPersistence.set")
           ),
         remove: (logical) =>
@@ -209,7 +210,7 @@ export const makeUpstashPersistenceLayer = (
             catch: (cause) => new UpstashPersistenceProviderError({ cause }),
           }).pipe(
             Effect.asVoid,
-            Effect.mapError(() => error("remove")),
+            Effect.mapError(() => persistenceError("remove")),
             Effect.withSpan("UpstashPersistence.remove")
           ),
         clear: scanKeys().pipe(
@@ -232,12 +233,12 @@ export const makeUpstashPersistenceLayer = (
               );
             })
           ),
-          Effect.mapError(() => error("clear")),
+          Effect.mapError(() => persistenceError("clear")),
           Effect.withSpan("UpstashPersistence.clear")
         ),
         size: scanKeys().pipe(
           Effect.map(HashSet.size),
-          Effect.mapError(() => error("size")),
+          Effect.mapError(() => persistenceError("size")),
           Effect.withSpan("UpstashPersistence.size")
         ),
       });

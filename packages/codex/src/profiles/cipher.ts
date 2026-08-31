@@ -45,7 +45,7 @@ const migrateLegacyCodexOAuthProfile = (
   requiresReauthentication: profile.requiresReauthentication,
 });
 
-export interface CodexOAuthProfileCipherShape {
+export interface CodexOAuthProfileCipherContract {
   readonly encrypt: (
     profile: CodexOAuthProfileType
   ) => Effect.Effect<
@@ -59,7 +59,7 @@ export interface CodexOAuthProfileCipherShape {
 
 export class CodexOAuthProfileCipher extends Context.Service<
   CodexOAuthProfileCipher,
-  CodexOAuthProfileCipherShape
+  CodexOAuthProfileCipherContract
 >()("@bundjil/codex/CodexOAuthProfileCipher") {}
 
 export const makeCodexOAuthProfileCipher = Effect.fn(

@@ -68,7 +68,7 @@ export class PhotonWebhookBindingWriteError extends Schema.TaggedErrorClass<Phot
   }
 ) {}
 
-export interface PhotonWebhookBindingSinkShape {
+export interface PhotonWebhookBindingSinkContract {
   readonly persistPreviewWebhookBinding: (
     input: PhotonWebhookBindingWrite
   ) => Effect.Effect<SecretReference, PhotonWebhookBindingWriteError>;
@@ -76,5 +76,5 @@ export interface PhotonWebhookBindingSinkShape {
 
 export class PhotonWebhookBindingSink extends Context.Service<
   PhotonWebhookBindingSink,
-  PhotonWebhookBindingSinkShape
+  PhotonWebhookBindingSinkContract
 >()("@bundjil/infrastructure/photon/PhotonWebhookBindingSink") {}

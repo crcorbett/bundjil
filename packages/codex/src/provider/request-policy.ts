@@ -2,13 +2,13 @@ import { Context, Layer } from "effect";
 
 import type { CodexResponsesRequestPolicy } from "./contracts.js";
 
-export interface CodexResponsesRequestPolicyServiceShape {
+export interface CodexResponsesRequestPolicyServiceContract {
   readonly policy: CodexResponsesRequestPolicy;
 }
 
 export class CodexResponsesRequestPolicyService extends Context.Service<
   CodexResponsesRequestPolicyService,
-  CodexResponsesRequestPolicyServiceShape
+  CodexResponsesRequestPolicyServiceContract
 >()("@bundjil/codex/CodexResponsesRequestPolicyService") {}
 
 export const makeCodexResponsesRequestPolicyLayer = (

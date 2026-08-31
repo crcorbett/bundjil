@@ -152,17 +152,22 @@ const writeFailure = (
   message: string,
   uncertain = false,
   providerFailure?: VercelStableEnvironmentProviderFailure
-) =>
-  new VercelStableEnvironmentWriteError({
+) => {
+  const failure = {
     operation,
     reason,
     retry: uncertain ? "readbackRequired" : "never",
     certainty: uncertain
       ? { _tag: "Uncertain", recovery: "operatorReview" }
       : { _tag: "Known" },
-    ...(providerFailure === undefined ? {} : { providerFailure }),
     message,
-  });
+  } satisfies ConstructorParameters<
+    typeof VercelStableEnvironmentWriteError
+  >[0];
+  return new VercelStableEnvironmentWriteError(
+    providerFailure === undefined ? failure : { ...failure, providerFailure }
+  );
+};
 
 export const VercelPreviewPhotonBindingValuesLive = Layer.succeed(
   VercelPreviewPhotonBindingValues,

@@ -66,7 +66,7 @@ export const CodexProxyMockDirectProviderLive = Layer.succeed(
   }
 );
 
-export const makeCodexProxyOpenAICompatibleProxyMockLive = (
+export const buildCodexProxyOpenAICompatibleProxyMockLive = (
   internalToken: Parameters<typeof makeOpenAICompatibleProxy>[0]
 ) =>
   Layer.effect(

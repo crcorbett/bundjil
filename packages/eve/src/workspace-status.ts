@@ -26,8 +26,8 @@ export const WorkspaceSummary = Schema.Struct({
   packages: Schema.Array(BundjilPackageName),
 });
 export type WorkspaceSummary = typeof WorkspaceSummary.Type;
-export const makeWorkspaceSummary = Effect.fn("WorkspaceSummary.make")(
-  function* makeWorkspaceSummary(
+export const loadWorkspaceSummary = Effect.fn("WorkspaceSummary.make")(
+  function* loadWorkspaceSummary(
     name?: BundjilWorkspaceName
   ): Effect.fn.Return<WorkspaceSummary, Schema.SchemaError> {
     const workspaceName =

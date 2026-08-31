@@ -80,19 +80,21 @@ export const loadAgentModelProviderConfig = Effect.gen(
               modelContextWindowTokens,
               protectionBypass,
               proxyModel,
-            }) =>
-              ({
+            }) => {
+              const common = {
                 baseURL,
                 internalToken,
                 model: Option.isNone(proxyModel) ? model : proxyModel.value,
                 modelContextWindowTokens,
-                ...(Option.isNone(protectionBypass)
-                  ? {}
-                  : {
-                      protectionBypass: protectionBypass.value,
-                    }),
                 provider: "codex-proxy",
-              }) satisfies AgentCodexProxyModelProviderConfig
+              } satisfies AgentCodexProxyModelProviderConfig;
+              return Option.isNone(protectionBypass)
+                ? common
+                : ({
+                    ...common,
+                    protectionBypass: protectionBypass.value,
+                  } satisfies AgentCodexProxyModelProviderConfig);
+            }
           )
         )
       ),
@@ -122,13 +124,14 @@ export const loadAgentConfig: () => Effect.Effect<
 > = Effect.fn("AgentConfig.load")(function* () {
   const modelProvider = yield* loadAgentModelProviderConfig;
 
-  return {
-    model: createAgentModel(modelProvider),
-    ...(modelProvider.provider === "codex-proxy"
-      ? { modelContextWindowTokens: modelProvider.modelContextWindowTokens }
-      : {}),
-    modelProvider,
-  };
+  const model = createAgentModel(modelProvider);
+  return modelProvider.provider === "codex-proxy"
+    ? {
+        model,
+        modelContextWindowTokens: modelProvider.modelContextWindowTokens,
+        modelProvider,
+      }
+    : { model, modelProvider };
 });
 
 export const loadAgentConfigFromEnv = loadAgentConfig().pipe(

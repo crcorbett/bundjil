@@ -4,7 +4,7 @@ import { provePhotonSdkLifecycle } from "./client.js";
 import { PhotonProviderProofError } from "./provider-proof.error.js";
 import type { PhotonConfig } from "./schemas.js";
 
-interface PhotonLifecycleProbeShape {
+interface PhotonLifecycleProbeContract {
   readonly run: (
     config: PhotonConfig
   ) => Effect.Effect<void, PhotonProviderProofError>;
@@ -12,7 +12,7 @@ interface PhotonLifecycleProbeShape {
 
 export class PhotonLifecycleProbe extends Context.Service<
   PhotonLifecycleProbe,
-  PhotonLifecycleProbeShape
+  PhotonLifecycleProbeContract
 >()("@bundjil/photon/PhotonLifecycleProbe") {}
 
 export const layerPhotonLifecycleProbeLive = Layer.succeed(

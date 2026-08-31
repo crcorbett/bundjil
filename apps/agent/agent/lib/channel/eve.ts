@@ -145,7 +145,7 @@ export const makeChannelEveEvents = <E>(
   };
 };
 
-export const makeChannelEveChannel = <E>(
+export const createChannelEveChannel = <E>(
   channelRuntime: ManagedRuntime.ManagedRuntime<Channel | ChannelHandoff, E>,
   webhookPath: ChannelWebhookPath,
   proofPolicy: ChannelWebhookProofPolicy

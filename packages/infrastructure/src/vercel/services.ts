@@ -38,7 +38,7 @@ import type {
   VercelCredentialScope,
 } from "./schemas.js";
 
-export interface VercelCredentialsShape {
+export interface VercelCredentialsContract {
   readonly accessToken: (
     scope: VercelCredentialScope
   ) => Effect.Effect<VercelAccessToken, VercelCredentialError>;
@@ -46,10 +46,10 @@ export interface VercelCredentialsShape {
 
 export class VercelCredentials extends Context.Service<
   VercelCredentials,
-  VercelCredentialsShape
+  VercelCredentialsContract
 >()("@bundjil/infrastructure/vercel/VercelCredentials") {}
 
-export interface VercelProjectsShape {
+export interface VercelProjectsContract {
   readonly discoverProject: (
     input: DiscoverVercelProject
   ) => Effect.Effect<VercelProjectDiscovery, VercelProjectsReadError>;
@@ -63,10 +63,10 @@ export interface VercelProjectsShape {
 
 export class VercelProjects extends Context.Service<
   VercelProjects,
-  VercelProjectsShape
+  VercelProjectsContract
 >()("@bundjil/infrastructure/vercel/VercelProjects") {}
 
-export interface VercelDomainsShape {
+export interface VercelDomainsContract {
   readonly observeDomain: (
     input: ObserveVercelProjectDomain
   ) => Effect.Effect<VercelProjectDomainObservation, VercelDomainsReadError>;
@@ -77,10 +77,10 @@ export interface VercelDomainsShape {
 
 export class VercelDomains extends Context.Service<
   VercelDomains,
-  VercelDomainsShape
+  VercelDomainsContract
 >()("@bundjil/infrastructure/vercel/VercelDomains") {}
 
-export interface VercelEnvironmentVariablesShape {
+export interface VercelEnvironmentVariablesContract {
   readonly observeEnvironmentVariable: (
     input: ObserveVercelEnvironmentVariable
   ) => Effect.Effect<
@@ -97,10 +97,10 @@ export interface VercelEnvironmentVariablesShape {
 
 export class VercelEnvironmentVariables extends Context.Service<
   VercelEnvironmentVariables,
-  VercelEnvironmentVariablesShape
+  VercelEnvironmentVariablesContract
 >()("@bundjil/infrastructure/vercel/VercelEnvironmentVariables") {}
 
-export interface VercelMarketplaceBindingsShape {
+export interface VercelMarketplaceBindingsContract {
   readonly observeMarketplaceBinding: (
     input: ObserveVercelMarketplaceBinding
   ) => Effect.Effect<
@@ -117,10 +117,10 @@ export interface VercelMarketplaceBindingsShape {
 
 export class VercelMarketplaceBindings extends Context.Service<
   VercelMarketplaceBindings,
-  VercelMarketplaceBindingsShape
+  VercelMarketplaceBindingsContract
 >()("@bundjil/infrastructure/vercel/VercelMarketplaceBindings") {}
 
-export interface VercelDeploymentsShape {
+export interface VercelDeploymentsContract {
   readonly observeDeployment: (
     input: ObserveVercelDeployment
   ) => Effect.Effect<VercelDeploymentObservation, VercelDeploymentsReadError>;
@@ -131,5 +131,5 @@ export interface VercelDeploymentsShape {
 
 export class VercelDeployments extends Context.Service<
   VercelDeployments,
-  VercelDeploymentsShape
+  VercelDeploymentsContract
 >()("@bundjil/infrastructure/vercel/VercelDeployments") {}

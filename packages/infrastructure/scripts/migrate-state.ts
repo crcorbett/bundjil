@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { dirname, isAbsolute } from "node:path";
+import nodePath from "node:path";
 
 import * as BunFileSystem from "@effect/platform-bun/BunFileSystem";
 import { Ajv2020 } from "ajv/dist/2020.js";
@@ -28,7 +28,7 @@ import {
   layerAlchemyR2State,
   loadAlchemyR2StateConfig,
   loadInfrastructurePhotonCredentials,
-  makePreviewStateBackupStoreLive,
+  buildPreviewStateBackupStoreLive,
   PreviewStateBackupPath,
   PreviewStateForbiddenValue,
   PreviewStateMigrationFailureReason,
@@ -37,6 +37,8 @@ import {
   ProductionStateMigrationLive,
 } from "../src/index.js";
 import { VercelAccessToken } from "../src/vercel/index.js";
+
+const { dirname, isAbsolute } = nodePath;
 
 declare const process: {
   exitCode: number | undefined;
@@ -47,7 +49,7 @@ const StateMigrationPath = Schema.String.pipe(
     Schema.makeFilter((value) =>
       value.length > 0 &&
       value.length <= 240 &&
-      /^[A-Za-z0-9._/-]+$/.test(value) &&
+      /^[A-Za-z0-9._/-]+$/u.test(value) &&
       !isAbsolute(value) &&
       !value.split("/").includes("..")
         ? undefined
@@ -203,7 +205,7 @@ const runStateMigration = Effect.gen(function* runStateMigrationOperation() {
     ],
     (value) => Schema.decodeUnknownEffect(PreviewStateForbiddenValue)(value)
   );
-  const backupStore = makePreviewStateBackupStoreLive(
+  const backupStore = buildPreviewStateBackupStoreLive(
     backupPath,
     forbiddenValues
   ).pipe(Layer.provide(BunFileSystem.layer));
@@ -221,18 +223,17 @@ const runStateMigration = Effect.gen(function* runStateMigrationOperation() {
     Match.when("apply", () => migration.retire(manifest)),
     Match.when("restore", () => migration.restore),
     Match.exhaustive,
-    Effect.mapError(
-      (error) =>
-        new StateMigrationCommandError({
-          reason: error.reason,
-          ...(error.observedCount === undefined
-            ? {}
-            : { observedCount: error.observedCount }),
-          ...(error.expectedCount === undefined
-            ? {}
-            : { expectedCount: error.expectedCount }),
-        })
-    )
+    Effect.mapError((error) => {
+      const observed =
+        error.observedCount === undefined
+          ? { reason: error.reason }
+          : { reason: error.reason, observedCount: error.observedCount };
+      return new StateMigrationCommandError(
+        error.expectedCount === undefined
+          ? observed
+          : { ...observed, expectedCount: error.expectedCount }
+      );
+    })
   );
 
   const fileSystem = yield* FileSystem.FileSystem;
@@ -359,16 +360,19 @@ const main = runStateMigration.pipe(
   /* oxlint-disable-next-line eslint-plugin-promise/prefer-await-to-then, eslint-plugin-promise/prefer-await-to-callbacks -- Effect.catch handles the typed Effect error channel, not a Promise callback. */
   Effect.catch((error) =>
     Schema.decodeUnknownEffect(StateMigrationCommandError)(error).pipe(
-      Effect.map((failure) => ({
-        status: "blocked" as const,
-        reason: failure.reason,
-        ...(failure.observedCount === undefined
-          ? {}
-          : { observedCount: failure.observedCount }),
-        ...(failure.expectedCount === undefined
-          ? {}
-          : { expectedCount: failure.expectedCount }),
-      })),
+      Effect.map((failure) => {
+        const observed =
+          failure.observedCount === undefined
+            ? { status: "blocked" as const, reason: failure.reason }
+            : {
+                status: "blocked" as const,
+                reason: failure.reason,
+                observedCount: failure.observedCount,
+              };
+        return failure.expectedCount === undefined
+          ? observed
+          : { ...observed, expectedCount: failure.expectedCount };
+      }),
       /* oxlint-disable-next-line eslint-plugin-promise/prefer-await-to-then, eslint-plugin-promise/prefer-await-to-callbacks -- Effect.catch handles the typed Effect decoding error channel. */
       Effect.catch(() =>
         Effect.succeed({

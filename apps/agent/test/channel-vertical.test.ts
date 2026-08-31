@@ -39,7 +39,7 @@ import {
   EveChannelDispatch,
   EveChannelDispatchFailureMemory,
   EveChannelDispatchMemory,
-  makeChannelEveChannel,
+  createChannelEveChannel,
 } from "../agent/lib/channel/index.js";
 import {
   ChannelIdentityRecords,
@@ -385,7 +385,7 @@ it.effect(
         yield* Effect.addFinalizer(() =>
           Effect.promise(() => runtime.dispose())
         );
-        const definition = makeChannelEveChannel(
+        const definition = createChannelEveChannel(
           runtime,
           "/eve/v1/photon/webhook",
           "provider-retry"
@@ -626,7 +626,7 @@ it.effect(
             ),
             messages
           );
-          const definition = makeChannelEveChannel(
+          const definition = createChannelEveChannel(
             runtime,
             "/eve/v1/photon/webhook",
             "disabled"
@@ -678,7 +678,7 @@ it.effect("keeps the Sendblue acknowledgement path proof-disabled", () =>
       const messages: globalThis.Array<unknown> = [];
       const runtime = makeObservedRuntime(layer, messages);
       yield* Effect.addFinalizer(() => Effect.promise(() => runtime.dispose()));
-      const definition = makeChannelEveChannel(
+      const definition = createChannelEveChannel(
         runtime,
         "/eve/v1/sendblue/webhook",
         "disabled"

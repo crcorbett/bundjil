@@ -8,7 +8,7 @@ import type {
   ChannelRoutingSecret,
 } from "./schemas.js";
 
-export interface ChannelRouterShape {
+export interface ChannelRouterContract {
   readonly route: (
     conversation: ChannelConversationType
   ) => Effect.Effect<ChannelContinuationTokenType, ChannelRoutingError>;
@@ -16,7 +16,7 @@ export interface ChannelRouterShape {
 
 export class ChannelRouter extends Context.Service<
   ChannelRouter,
-  ChannelRouterShape
+  ChannelRouterContract
 >()("@bundjil/agent/ChannelRouter") {}
 
 export const layerMemory = Layer.succeed(

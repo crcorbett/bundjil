@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { dirname, isAbsolute } from "node:path";
+import nodePath from "node:path";
 
 import * as BunFileSystem from "@effect/platform-bun/BunFileSystem";
 import {
@@ -25,6 +25,8 @@ import {
   ProductionPreflightSnapshotPath,
 } from "../agent/production-preflight.js";
 
+const { dirname, isAbsolute } = nodePath;
+
 declare const process: {
   exitCode: number | undefined;
 };
@@ -34,7 +36,7 @@ const SafeDetailPath = Schema.String.pipe(
     Schema.makeFilter((value) =>
       value.length > 0 &&
       value.length <= 200 &&
-      /^[A-Za-z0-9._/-]+$/.test(value) &&
+      /^[A-Za-z0-9._/-]+$/u.test(value) &&
       !isAbsolute(value) &&
       !value.split("/").includes("..")
         ? undefined

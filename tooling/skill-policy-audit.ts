@@ -1,6 +1,6 @@
 import { lstatSync } from "node:fs";
 import { lstat, mkdir, readlink, stat } from "node:fs/promises";
-import { dirname, posix, resolve } from "node:path";
+import nodePath from "node:path";
 
 import { Clock, Console, Effect, Schema } from "effect";
 
@@ -10,6 +10,8 @@ import {
   SkillPolicyReportJson,
 } from "./skill-policy.js";
 import type { SkillFile, SkillLink } from "./skill-policy.js";
+
+const { dirname, posix, resolve } = nodePath;
 
 const repositoryRoot = resolve(import.meta.dirname, "..");
 const detailPath = "tmp/skill-policy-report.json";
@@ -79,7 +81,7 @@ const selectedPolicyFile = (path: string) =>
   path === "AGENTS.md" ||
   path === "docs/architecture/effect-patterns.md" ||
   path === "docs/architecture/frontend-composition.md" ||
-  (path.startsWith(".agents/skills/") && /\.(?:md|mdx|ya?ml)$/.test(path));
+  (path.startsWith(".agents/skills/") && /\.(?:md|mdx|ya?ml)$/u.test(path));
 
 const readPolicyFile = Effect.fn("SkillAudit.readPolicyFile")((path: string) =>
   Effect.tryPromise({
@@ -128,7 +130,7 @@ const program = Effect.gen(function* () {
     { concurrency: 24 }
   );
   const links = yield* Effect.forEach(
-    repositoryPaths.filter((path) => /^\.claude\/skills\/[^/]+$/.test(path)),
+    repositoryPaths.filter((path) => /^\.claude\/skills\/[^/]+$/u.test(path)),
     inspectLink,
     { concurrency: 16 }
   );

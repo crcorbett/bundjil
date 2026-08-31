@@ -13,7 +13,7 @@ export type OpenAICompatibleProxyFailure =
   | OpenAICompatibleProxyAuthError
   | CodexDirectProviderFailure;
 
-export interface OpenAICompatibleProxyShape {
+export interface OpenAICompatibleProxyContract {
   readonly handleChatCompletions: (
     input: OpenAICompatibleProxyInput
   ) => Effect.Effect<
@@ -24,7 +24,7 @@ export interface OpenAICompatibleProxyShape {
 
 export class OpenAICompatibleProxy extends Context.Service<
   OpenAICompatibleProxy,
-  OpenAICompatibleProxyShape
+  OpenAICompatibleProxyContract
 >()("@bundjil/codex/OpenAICompatibleProxy") {}
 
 const authorizationPrefix = "Bearer ";

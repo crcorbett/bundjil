@@ -1,7 +1,7 @@
 import { Schema } from "effect";
 
-const Digest = Schema.String.check(Schema.isPattern(/^[a-f0-9]{64}$/));
-const Commit = Schema.String.check(Schema.isPattern(/^[a-f0-9]{40}$/));
+const Digest = Schema.String.check(Schema.isPattern(/^[a-f0-9]{64}$/u));
+const Commit = Schema.String.check(Schema.isPattern(/^[a-f0-9]{40}$/u));
 const TextArray = Schema.Array(Schema.NonEmptyString);
 const Clock = Schema.NullOr(Schema.Int.check(Schema.isGreaterThanOrEqualTo(0)));
 
