@@ -1,17 +1,18 @@
 ---
 document_type: execution-plan
-lifecycle: current
+lifecycle: historical
 authority: canonical
 owner: bundjil-security-automation-maintainer
 last_reviewed: 2026-08-31
 review_trigger: task status, provider metadata, workflow, CI, PR, cleanup, or claim change
 spec: ../../product-specs/doppler-secret-custody.md
 task_ledger: ../../product-specs/doppler-secret-custody.tasks.json
+completed: 2026-08-31
 ---
 
 # Doppler secret custody execution plan
 
-Status: Versioned timestamp-bound correction pending Doppler and hosted proof
+Status: Complete
 
 Branch: `codex/doppler-secret-ownership`
 
@@ -19,13 +20,14 @@ Base: `origin/main` at `8c97942d8c3737525c0d9d2e47d24d3637c138ec`
 
 Pull request: `https://github.com/crcorbett/bundjil/pull/7`
 
-Hosted state: CI run `33357705409` and Preview run `33357705406` passed exact
-head `edc5e9d0269dea81d39eb38b734a5b233884cd2e`. Preview fetched version 3
-manifest `bb731f680e64422d198ed6fa88997a23dbf4f99f55ba743d36d10c954dff76f5`
-and reported 155 desired no-ops, 63 accepted rows, 92 report-only rows, zero
-blocking, zero inconclusive and zero provider writes. Exact `bundjil/stg`
-readback matched its bytes, digest, 155 resources and eight timestamps.
-Production has not run for this PR.
+Hosted state: final CI run `33358065293` and Preview run `33358065300` passed
+exact PR head `c418d2e8925fb389cdbabe6fbb059b4fae7e3169`. PR `#7` merged as
+`413d39a072f31ef64af0502b38a6a4f46786f53f`; main CI run `33358238289`
+passed and automatic Production run `33358460243` promoted that exact SHA with
+rollback ready. Independent Vercel readback matched both stable targets, the
+agent callback, the live proxy health Schema and project-token isolation.
+Name-only GitHub readback proved the nine legacy copies absent while both
+`DOPPLER_TOKEN` entries and the callback alias remain.
 
 Approval: Cooper's 2026-08-24 goal continuation authorises this plan to make PR
 `#7` green, merge only after exact-head checks pass, observe the automatic
@@ -64,7 +66,7 @@ permission, action-pin mismatch, fork credential path, unapproved provider
 write, changed re-admission scope, failed exact-head check, or any cleanup
 target outside the nine exact GitHub copies.
 
-## Current limitations
+## Retained limitations
 
 - Doppler OIDC is unavailable on the current Personal Developer plan.
 - Fresh provider readback shows the exact agent project linked to
@@ -111,8 +113,8 @@ target outside the nine exact GitHub copies.
 - A clean local report against the timestamp-bound candidate passed 155 desired
   no-ops, 63 accepted rows, 92 report-only rows, zero blocking rows, zero
   inconclusive rows and zero provider writes. This is not hosted proof.
-- Merge, deployment and cleanup remain paused pending exact-head hosted checks.
-  No exposed value is recorded here and no provider credential has been
-  rotated or revoked.
-- Production fetch, deployment and runtime/public behaviour remain unproved
-  until the later eligible main-push CI event and their separate readbacks.
+- The merged Production receipt and independent metadata/health readbacks do
+  not prove an end-user journey or wider public behaviour.
+- No provider credential was rotated or revoked, no permission was widened,
+  and the local-only `stg_repair` config remains because its deletion was not
+  authorised.

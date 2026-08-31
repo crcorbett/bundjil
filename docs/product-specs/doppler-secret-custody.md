@@ -1,12 +1,12 @@
 ---
 document_type: product-spec
-lifecycle: current
-authority: canonical
+lifecycle: implemented
+authority: supporting
 owner: bundjil-security-automation-maintainer
 last_reviewed: 2026-08-31
 review_trigger: Doppler project/config/token, GitHub secret, workflow, root command, Vercel project, Alchemy state, or credential-consumer change
 task_ledger: doppler-secret-custody.tasks.json
-active_plan: ../exec-plans/active/doppler-secret-custody.md
+completed_plan: ../exec-plans/completed/doppler-secret-custody.md
 ---
 
 # Doppler secret custody
@@ -65,8 +65,9 @@ adopted infrastructure roles. This change gives Alchemy no deployment role.
 - Personal Doppler now has the four locked root configs and exact key sets
   described below. `stg_repair` has exactly eight direct consumer inputs and
   no service token or inherited config. The two hosted GitHub Environments each
-  hold one read-only, config-scoped token expiring on 2026-09-23; every legacy
-  GitHub name remains.
+  hold one read-only, config-scoped token expiring on 2026-09-23. Name-only
+  cleanup readback found no legacy GitHub copies: each Environment retains only
+  `DOPPLER_TOKEN`, and Production also retains the non-secret callback alias.
 - CI run `33353598799` passed exact PR head `a28ed2b`. Preview run
   `33353598789` fetched the refreshed manifest, produced 155 desired no-ops and
   zero writes, and reduced the earlier eight inconclusive rows to the one
@@ -94,6 +95,19 @@ adopted infrastructure roles. This change gives Alchemy no deployment role.
   `bb731f680e64422d198ed6fa88997a23dbf4f99f55ba743d36d10c954dff76f5`
   and matched the local counts with 155 no-ops and zero provider writes. This
   is hosted Preview report proof, not deployment or public behaviour proof.
+- Final CI run `33358065293` and Preview run `33358065300` passed exact PR head
+  `c418d2e8925fb389cdbabe6fbb059b4fae7e3169`. PR `#7` then merged as
+  `413d39a072f31ef64af0502b38a6a4f46786f53f`; main CI run `33358238289`
+  passed. Automatic Production run `33358460243` fetched only the named
+  `bundjil/prd` outputs and returned `promoted` for that exact merge SHA with
+  rollback ready.
+- Independent Vercel readback found both exact projects on that merge SHA in
+  `READY` Production state. The stable proxy target was
+  `dpl_6moFcrPmdB6FNzFjTzeiydr9Udmh`, the stable agent and callback target was
+  `dpl_BoRauaL3HivkXxdKQSKbXp1n3MpH`, and the proxy health response matched the
+  live Schema. Each token returned `200` only for its own project and `404` for
+  the sibling. This proves deployment metadata and health only, not an end-user
+  journey or public behaviour.
 - The narrow repair consumer requires its own `stg_repair` config. It must not
   reuse the report-only `stg` authority. Repository code now denies provider
   writes, keeps all eight approved identities in scope, accepts only the exact
@@ -108,8 +122,7 @@ adopted infrastructure roles. This change gives Alchemy no deployment role.
   command ran from an uncommitted repair tree. It therefore proves
   the recorded state plan and convergence, not exact-source execution. The
   runbook now requires a clean committed source before any future state write.
-  Hosted exact-head Preview readback against the corrected manifest remains
-  required.
+  The later exact-head Preview runs passed against the corrected manifest.
 
 ## Command and workflow call graphs
 
@@ -166,10 +179,10 @@ Authorised Preview state metadata repair
 4. Doppler receives no dummy or empty values. A missing value remains missing
    until a real consumer and source prove it is required.
 5. Existing GitHub provider secrets and variables remain in place until merge
-   and independent hosted proof. The approved continuation may then delete only
-   the five legacy GitHub secrets and four legacy GitHub variables named by the
-   inventory. It must not revoke either underlying Vercel credential because
-   Doppler remains their active custody owner.
+   and independent hosted proof. Cleanup then deletes only the five legacy
+   GitHub secrets and four legacy GitHub variables named by the inventory,
+   while preserving both `DOPPLER_TOKEN` entries and the callback alias. The
+   underlying Vercel credentials remain active through Doppler custody.
 6. Runtime Vercel variables, project connections, deployment provenance,
    Alchemy state and public behaviour remain separate claims. The only Alchemy
    mutation in this slice is the approved seven-row Preview state metadata
@@ -179,19 +192,19 @@ Authorised Preview state metadata repair
 
 ## Downstream impact ledger
 
-| Surface                            | Decision        | Owner and evidence                                                                                                                                               | Required result                                                                                                                       |
-| ---------------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| Architecture and standards         | Change required | `packages/infrastructure/src/state/readmission.ts`, exact read-only Layer and tests                                                                              | State-only repair is a closed Effect boundary with provider mutation denied and exact plan policy.                                    |
-| Root and package commands          | Change required | `package.json`, `packages/infrastructure/package.json`                                                                                                           | Friendly wrappers use fixed configs; internal commands stay credential-neutral.                                                       |
-| Workflows and action lock          | Change required | `.github/workflows/{ci,infrastructure-drift,production}.yml`, `docs/operations/github-actions-lock.json`                                                         | Exact fetch pin, output mapping, fork exclusion and internal commands are executable policy.                                          |
-| Knip and config                    | Change required | `knip.json`                                                                                                                                                      | The external `doppler` binary is explicitly admitted.                                                                                 |
-| Authority and runbooks             | Change required | `tooling/authority-policy.ts`, workflow contract tests, automation register, app runbooks                                                                        | Custody and command boundaries reject direct legacy secret reads and broad injection.                                                 |
-| Runtime app variables              | Preserve        | app config Schemas, app READMEs and Vercel metadata                                                                                                              | Vercel remains current storage owner; no values move.                                                                                 |
-| Provider services and Layers       | Change required | adoption/readmission and drift modules, exact-project read-only Layer and focused tests                                                                          | Re-admission binds exact provider timestamps; unmatched revisions fail closed and state repair cannot read values or write providers. |
-| SPEC, tasks and plan               | Change required | this SPEC, sibling ledger, active plan and indexes                                                                                                               | Current intent and claim limits remain routed until post-merge proof and cleanup.                                                     |
-| Critical journeys and dated proof  | Preserve        | `docs/verification/README.md` routes open Alchemy state receipts to ignored `tmp/proof/**`, with sanitised summary in this SPEC, its task ledger and active plan | The bounded state receipt remains local while this SPEC is open; hosted and provider claims stay separate.                            |
-| Skills and AGENTS                  | N/A             | `.agents/skills/docs-maintainer`, `.agents/skills/alchemy-iac`, `AGENTS.md` inspected                                                                            | No instruction or skill behaviour changes.                                                                                            |
-| Frontend and browser-visible state | N/A             | no React, route or public UI consumer in the call graph                                                                                                          | No browser proof required.                                                                                                            |
+| Surface                            | Decision        | Owner and evidence                                                                                                                                             | Required result                                                                                                                       |
+| ---------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Architecture and standards         | Change required | `packages/infrastructure/src/state/readmission.ts`, exact read-only Layer and tests                                                                            | State-only repair is a closed Effect boundary with provider mutation denied and exact plan policy.                                    |
+| Root and package commands          | Change required | `package.json`, `packages/infrastructure/package.json`                                                                                                         | Friendly wrappers use fixed configs; internal commands stay credential-neutral.                                                       |
+| Workflows and action lock          | Change required | `.github/workflows/{ci,infrastructure-drift,production}.yml`, `docs/operations/github-actions-lock.json`                                                       | Exact fetch pin, output mapping, fork exclusion and internal commands are executable policy.                                          |
+| Knip and config                    | Change required | `knip.json`                                                                                                                                                    | The external `doppler` binary is explicitly admitted.                                                                                 |
+| Authority and runbooks             | Change required | `tooling/authority-policy.ts`, workflow contract tests, automation register, app runbooks                                                                      | Custody and command boundaries reject direct legacy secret reads and broad injection.                                                 |
+| Runtime app variables              | Preserve        | app config Schemas, app READMEs and Vercel metadata                                                                                                            | Vercel remains current storage owner; no values move.                                                                                 |
+| Provider services and Layers       | Change required | adoption/readmission and drift modules, exact-project read-only Layer and focused tests                                                                        | Re-admission binds exact provider timestamps; unmatched revisions fail closed and state repair cannot read values or write providers. |
+| SPEC, tasks and plan               | Change required | this SPEC, sibling ledger, completed plan and indexes                                                                                                          | Completed intent, proof, cleanup and claim limits remain routed as retained history.                                                  |
+| Critical journeys and dated proof  | Preserve        | `docs/verification/README.md` routes Alchemy state receipts to ignored `tmp/proof/**`, with sanitised summary in this SPEC, its task ledger and completed plan | Hosted, provider, health and public-behaviour claims stay separate; no end-user journey is inferred.                                  |
+| Skills and AGENTS                  | N/A             | `.agents/skills/docs-maintainer`, `.agents/skills/alchemy-iac`, `AGENTS.md` inspected                                                                          | No instruction or skill behaviour changes.                                                                                            |
+| Frontend and browser-visible state | N/A             | no React, route or public UI consumer in the call graph                                                                                                        | No browser proof required.                                                                                                            |
 
 ## Verification and delivery
 
@@ -215,10 +228,13 @@ binds the full sorted admitted projection, so metadata-only changes cannot share
 an identity. Its clean local report passed with 155 desired no-ops, zero
 blocking or inconclusive rows and zero provider writes. Exact `bundjil/stg`
 readback matched its bytes, digest, 155 resources and eight timestamps. CI run
-`33357705409` and Preview run `33357705406` passed exact head `edc5e9d` with the
-same Preview counts and zero writes. A final evidence-only head must still pass
-before merge. Only then may the existing automatic Production path run.
-Deployment, stable target, health and public behaviour remain separate claims.
+`33358065293` and Preview run `33358065300` passed final head `c418d2e`; PR
+`#7` merged as `413d39a`, main CI run `33358238289` passed, and automatic
+Production run `33358460243` promoted that exact SHA. Independent Vercel
+readback matched both stable targets, callback assignment, health and token
+isolation. Name-only GitHub readback then proved only both `DOPPLER_TOKEN`
+entries and the Production callback alias remain. No provider credential was
+revoked, no permission was widened, and no public-behaviour claim is made.
 
 ## References
 
