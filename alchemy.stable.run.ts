@@ -5,7 +5,6 @@
 import {
   adoptionManifestProviderScopes,
   layerAlchemyR2State,
-  layerLiveExactProjectReadOnlyAdoptionProviders,
   layerLiveStableAdoptionDriftProviders,
   layerLiveStableAdoptionProviders,
   loadAdoptionCommand,
@@ -63,30 +62,6 @@ export const makeStableInfrastructureDriftStack = Effect.fn(
   makeStableInfrastructureStackWith(
     manifest,
     layerLiveStableAdoptionDriftProviders
-  )
-);
-
-export const makeStableInfrastructureReadmissionStack = Effect.fn(
-  "StableInfrastructureReadmissionStack.make"
-)((manifest: AdoptionManifest) =>
-  adoptionManifestProviderScopes(manifest).pipe(
-    Effect.catch(() =>
-      failConfiguration(
-        "The state re-admission manifest does not define the exact provider scopes."
-      )
-    ),
-    Effect.flatMap((scopes) =>
-      Alchemy.Stack(
-        "BundjilInfrastructure",
-        {
-          providers: layerLiveExactProjectReadOnlyAdoptionProviders(scopes),
-          // Alchemy.Stack requires an infallible state Layer; retain the defect
-          // conversion only at this framework-owned host edge.
-          state: layerAlchemyR2State.pipe(Layer.orDie),
-        },
-        BundjilInfrastructureStack(manifest)
-      )
-    )
   )
 );
 

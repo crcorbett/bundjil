@@ -139,20 +139,10 @@ Photon projects, manifests, or physical identities.
    create, replace or delete, and no managed Photon update. The eighth identity
    is provider-revision-only and must remain a no-op in Alchemy state. Do not
    use the general Alchemy apply command for this repair.
-   Under a distinct mode-`0600` authority matching
-   `preview-state-readmission-authority.schema.json`, run the friendly
-   `bun run infrastructure:preview-state-readmission` command. It fixes the
-   `bundjil/stg_repair` Doppler config and delegates to the credential-neutral
-   internal command. That command denies provider writes by construction,
-   validates one exact plan, applies that same in-memory plan only to Alchemy
-   state, and requires the following plan to contain 155 no-ops. Before any
-   state write, require `git status --short` to be empty and set the receipt
-   source SHA from that exact `git rev-parse HEAD`; a base SHA from a dirty
-   worktree is not exact-source proof. Stop before running it if the source,
-   repair config, authority, eight logical IDs, candidate digest, Personal
-   provider identity or Preview target differs. Its receipt proves state
-   convergence only; rerun the report-only drift journey for independent
-   provider readback.
+   The one-off 2026-08-31 Preview state re-admission path is retired after
+   convergence. Do not recreate its command or temporary Doppler config. Stop
+   if another state write appears necessary: it needs a new operation-specific
+   authority, current provider evidence, rollback plan and explicit approval.
 
    If a stage-correct Preview manifest reveals exactly the accepted seven-row
    source-project state discontinuity, do not apply the delete plan. Run

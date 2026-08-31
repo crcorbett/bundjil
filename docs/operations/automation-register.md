@@ -86,14 +86,11 @@ concealed personal `bundjil` 1Password items with fingerprint prefixes, and
 exactly the two refreshed Production GitHub secret names. It did not prove a
 deployment; the earlier 90-day result remains in
 [`automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json`](../evidence/verification/packets/automatic-production-personal-vercel-custody-inconclusive-2026-08-21.json).
-Fresh 2026-08-24 readback also confirmed one expiring read-only Doppler token
-for `bundjil/prd`, while the two legacy Vercel secrets and four legacy variables
-remained in place. No eligible main-push event had been created at that point,
-so no Production run, deployment or public behaviour was proved.
-The current branch fetches `bundjil/prd` once, maps four identifiers plus the
-two exact project credentials, and keeps the callback alias as a separate
-non-secret GitHub variable. That combined custody and automatic callback path
-remains unproved until this PR merges and a new exact-main run completes.
+Fresh 2026-08-31 readback confirmed that Production retains only one expiring
+read-only Doppler token and the separate non-secret callback alias. The unused
+Vercel secret and variable duplicates were removed after exact-main Production
+and independent provider proof. The workflow fetches `bundjil/prd` once and
+maps four identifiers plus the two exact project credentials.
 
 - **Signal and target:** only a completed successful `CI` `workflow_run` for a
   same-repository `push` to `main` may start the writer. The exact head SHA is

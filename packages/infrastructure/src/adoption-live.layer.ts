@@ -8,11 +8,7 @@ import { Layer } from "effect";
 import type { AdoptionProviderScopes } from "./adoption-manifest.js";
 import { loadInfrastructurePhotonCredentials } from "./config.js";
 import { layerPhotonReadOnlyProviders } from "./photon/providers.js";
-import {
-  VercelLive,
-  VercelCredentialsLive,
-  VercelProjectCredentialsLive,
-} from "./vercel/live.layer.js";
+import { VercelLive, VercelCredentialsLive } from "./vercel/live.layer.js";
 import { layerVercelReadOnlyProviders } from "./vercel/providers.js";
 import {
   VercelPreviewPhotonBindingValuesDenied,
@@ -55,7 +51,3 @@ const makeLiveReadOnlyAdoptionProviders = (
 export const layerLiveReadOnlyAdoptionProviders = (
   scopes: AdoptionProviderScopes
 ) => makeLiveReadOnlyAdoptionProviders(scopes, VercelCredentialsLive);
-
-export const layerLiveExactProjectReadOnlyAdoptionProviders = (
-  scopes: AdoptionProviderScopes
-) => makeLiveReadOnlyAdoptionProviders(scopes, VercelProjectCredentialsLive);
