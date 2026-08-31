@@ -111,6 +111,12 @@ adopted infrastructure roles. This change gives Alchemy no deployment role.
   passed, and automatic Production run `33369366535` promoted that exact SHA
   with rollback ready. This is a separate exact-main deployment result, not a
   public-behaviour claim.
+- Hard-cutover CI `33370139881` and read-only Preview run `33370139899` passed
+  exact head `cdd492b075c311bbc306059f6289a624efefae1f`. Preview reported 155
+  no-ops and zero provider writes. Doppler metadata then showed the temporary
+  repair environment had no service token; its exact environment/root config
+  was deleted. Name-only readback found `dev`, `stg` and `prd` plus the empty
+  `dev_personal` branch config.
 - The one approved Preview state operation applied seven R2 metadata updates;
   its immediate and independent following plans each contained 155 no-ops.
   Its receipt names base SHA `67b2d95c`, but it ran from an uncommitted repair

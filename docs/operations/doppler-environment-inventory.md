@@ -17,8 +17,8 @@ provider readback.
 
 The locked root configs are `dev`, `stg`, and `prd`. Doppler's automatically
 created `dev_personal` branch config remains empty. No config receives a dummy
-value. The temporary one-operation repair config was deleted after its source
-consumer was retired.
+value. The temporary one-operation repair environment and root config were
+deleted after their source consumer was retired.
 
 | Logical name                       | Current name                                                                                       | Exact consumer and purpose                                                                                                                                                                                      | Required environment | Current storage owner                                            | Desired Doppler config  | Class                                                     | Migration and cleanup                                                                                                                                                                            |
 | ---------------------------------- | -------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- | ---------------------------------------------------------------- | ----------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -72,6 +72,9 @@ Name-only readback found only `DOPPLER_TOKEN` in each exact workflow
 Environment and only `BUNDJIL_PRODUCTION_AGENT_CALLBACK_ALIAS` as the retained
 Production variable. The underlying Vercel credentials, Doppler configs,
 Vercel runtime variables, Personal recovery items and Alchemy state were not
-deleted or revoked. The later hard cutover removed the temporary repair source
-path and deleted its exact Doppler config after proving it had no service token
-or remaining consumer. The active `dev`, `stg` and `prd` configs remain.
+deleted or revoked. After exact-head CI `33370139881` and read-only Preview run
+`33370139899` passed, the later hard cutover removed the temporary repair source
+path and deleted only its exact Doppler environment/root config after proving
+it had no service token or remaining consumer. Name-only readback found exactly
+the active `dev`, `stg` and `prd` environments/configs plus the intentionally
+empty `dev_personal` branch config.

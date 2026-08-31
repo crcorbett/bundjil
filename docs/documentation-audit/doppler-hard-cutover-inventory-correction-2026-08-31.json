@@ -48,6 +48,6 @@
   ],
   "nonClaims": [
     "No harness-effectiveness epoch was rerun or upgraded.",
-    "No active provider credential was revoked, rotated or widened by this cleanup."
+    "No active provider credential was revoked, rotated or widened by this cleanup. The deleted temporary Doppler environment had no service token and no remaining source consumer."
   ]
 }

@@ -32,6 +32,11 @@ Closeout PR `#17` then merged as
 `e4603837d7558db8463d24332219c04b8d67fccc`; main CI `33369067571` passed
 and automatic Production `33369366535` promoted that exact SHA with rollback
 ready.
+Hard-cutover CI `33370139881` and Preview `33370139899` passed exact head
+`cdd492b075c311bbc306059f6289a624efefae1f`; Preview recorded 155 no-ops and
+zero provider writes. The temporary Doppler environment/root config was then
+deleted, and name-only readback retained only the three active environments
+plus the empty personal Development branch config.
 
 Approval: Cooper's 2026-08-24 goal continuation authorises this plan to make PR
 `#7` green, merge only after exact-head checks pass, observe the automatic
