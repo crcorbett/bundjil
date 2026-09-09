@@ -3,7 +3,7 @@ document_type: architecture-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-quality-owner
-last_reviewed: 2026-08-31
+last_reviewed: 2026-09-09
 review_trigger: verification, lint, test, CI, proof, documentation, or skill-control change
 ---
 
@@ -69,6 +69,11 @@ ingress owners, reflective property access, and imports of private Effect
 service constructors. The checked-in plugin source is ignored by the root
 check because it is the rule implementation, not a consumer; its own fixtures
 and installed-plugin integration tests prove the executable path.
+
+The global `package/no-cross-package-source-imports` rule stops one app or
+package from reaching into another workspace's private `src` tree through a
+package alias or relative path. Consumers use the owning package's named public
+export. Installed-root positive and negative fixtures prove that boundary.
 
 TypeScript alone may use the language's value/type namespace pairing, so the
 base `no-redeclare` rule is disabled only for TypeScript-family files. The lint

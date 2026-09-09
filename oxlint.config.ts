@@ -30,6 +30,7 @@ export default defineConfig({
   ],
   jsPlugins: [
     "./lint/oxlint-plugin.ts",
+    "./lint/package-rules.ts",
     {
       name: "anti-slop",
       specifier: "./tools/oxlint/anti-slop/index.ts",
@@ -288,6 +289,7 @@ export default defineConfig({
     "anti-slop/no-widen-then-assert": "error",
     "anti-slop/require-safety-comment-for-type-assertion": "error",
     "anti-slop-effect/no-service-constructor-imports": "error",
+    "package/no-cross-package-source-imports": "error",
     "eslint/func-names": "off",
     "eslint/func-style": "off",
     "eslint/max-classes-per-file": "off",
