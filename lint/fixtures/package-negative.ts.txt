@@ -1,0 +1,5 @@
+import "@bundjil/codex/src/index.js";
+
+export * from "../../codex/src/index.js";
+
+export const loadCodex = () => import("../../codex/src/index.js");

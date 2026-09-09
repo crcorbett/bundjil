@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { rmSync, writeFileSync } from "node:fs";
+import { readFileSync, rmSync, writeFileSync } from "node:fs";
 import nodePath from "node:path";
 
 import { describe, expect, it } from "vitest";
@@ -104,6 +104,35 @@ describe("installed Bundjil Oxlint plugin", () => {
     } finally {
       rmSync(resolve(genericProbe), { force: true });
       rmSync(resolve(effectProbe), { force: true });
+    }
+  });
+
+  it("rejects private package source imports and accepts public exports", () => {
+    const negativeProbe = "packages/channel/src/.package-boundary-negative.ts";
+    const positiveProbe = "packages/channel/src/.package-boundary-positive.ts";
+    writeFileSync(
+      resolve(negativeProbe),
+      readFileSync(resolve("lint/fixtures/package-negative.ts.txt"), "utf-8")
+    );
+    writeFileSync(
+      resolve(positiveProbe),
+      readFileSync(resolve("lint/fixtures/package-positive.ts"), "utf-8")
+    );
+
+    try {
+      const negative = runRootProbe(negativeProbe);
+      const positive = runRootProbe(positiveProbe);
+      expect(negative.exitCode).not.toBe(0);
+      expect(
+        negative.output.match(/package\(no-cross-package-source-imports\)/gu)
+      ).toHaveLength(3);
+      expect(positive.exitCode).toBe(0);
+      expect(positive.output).not.toContain(
+        "package(no-cross-package-source-imports)"
+      );
+    } finally {
+      rmSync(resolve(negativeProbe), { force: true });
+      rmSync(resolve(positiveProbe), { force: true });
     }
   });
 
