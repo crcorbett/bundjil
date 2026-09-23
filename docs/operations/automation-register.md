@@ -93,8 +93,10 @@ and independent provider proof. The workflow fetches `bundjil/prd` once and
 maps four identifiers plus the two exact project credentials.
 On 2026-09-23 the Production bootstrap token was replaced with a one-year,
 read-only `bundjil/prd` token and GitHub secret metadata confirmed the update.
-Its next hosted Production fetch is still pending; the Preview run proves only
-the separate `bundjil/stg` binding. The
+Automatic [Production run `35834880879`](https://github.com/crcorbett/bundjil/actions/runs/35834880879)
+passed the bounded Doppler fetch and stage, verify and promote steps for main
+SHA `d49cbff0a7100f0e957f175e9a46a1ee9c078f27`. This does not prove an
+end-user channel response. The
 [dated rotation receipt](../evidence/verification/details/doppler-github-bootstrap-rotation-2026-09-23.json)
 owns the one-run details.
 

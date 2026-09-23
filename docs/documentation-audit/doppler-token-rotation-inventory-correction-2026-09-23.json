@@ -28,7 +28,7 @@
     "decision": "inventory_correction_only",
     "reason": "The two new documentation paths change current path accounting but not the accepted HGI-307 scenario manifest, epoch, worker identity, skill bytes or metrics.",
     "historicalBoundary": "The original HGI-307 validation remains historical proof for its original candidate.",
-    "nonClaim": "This path correction does not prove a Production fetch, deployment or public response; the separate rotation receipt records provider and Preview proof."
+    "nonClaim": "This path correction does not prove provider or public behaviour; the separate rotation receipt records the provider, Preview and automatic Production proof."
   },
   "checks": [
     {
@@ -44,7 +44,7 @@
   ],
   "limitations": [
     "The count and digest prove repository path accounting only.",
-    "Hosted Production, provider settings and public behaviour remain separate claims."
+    "The recorded hosted Production run, provider settings and public behaviour remain separate claims."
   ],
   "nonClaims": [
     "No harness-effectiveness epoch was rerun or upgraded.",

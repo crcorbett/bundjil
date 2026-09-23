@@ -4,7 +4,7 @@
   "lifecycle": "evidence",
   "authority": "supporting",
   "owner": "bundjil-security-automation-maintainer",
-  "observedAt": "2026-09-23T07:42:39Z",
+  "observedAt": "2026-09-23T08:08:16Z",
   "actor": {
     "dopplerWorkplace": "Personal",
     "dopplerProject": "bundjil",
@@ -39,17 +39,20 @@
     "githubSecretName": "DOPPLER_TOKEN",
     "githubSecretUpdatedAt": "2026-09-23T07:42:39Z",
     "scopeCheck": "prd read succeeded; stg read denied",
-    "hostedResult": "pending next eligible automatic Production run"
+    "hostedRunId": 35834880879,
+    "hostedRunUrl": "https://github.com/crcorbett/bundjil/actions/runs/35834880879",
+    "hostedSourceSha": "d49cbff0a7100f0e957f175e9a46a1ee9c078f27",
+    "hostedResult": "success: automatic Production workflow fetched bounded configuration and completed stage, verify and promote"
   },
-  "postcondition": "Both exact GitHub Environment secrets have new read-only, config-scoped one-year token bindings; the Preview consumer passed.",
+  "postcondition": "Both exact GitHub Environment secrets have new read-only, config-scoped one-year token bindings; the Preview report and automatic Production deployment consumers passed.",
   "rollbackIdentity": "The prior tokens expired on 2026-09-23. Rebind a newly issued exact-config token if a consumer fails; revoke only the identified replacement slug after a valid successor is bound.",
   "limitations": [
     "GitHub secret values are write-only; metadata timestamps and hosted use are the available binding checks.",
-    "The new Production token has direct read and cross-config denial proof but no hosted Production fetch yet.",
-    "The Preview run proves its report-only command, not a Production deployment or end-user behaviour."
+    "The hosted Production fetch and promotion prove the workflow path for the merged main commit, not future runs.",
+    "The Preview report and Production deployment do not prove an end-user channel response."
   ],
   "nonClaims": [
     "No Vercel credential or deployed runtime variable was rotated.",
-    "No new Production deployment or public channel response is claimed."
+    "No public channel response or runtime behaviour is independently verified by this receipt."
   ]
 }
