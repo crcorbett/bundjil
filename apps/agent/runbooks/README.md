@@ -30,6 +30,8 @@ command, and routing map.
   retained Vercel/Photon configuration through dedicated remote state, run
   report-only Preview drift observation, and preserve Vercel Git deployment
   ownership.
+- [Doppler token rotation](doppler-token-rotation.md) — replace the two
+  config-scoped GitHub Actions bootstrap tokens and prove their exact bindings.
 - [Incident and revocation](incident-revocation.md) — contain agent incidents,
   route revocation to the owning provider, and prove recovery without exposing
   secrets.

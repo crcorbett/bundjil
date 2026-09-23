@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "taskId": "doppler-github-bootstrap-token-rotation",
+  "status": "passed",
+  "observedAt": "2026-09-23T07:49:02Z",
+  "trigger": "The one-year Doppler bootstrap rotation adds one dated, secret-negative operations receipt and this path-accounting correction.",
+  "docsInventory": {
+    "pathCount": 268,
+    "sortedPathSha256": "dabf1d76493ec895dc1a8be4c9525376eeb2fb6ba25ecc9885178d051f4606b7"
+  },
+  "readmeInventory": {
+    "pathCount": 23,
+    "sortedPathSha256": "6a59add4779c38b102caa166f47e2f687c7eb15cfaa28594c0accd52785380cd"
+  },
+  "ownerUpdates": [
+    "apps/agent/runbooks/README.md",
+    "apps/agent/runbooks/doppler-token-rotation.md",
+    "docs/documentation-audit/README.md",
+    "docs/documentation-audit/HGI-307-impact-ledger.json",
+    "docs/documentation-audit/doppler-token-rotation-inventory-correction-2026-09-23.json",
+    "docs/evidence/verification/details/doppler-github-bootstrap-rotation-2026-09-23.json",
+    "docs/operations/authority-register.json",
+    "docs/operations/automation-register.md",
+    "docs/operations/doppler-environment-inventory.md",
+    "docs/standards/automation-register.json"
+  ],
+  "harnessDisposition": {
+    "decision": "inventory_correction_only",
+    "reason": "The two new documentation paths change current path accounting but not the accepted HGI-307 scenario manifest, epoch, worker identity, skill bytes or metrics.",
+    "historicalBoundary": "The original HGI-307 validation remains historical proof for its original candidate.",
+    "nonClaim": "This path correction does not prove a Production fetch, deployment or public response; the separate rotation receipt records provider and Preview proof."
+  },
+  "checks": [
+    {
+      "command": "bun run verification",
+      "status": "failed_before_correction",
+      "result": "The candidate passed the preceding policy checks and HARNESS-DOCS-INVENTORY rejected the stale 266-path inventory."
+    },
+    {
+      "command": "bun run eval:hgi-307",
+      "status": "passed",
+      "result": "The corrected 268-path docs and unchanged 23-path README inventories passed all twelve scenarios and nine impact areas without changing the historical epoch."
+    }
+  ],
+  "limitations": [
+    "The count and digest prove repository path accounting only.",
+    "Hosted Production, provider settings and public behaviour remain separate claims."
+  ],
+  "nonClaims": [
+    "No harness-effectiveness epoch was rerun or upgraded.",
+    "No provider token value is stored in the repository."
+  ]
+}

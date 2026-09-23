@@ -73,7 +73,7 @@
       "readback": {
         "availability": "available",
         "outcome": "inconclusive",
-        "evidence": "GitHub name-only readback on 2026-08-31 found only DOPPLER_TOKEN in infrastructure-read-only-preview after the three unused artifact duplicates were removed. The token is read-only, scoped only to bundjil/stg and expires 2026-09-23T00:13:50Z. Exact-head CI and Preview runs passed with 63 accepted, 92 report-only, zero blocking, zero inconclusive, 155 no-ops and zero provider writes. Exact bundjil/stg readback matched the accepted version 3 manifest metadata without exposing values."
+        "evidence": "On 2026-09-23 the Personal Doppler stg token was replaced with a read-only, config-scoped token expiring 2027-09-23T07:40:23Z. GitHub infrastructure-read-only-preview DOPPLER_TOKEN metadata changed at 2026-09-23T07:40:26Z. Hosted report-only Preview run 35833002620 passed on main with its Doppler fetch and drift report steps successful. The dated rotation receipt records the exact provider metadata and limitations; no token value was retained."
       }
     },
     {

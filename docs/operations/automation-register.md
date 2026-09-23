@@ -3,7 +3,7 @@ document_type: automation-register
 lifecycle: current
 authority: canonical
 owner: bundjil-security-automation-maintainer
-last_reviewed: 2026-08-31
+last_reviewed: 2026-09-23
 review_trigger: workflow, action pin, token, OIDC, permission, trigger, target gate, concurrency, timeout, release, review, receipt, or external-setting change
 ---
 
@@ -91,6 +91,12 @@ read-only Doppler token and the separate non-secret callback alias. The unused
 Vercel secret and variable duplicates were removed after exact-main Production
 and independent provider proof. The workflow fetches `bundjil/prd` once and
 maps four identifiers plus the two exact project credentials.
+On 2026-09-23 the Production bootstrap token was replaced with a one-year,
+read-only `bundjil/prd` token and GitHub secret metadata confirmed the update.
+Its next hosted Production fetch is still pending; the Preview run proves only
+the separate `bundjil/stg` binding. The
+[dated rotation receipt](../evidence/verification/details/doppler-github-bootstrap-rotation-2026-09-23.json)
+owns the one-run details.
 
 - **Signal and target:** only a completed successful `CI` `workflow_run` for a
   same-repository `push` to `main` may start the writer. The exact head SHA is
@@ -165,6 +171,11 @@ this report-only automation. CI run `33357705409` and Preview run `33357705406`
 passed exact head `edc5e9d0269dea81d39eb38b734a5b233884cd2e`. The hosted
 Preview receipt matched the local 63 accepted, 92 report-only, zero blocking,
 zero inconclusive, 155-no-op and zero-write result.
+
+On 2026-09-23 the Preview bootstrap token was replaced with a one-year,
+read-only `bundjil/stg` token. Hosted run `35833002620` passed the Doppler
+fetch, custody preparation, and report-only drift steps. The dated rotation
+receipt above owns its exact metadata.
 
 CI run `32455191281` passed exact successor SHA
 `f5c707c4da8065993e6886130f887a774ff71520`. Same-source drift run
