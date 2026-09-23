@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "documentType": "operations-receipt",
+  "lifecycle": "evidence",
+  "authority": "supporting",
+  "owner": "bundjil-security-automation-maintainer",
+  "observedAt": "2026-09-23T07:42:39Z",
+  "actor": {
+    "dopplerWorkplace": "Personal",
+    "dopplerProject": "bundjil",
+    "githubAccount": "crcorbett",
+    "githubRepository": "crcorbett/bundjil"
+  },
+  "approval": "Cooper's 2026-09-23 request in Bundjil task 019f3c64-2576-70c2-90c0-e6b212f79ee1 to renew the two tokens for one year",
+  "sourceSha": "6fe5398b1164af5ececb4a4588a85c8de31b1149",
+  "metadataDigestSha256": "b54efcc029a60f01867a1b2a81871d6fa9556f716e38cd182cc7495ce2ea6c39",
+  "metadataDigestInput": "sourceSha|stg|stgTokenSlug|stgExpiry|stgGitHubUpdatedAt|prd|prdTokenSlug|prdExpiry|prdGitHubUpdatedAt|previewRunId",
+  "preview": {
+    "dopplerConfig": "stg",
+    "tokenName": "bundjil-github-preview-2026-09-23",
+    "tokenSlug": "fb474c4a-a7fb-4c33-a2fd-489f1bfd45ec",
+    "access": "read",
+    "expiresAt": "2027-09-23T07:40:23Z",
+    "githubEnvironment": "infrastructure-read-only-preview",
+    "githubSecretName": "DOPPLER_TOKEN",
+    "githubSecretUpdatedAt": "2026-09-23T07:40:26Z",
+    "scopeCheck": "stg read succeeded; prd read denied",
+    "hostedRunId": 35833002620,
+    "hostedRunUrl": "https://github.com/crcorbett/bundjil/actions/runs/35833002620",
+    "hostedResult": "success: Doppler fetch, custody preparation and report-only drift completed"
+  },
+  "production": {
+    "dopplerConfig": "prd",
+    "tokenName": "bundjil-github-production-2026-09-23",
+    "tokenSlug": "f2b4c2b0-cf6e-42a8-ba1f-ece4a28ddab7",
+    "access": "read",
+    "expiresAt": "2027-09-23T07:42:36Z",
+    "githubEnvironment": "Production",
+    "githubSecretName": "DOPPLER_TOKEN",
+    "githubSecretUpdatedAt": "2026-09-23T07:42:39Z",
+    "scopeCheck": "prd read succeeded; stg read denied",
+    "hostedResult": "pending next eligible automatic Production run"
+  },
+  "postcondition": "Both exact GitHub Environment secrets have new read-only, config-scoped one-year token bindings; the Preview consumer passed.",
+  "rollbackIdentity": "The prior tokens expired on 2026-09-23. Rebind a newly issued exact-config token if a consumer fails; revoke only the identified replacement slug after a valid successor is bound.",
+  "limitations": [
+    "GitHub secret values are write-only; metadata timestamps and hosted use are the available binding checks.",
+    "The new Production token has direct read and cross-config denial proof but no hosted Production fetch yet.",
+    "The Preview run proves its report-only command, not a Production deployment or end-user behaviour."
+  ],
+  "nonClaims": [
+    "No Vercel credential or deployed runtime variable was rotated.",
+    "No new Production deployment or public channel response is claimed."
+  ]
+}
