@@ -4,10 +4,13 @@ import { inMemoryState, State } from "alchemy/State";
 import { Effect, Layer, Redacted, Schema } from "effect";
 import { describe, expect, it } from "vitest";
 
+import { AdoptionManifest } from "../src/adoption-manifest.js";
 import {
-  AdoptionManifest,
   AdoptionManifestDigest,
   AlchemyLogicalResourceId,
+  SyntheticPhysicalResourceId,
+} from "../src/schemas.js";
+import {
   makePreviewStateBackupStoreMemory,
   makePreviewStateMigrationLayer,
   PreviewStateMigration,
@@ -18,8 +21,7 @@ import {
   PreviewStateForbiddenValue,
   PreviewStateResourceFingerprint,
   PreviewStateResourceType,
-  SyntheticPhysicalResourceId,
-} from "../src/index.js";
+} from "../src/state/preview-state-migration.js";
 
 const sha256 = (value: string) =>
   createHash("sha256").update(value).digest("hex");

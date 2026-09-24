@@ -19,15 +19,15 @@ import authorityEnvelopeSchema from "../../../.agents/skills/docs-maintainer/ass
 import boundedReceiptSchema from "../../../.agents/skills/docs-maintainer/assets/harness/bounded-receipt.schema.json" with { type: "json" };
 import previewMigrationAuthorityPolicy from "../schemas/preview-state-migration-authority.schema.json" with { type: "json" };
 import productionMigrationAuthorityPolicy from "../schemas/production-state-migration-authority.schema.json" with { type: "json" };
+import { AdoptionManifestJson } from "../src/adoption-manifest.js";
+import { loadInfrastructurePhotonCredentials } from "../src/config.js";
 import {
-  AdoptionManifestJson,
-  InfrastructureStage,
   InfrastructureArtifactDigest,
   InfrastructureBoundedReceipt,
   InfrastructureBoundedReceiptJson,
-  layerAlchemyR2State,
-  loadAlchemyR2StateConfig,
-  loadInfrastructurePhotonCredentials,
+} from "../src/receipt.js";
+import { InfrastructureStage } from "../src/schemas.js";
+import {
   buildPreviewStateBackupStoreLive,
   PreviewStateBackupPath,
   PreviewStateForbiddenValue,
@@ -35,7 +35,11 @@ import {
   PreviewStateMigrationLive,
   PreviewStateMigration,
   ProductionStateMigrationLive,
-} from "../src/index.js";
+} from "../src/state/preview-state-migration.js";
+import {
+  layerAlchemyR2State,
+  loadAlchemyR2StateConfig,
+} from "../src/state/r2-state.js";
 import { VercelAccessToken } from "../src/vercel/index.js";
 
 const { dirname, isAbsolute } = nodePath;

@@ -14,8 +14,6 @@ export const InfrastructureReceiptStatus = Schema.Literals([
 ]);
 export type InfrastructureReceiptStatus =
   typeof InfrastructureReceiptStatus.Type;
-export type InfrastructureReceiptStatusEncoded =
-  typeof InfrastructureReceiptStatus.Encoded;
 
 export const InfrastructureArtifactDigest = Schema.String.pipe(
   Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/u)),
@@ -23,8 +21,6 @@ export const InfrastructureArtifactDigest = Schema.String.pipe(
 );
 export type InfrastructureArtifactDigest =
   typeof InfrastructureArtifactDigest.Type;
-export type InfrastructureArtifactDigestEncoded =
-  typeof InfrastructureArtifactDigest.Encoded;
 
 export const InfrastructureDetailArtifact = Schema.Struct({
   path: InfrastructureReceiptText,
@@ -32,8 +28,6 @@ export const InfrastructureDetailArtifact = Schema.Struct({
 });
 export type InfrastructureDetailArtifact =
   typeof InfrastructureDetailArtifact.Type;
-export type InfrastructureDetailArtifactEncoded =
-  typeof InfrastructureDetailArtifact.Encoded;
 
 const InfrastructureReceiptNonEmptyTexts = Schema.Array(
   InfrastructureReceiptText
@@ -63,13 +57,9 @@ export const InfrastructureBoundedReceipt = Schema.Struct({
 });
 export type InfrastructureBoundedReceipt =
   typeof InfrastructureBoundedReceipt.Type;
-export type InfrastructureBoundedReceiptEncoded =
-  typeof InfrastructureBoundedReceipt.Encoded;
 
 export const InfrastructureBoundedReceiptJson = Schema.fromJsonString(
   InfrastructureBoundedReceipt
 );
 export type InfrastructureBoundedReceiptJson =
   typeof InfrastructureBoundedReceiptJson.Type;
-export type InfrastructureBoundedReceiptJsonEncoded =
-  typeof InfrastructureBoundedReceiptJson.Encoded;

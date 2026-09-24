@@ -7,8 +7,6 @@ export const SyntheticProviderCredential = Schema.Redacted(
 );
 export type SyntheticProviderCredential =
   typeof SyntheticProviderCredential.Type;
-export type SyntheticProviderCredentialEncoded =
-  typeof SyntheticProviderCredential.Encoded;
 
 const syntheticProviderCredentialConfig = Config.schema(
   SyntheticProviderCredential,

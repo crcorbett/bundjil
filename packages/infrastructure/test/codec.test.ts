@@ -7,12 +7,14 @@ import { decodeSyntheticFixture } from "../src/__testing__/fixtures.js";
 import {
   AdoptionManifest,
   AdoptionManifestJson,
+} from "../src/adoption-manifest.js";
+import {
   InfrastructureArtifactDigest,
   InfrastructureBoundedReceipt,
   InfrastructureBoundedReceiptJson,
-  SecretOwnership,
-  SyntheticResourceProps,
-} from "../src/index.js";
+} from "../src/receipt.js";
+import { SyntheticResourceProps } from "../src/schemas.js";
+import { SecretOwnership } from "../src/secret-reference.js";
 
 it.effect("round trips foundational props and adoption JSON", () =>
   Effect.gen(function* testFoundationalCodecRoundTrips() {

@@ -4,11 +4,11 @@
 
 import { expect } from "bun:test";
 
+import { BundjilInfrastructureStack } from "@bundjil/infrastructure/stack";
 import { adopt } from "alchemy/AdoptPolicy";
 import * as Test from "alchemy/Test/Bun";
 import { Effect, Layer, Schema } from "effect";
 
-import { BundjilInfrastructureStack } from "../../../stacks/bundjil.js";
 import { AdoptionManifest } from "../src/adoption-manifest.js";
 import {
   layerVercelMemory,

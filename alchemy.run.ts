@@ -8,10 +8,9 @@ import {
   layerLiveReadOnlyAdoptionProviders,
   loadAdoptionCommand,
 } from "@bundjil/infrastructure";
+import { BundjilInfrastructureStack } from "@bundjil/infrastructure/stack";
 import * as Alchemy from "alchemy";
 import { Config, Effect, Layer, Schema } from "effect";
-
-import { BundjilInfrastructureStack } from "./stacks/bundjil.js";
 
 const failConfiguration = (message: string) =>
   Schema.decodeUnknownEffect(Schema.Never)(message).pipe(

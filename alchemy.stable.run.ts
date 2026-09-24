@@ -11,11 +11,10 @@ import {
   validateStableAdoptionCommand,
 } from "@bundjil/infrastructure";
 import type { AdoptionManifest } from "@bundjil/infrastructure";
+import { BundjilInfrastructureStack } from "@bundjil/infrastructure/stack";
 import { loadVercelStableEnvironmentAuthority } from "@bundjil/infrastructure/vercel";
 import * as Alchemy from "alchemy";
 import { Config, Effect, Layer, Schema } from "effect";
-
-import { BundjilInfrastructureStack } from "./stacks/bundjil.js";
 
 const failConfiguration = (message: string) =>
   Schema.decodeUnknownEffect(Schema.Never)(message).pipe(
@@ -65,7 +64,7 @@ export const buildStableInfrastructureDriftStack = Effect.fn(
   )
 );
 
-export const loadStableInfrastructureStack = Effect.all({
+const loadStableInfrastructureStack = Effect.all({
   authorityPath: loadVercelStableEnvironmentAuthority,
   command: loadAdoptionCommand,
 }).pipe(

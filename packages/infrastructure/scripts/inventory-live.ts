@@ -23,10 +23,11 @@ import authorityEnvelopeSchema from "../../../.agents/skills/docs-maintainer/ass
 import boundedReceiptSchema from "../../../.agents/skills/docs-maintainer/assets/harness/bounded-receipt.schema.json" with { type: "json" };
 import readOnlyInventoryAuthorityPolicy from "../schemas/read-only-inventory-authority.schema.json" with { type: "json" };
 import {
+  loadInfrastructureCommandConfig,
+  loadInfrastructurePhotonCredentials,
+} from "../src/config.js";
+import {
   canonicalizeInfrastructureObservedManifest,
-  InfrastructureArtifactDigest,
-  InfrastructureBoundedReceipt,
-  InfrastructureBoundedReceiptJson,
   InfrastructureInventory,
   InfrastructureInventoryArtifact,
   InfrastructureInventoryArtifactJson,
@@ -36,9 +37,12 @@ import {
   InfrastructureInventorySourceSha,
   InfrastructureInventoryTarget,
   InfrastructureObservedManifest,
-  loadInfrastructureCommandConfig,
-  loadInfrastructurePhotonCredentials,
-} from "../src/index.js";
+} from "../src/inventory.js";
+import {
+  InfrastructureArtifactDigest,
+  InfrastructureBoundedReceipt,
+  InfrastructureBoundedReceiptJson,
+} from "../src/receipt.js";
 import {
   VercelLive,
   VercelProjectCredentialsLive,

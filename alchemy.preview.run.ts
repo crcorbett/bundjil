@@ -2,14 +2,13 @@
 /** @effect-diagnostics anyUnknownInErrorContext:off */
 
 import { layerAlchemyR2State } from "@bundjil/infrastructure";
+import { BundjilPreviewVercelConfigurationStack } from "@bundjil/infrastructure/stack";
 import {
   layerVercelPreviewConfigurationLiveProviders,
   loadVercelPreviewConfigurationInput,
 } from "@bundjil/infrastructure/vercel";
 import * as Alchemy from "alchemy";
 import { Effect, Layer } from "effect";
-
-import { BundjilPreviewVercelConfigurationStack } from "./stacks/preview-vercel-configuration.js";
 
 export default loadVercelPreviewConfigurationInput.pipe(
   Effect.flatMap((input) => {

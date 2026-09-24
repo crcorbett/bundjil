@@ -34,8 +34,6 @@ export const InfrastructureDriftArtifactPath = Schema.String.pipe(
 );
 export type InfrastructureDriftArtifactPath =
   typeof InfrastructureDriftArtifactPath.Type;
-export type InfrastructureDriftArtifactPathEncoded =
-  typeof InfrastructureDriftArtifactPath.Encoded;
 
 export const InfrastructureDriftResourceFingerprint = Schema.String.pipe(
   Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/u)),
@@ -43,8 +41,6 @@ export const InfrastructureDriftResourceFingerprint = Schema.String.pipe(
 );
 export type InfrastructureDriftResourceFingerprint =
   typeof InfrastructureDriftResourceFingerprint.Type;
-export type InfrastructureDriftResourceFingerprintEncoded =
-  typeof InfrastructureDriftResourceFingerprint.Encoded;
 
 export const InfrastructureDriftSourceSha = Schema.String.pipe(
   Schema.check(Schema.isPattern(/^[a-f0-9]{40}$/u)),
@@ -52,8 +48,6 @@ export const InfrastructureDriftSourceSha = Schema.String.pipe(
 );
 export type InfrastructureDriftSourceSha =
   typeof InfrastructureDriftSourceSha.Type;
-export type InfrastructureDriftSourceShaEncoded =
-  typeof InfrastructureDriftSourceSha.Encoded;
 
 export const InfrastructureDriftRunIdentity = Schema.String.pipe(
   Schema.check(
@@ -65,8 +59,6 @@ export const InfrastructureDriftRunIdentity = Schema.String.pipe(
 );
 export type InfrastructureDriftRunIdentity =
   typeof InfrastructureDriftRunIdentity.Type;
-export type InfrastructureDriftRunIdentityEncoded =
-  typeof InfrastructureDriftRunIdentity.Encoded;
 
 export const InfrastructureDriftAction = Schema.Literals([
   "unchanged",
@@ -76,8 +68,6 @@ export const InfrastructureDriftAction = Schema.Literals([
   "unavailable",
 ]);
 export type InfrastructureDriftAction = typeof InfrastructureDriftAction.Type;
-export type InfrastructureDriftActionEncoded =
-  typeof InfrastructureDriftAction.Encoded;
 
 export const InfrastructureDriftReadback = Schema.Literals([
   "available",
@@ -86,8 +76,6 @@ export const InfrastructureDriftReadback = Schema.Literals([
 ]);
 export type InfrastructureDriftReadback =
   typeof InfrastructureDriftReadback.Type;
-export type InfrastructureDriftReadbackEncoded =
-  typeof InfrastructureDriftReadback.Encoded;
 
 export const InfrastructureDriftSecretRevision = Schema.Literals([
   "known",
@@ -96,8 +84,6 @@ export const InfrastructureDriftSecretRevision = Schema.Literals([
 ]);
 export type InfrastructureDriftSecretRevision =
   typeof InfrastructureDriftSecretRevision.Type;
-export type InfrastructureDriftSecretRevisionEncoded =
-  typeof InfrastructureDriftSecretRevision.Encoded;
 
 export const InfrastructureDriftProviderRead = Schema.Literals([
   "performed",
@@ -105,8 +91,6 @@ export const InfrastructureDriftProviderRead = Schema.Literals([
 ]);
 export type InfrastructureDriftProviderRead =
   typeof InfrastructureDriftProviderRead.Type;
-export type InfrastructureDriftProviderReadEncoded =
-  typeof InfrastructureDriftProviderRead.Encoded;
 
 export const InfrastructureDriftBaselineDisposition = Schema.Literals([
   "accepted",
@@ -114,8 +98,6 @@ export const InfrastructureDriftBaselineDisposition = Schema.Literals([
 ]);
 export type InfrastructureDriftBaselineDisposition =
   typeof InfrastructureDriftBaselineDisposition.Type;
-export type InfrastructureDriftBaselineDispositionEncoded =
-  typeof InfrastructureDriftBaselineDisposition.Encoded;
 
 export const InfrastructureDriftDiffClass = Schema.Literals([
   "no_op",
@@ -125,8 +107,6 @@ export const InfrastructureDriftDiffClass = Schema.Literals([
 ]);
 export type InfrastructureDriftDiffClass =
   typeof InfrastructureDriftDiffClass.Type;
-export type InfrastructureDriftDiffClassEncoded =
-  typeof InfrastructureDriftDiffClass.Encoded;
 
 export const InfrastructureDriftAttempts = Schema.Union([
   Schema.TaggedStruct("Observed", { count: NonNegativeInt }),
@@ -134,8 +114,6 @@ export const InfrastructureDriftAttempts = Schema.Union([
 ]);
 export type InfrastructureDriftAttempts =
   typeof InfrastructureDriftAttempts.Type;
-export type InfrastructureDriftAttemptsEncoded =
-  typeof InfrastructureDriftAttempts.Encoded;
 
 export const InfrastructureDriftDuration = Schema.Union([
   Schema.TaggedStruct("Observed", { milliseconds: NonNegativeInt }),
@@ -143,8 +121,6 @@ export const InfrastructureDriftDuration = Schema.Union([
 ]);
 export type InfrastructureDriftDuration =
   typeof InfrastructureDriftDuration.Type;
-export type InfrastructureDriftDurationEncoded =
-  typeof InfrastructureDriftDuration.Encoded;
 
 export const InfrastructureDriftResourceKind = Schema.Union([
   InfrastructureResourceKind,
@@ -152,8 +128,6 @@ export const InfrastructureDriftResourceKind = Schema.Union([
 ]);
 export type InfrastructureDriftResourceKind =
   typeof InfrastructureDriftResourceKind.Type;
-export type InfrastructureDriftResourceKindEncoded =
-  typeof InfrastructureDriftResourceKind.Encoded;
 
 export const InfrastructureDriftObservation = Schema.Struct({
   action: InfrastructureDriftAction,
@@ -177,8 +151,6 @@ export const InfrastructureDriftObservation = Schema.Struct({
 });
 export type InfrastructureDriftObservation =
   typeof InfrastructureDriftObservation.Type;
-export type InfrastructureDriftObservationEncoded =
-  typeof InfrastructureDriftObservation.Encoded;
 
 export const InfrastructureDriftCategory = Schema.Literals([
   "expectedProviderNormalization",
@@ -196,8 +168,6 @@ export const InfrastructureDriftCategory = Schema.Literals([
 ]);
 export type InfrastructureDriftCategory =
   typeof InfrastructureDriftCategory.Type;
-export type InfrastructureDriftCategoryEncoded =
-  typeof InfrastructureDriftCategory.Encoded;
 
 export const InfrastructureDriftDisposition = Schema.Literals([
   "accepted",
@@ -207,8 +177,6 @@ export const InfrastructureDriftDisposition = Schema.Literals([
 ]);
 export type InfrastructureDriftDisposition =
   typeof InfrastructureDriftDisposition.Type;
-export type InfrastructureDriftDispositionEncoded =
-  typeof InfrastructureDriftDisposition.Encoded;
 
 export const InfrastructureDriftFinding = Schema.Struct({
   category: InfrastructureDriftCategory,
@@ -218,8 +186,6 @@ export const InfrastructureDriftFinding = Schema.Struct({
   source: Schema.Literals(["desiredPlan", "nativeSync"]),
 });
 export type InfrastructureDriftFinding = typeof InfrastructureDriftFinding.Type;
-export type InfrastructureDriftFindingEncoded =
-  typeof InfrastructureDriftFinding.Encoded;
 
 const InfrastructureDriftDesiredPlanCounts = Schema.Struct({
   create: NonNegativeInt,
@@ -235,8 +201,6 @@ export const InfrastructureDriftDesiredPlan = Schema.Union([
 ]);
 export type InfrastructureDriftDesiredPlan =
   typeof InfrastructureDriftDesiredPlan.Type;
-export type InfrastructureDriftDesiredPlanEncoded =
-  typeof InfrastructureDriftDesiredPlan.Encoded;
 
 export const InfrastructureDriftReportInput = Schema.Struct({
   authorityFingerprint: InfrastructureDriftResourceFingerprint,
@@ -257,12 +221,6 @@ export const InfrastructureDriftReportInput = Schema.Struct({
 });
 export type InfrastructureDriftReportInput =
   typeof InfrastructureDriftReportInput.Type;
-export type InfrastructureDriftReportInputEncoded =
-  typeof InfrastructureDriftReportInput.Encoded;
-export const InfrastructureDriftReportInputJson = Schema.fromJsonString(
-  InfrastructureDriftReportInput
-);
-
 export const InfrastructureDriftReportStatus = Schema.Literals([
   "no_op",
   "passed",
@@ -271,8 +229,6 @@ export const InfrastructureDriftReportStatus = Schema.Literals([
 ]);
 export type InfrastructureDriftReportStatus =
   typeof InfrastructureDriftReportStatus.Type;
-export type InfrastructureDriftReportStatusEncoded =
-  typeof InfrastructureDriftReportStatus.Encoded;
 
 export const InfrastructureDriftReport = Schema.Struct({
   authorityFingerprint: InfrastructureDriftResourceFingerprint,
@@ -297,8 +253,6 @@ export const InfrastructureDriftReport = Schema.Struct({
   status: InfrastructureDriftReportStatus,
 });
 export type InfrastructureDriftReport = typeof InfrastructureDriftReport.Type;
-export type InfrastructureDriftReportEncoded =
-  typeof InfrastructureDriftReport.Encoded;
 
 export const hasAcceptedWriteOnlyBaseline = (input: {
   readonly action: InfrastructureDriftAction;
@@ -335,8 +289,6 @@ export const InfrastructureDriftReceiptInput = Schema.Struct({
 });
 export type InfrastructureDriftReceiptInput =
   typeof InfrastructureDriftReceiptInput.Type;
-export type InfrastructureDriftReceiptInputEncoded =
-  typeof InfrastructureDriftReceiptInput.Encoded;
 
 const categoryFor = (observation: InfrastructureDriftObservation) =>
   Match.value(observation).pipe(

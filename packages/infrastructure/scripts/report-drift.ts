@@ -33,12 +33,12 @@ import authorityEnvelopeSchema from "../../../.agents/skills/docs-maintainer/ass
 import boundedReceiptSchema from "../../../.agents/skills/docs-maintainer/assets/harness/bounded-receipt.schema.json" with { type: "json" };
 import { buildStableInfrastructureDriftStack } from "../../../alchemy.stable.run.js";
 import driftAuthorityPolicy from "../schemas/drift-report-authority.schema.json" with { type: "json" };
+import { loadAdoptionCommand } from "../src/adoption-command.js";
+import type { AdoptionManifest } from "../src/adoption-manifest.js";
 import {
   buildInfrastructureDriftReceipt,
   buildInfrastructureDriftReport,
   hasAcceptedWriteOnlyBaseline,
-  InfrastructureArtifactDigest,
-  InfrastructureBoundedReceiptJson,
   InfrastructureDriftArtifactPath,
   InfrastructureDriftObservation,
   InfrastructureDriftReportInput,
@@ -46,17 +46,19 @@ import {
   InfrastructureDriftResourceFingerprint,
   InfrastructureDriftRunIdentity,
   InfrastructureDriftSourceSha,
+} from "../src/drift.js";
+import type { InfrastructureDriftReport as InfrastructureDriftReportType } from "../src/drift.js";
+import {
+  InfrastructureArtifactDigest,
+  InfrastructureBoundedReceiptJson,
+} from "../src/receipt.js";
+import {
+  InfrastructureOwnershipState,
   InfrastructureStage,
-  layerAlchemyR2State,
-  loadAdoptionCommand,
-  validateStableAdoptionCommand,
-} from "../src/index.js";
-import type {
-  AdoptionManifest,
-  InfrastructureDriftReport as InfrastructureDriftReportType,
-} from "../src/index.js";
-import { InfrastructureOwnershipState } from "../src/schemas.js";
+} from "../src/schemas.js";
 import { SecretOwnership } from "../src/secret-reference.js";
+import { validateStableAdoptionCommand } from "../src/stable-adoption-command.js";
+import { layerAlchemyR2State } from "../src/state/r2-state.js";
 import { VercelEnvironmentVariableUpdatedAt } from "../src/vercel/index.js";
 
 const { dirname } = nodePath;

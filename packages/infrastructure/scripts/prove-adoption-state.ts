@@ -21,19 +21,25 @@ import authorityEnvelopeSchema from "../../../.agents/skills/docs-maintainer/ass
 import boundedReceiptSchema from "../../../.agents/skills/docs-maintainer/assets/harness/bounded-receipt.schema.json" with { type: "json" };
 import productionStableEnvironmentAuthorityPolicy from "../schemas/production-stable-vercel-environment-authority.schema.json" with { type: "json" };
 import stableEnvironmentAuthorityPolicy from "../schemas/stable-vercel-environment-authority.schema.json" with { type: "json" };
-import { ManagedStableEnvironmentStateResource } from "../src/adoption-proof.js";
 import {
   AdoptionBindingProfile,
   AdoptionManifestJson,
-  AlchemyLogicalResourceId,
+} from "../src/adoption-manifest.js";
+import { ManagedStableEnvironmentStateResource } from "../src/adoption-proof.js";
+import { loadInfrastructurePhotonCredentials } from "../src/config.js";
+import {
   InfrastructureArtifactDigest,
   InfrastructureBoundedReceipt,
   InfrastructureBoundedReceiptJson,
+} from "../src/receipt.js";
+import {
+  AlchemyLogicalResourceId,
   InfrastructureStage,
+} from "../src/schemas.js";
+import {
   layerAlchemyR2State,
   loadAlchemyR2StateConfig,
-  loadInfrastructurePhotonCredentials,
-} from "../src/index.js";
+} from "../src/state/r2-state.js";
 import { VercelAccessToken } from "../src/vercel/index.js";
 
 const { dirname, isAbsolute } = nodePath;

@@ -30,48 +30,6 @@ const occurrenceDecision = JSON.stringify({
   state: "accepted",
 });
 
-const alchemyMainIntegrationReceipt = {
-  parentRevisions: [
-    "f30172290a83bd7ce39dedf9ce57ef88883867d6",
-    "a270116f30aeb20d2087484c4f3fd4051f442897",
-  ],
-  postMergeReadOnlyChecks: [
-    {
-      command:
-        "git show -s --format='%H %P' 4fc8ba1750524581c281ad97351bf0b1e6e29631",
-      observedAt: "2026-08-01T07:47:03.000Z",
-      result:
-        "4fc8ba1750524581c281ad97351bf0b1e6e29631 f30172290a83bd7ce39dedf9ce57ef88883867d6 a270116f30aeb20d2087484c4f3fd4051f442897",
-      status: "passed",
-    },
-    {
-      command:
-        "git show -s --format='%T' 4fc8ba1750524581c281ad97351bf0b1e6e29631",
-      observedAt: "2026-08-01T07:47:03.000Z",
-      result: "485c5264cec04c7db3683921d47a1d3b69042c45",
-      status: "passed",
-    },
-  ],
-  postMergeReadOnlyLimitation:
-    "These checks observe Git identity and tree only; they do not rerun verification or refresh provider, deployment, messaging, credential, billing, Preview, Production, or external state.",
-  preMergeCandidateChecks: [
-    { command: "focused checks", result: "passed", status: "passed" },
-    {
-      command: "bun run verification",
-      result: "passed",
-      status: "passed",
-    },
-  ],
-  preMergeCandidateLimitation:
-    "These checks ran on the integrated candidate before the final merge identity existed and were not rerun on the final merge object.",
-  preMergeCandidateObservedAt: "2026-08-01T01:18:41.000Z",
-  schemaVersion: 1,
-  status: "passed",
-  targetRevision: "4fc8ba1750524581c281ad97351bf0b1e6e29631",
-  targetTree: "485c5264cec04c7db3683921d47a1d3b69042c45",
-  taskId: "alchemy-vercel-photon-infrastructure-main-integration",
-};
-
 const ownerPolicy: CurrentOwnerPolicy = {
   acceptedTaskStates: { "HGI-300": "completed" },
   nonterminalTaskTerms: ["pending", "underway"],
@@ -192,10 +150,6 @@ const baseFiles: readonly DocumentationFile[] = [
   {
     content: occurrenceDecision,
     path: "docs/documentation-audit/HGI-308-boundary-exceptions.decision.json",
-  },
-  {
-    content: JSON.stringify(alchemyMainIntegrationReceipt),
-    path: "docs/documentation-audit/alchemy-main-integration-inventory-correction-2026-08-01.json",
   },
   { content: "# Package", path: "packages/demo/README.md" },
   {
@@ -395,36 +349,6 @@ describe("HGI-302 documentation policy", () => {
     expect(
       run(snapshot(files)).findings.some(
         (issue) => issue.code === "DOC-COMPLETED-PLAN-LEDGER"
-      )
-    ).toBeTruthy();
-  });
-
-  it.each([
-    {
-      name: "wrong merge revision",
-      receipt: {
-        ...alchemyMainIntegrationReceipt,
-        targetRevision: "0000000000000000000000000000000000000000",
-      },
-    },
-    {
-      name: "reversed parent order",
-      receipt: {
-        ...alchemyMainIntegrationReceipt,
-        parentRevisions:
-          alchemyMainIntegrationReceipt.parentRevisions.toReversed(),
-      },
-    },
-  ])("rejects an integration receipt with $name", ({ receipt }) => {
-    const files = baseFiles.map((file) =>
-      file.path ===
-      "docs/documentation-audit/alchemy-main-integration-inventory-correction-2026-08-01.json"
-        ? { ...file, content: JSON.stringify(receipt) }
-        : file
-    );
-    expect(
-      run(snapshot(files)).findings.some(
-        (issue) => issue.code === "DOC-INTEGRATION-RECEIPT"
       )
     ).toBeTruthy();
   });

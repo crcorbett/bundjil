@@ -9,7 +9,6 @@ export const AdoptionCommand = Schema.Struct({
   manifest: AdoptionManifest,
 });
 export type AdoptionCommand = typeof AdoptionCommand.Type;
-export type AdoptionCommandEncoded = typeof AdoptionCommand.Encoded;
 
 const failAdoptionCommandConfiguration = (message: string) =>
   Schema.decodeUnknownEffect(Schema.Never)(message).pipe(

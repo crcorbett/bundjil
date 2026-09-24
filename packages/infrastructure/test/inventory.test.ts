@@ -30,7 +30,7 @@ import {
   InfrastructureInventoryPrincipalFingerprint,
   InfrastructureInventorySourceSha,
   InfrastructureInventoryTarget,
-} from "../src/index.js";
+} from "../src/inventory.js";
 import {
   layerVercelMemory,
   VercelCanonicalDomain,
