@@ -58,7 +58,11 @@ const discoverPaths = Effect.tryPromise({
     if (exitCode !== 0) {
       throw new Error(stderr || `git ls-files exited ${exitCode}`);
     }
-    return stdout.split("\0").filter(Boolean).toSorted();
+    const paths = stdout.split("\0").filter(Boolean);
+    const existing = await Promise.all(
+      paths.map((path) => Bun.file(resolve(repositoryRoot, path)).exists())
+    );
+    return paths.filter((_, index) => existing[index]).toSorted();
   },
   catch: (cause) =>
     new ControlAuditError({

@@ -5,17 +5,21 @@ import { Effect, Exit, Schema } from "effect";
 
 import {
   AdoptionManifest,
-  AdoptionManifestDigest,
-  AlchemyLogicalResourceId,
   buildAdoptionManifest,
   buildAdoptionManifestReadmissionDigest,
-  InfrastructureCommandInput,
+  reAdmitAdoptionManifest,
+  verifyAdoptionManifestAgainstInventory,
+} from "../src/adoption-manifest.js";
+import {
   InfrastructureInventoryArtifact,
   InfrastructureInventoryDigest,
-  reAdmitAdoptionManifest,
-  validateStableAdoptionCommand,
-  verifyAdoptionManifestAgainstInventory,
-} from "../src/index.js";
+} from "../src/inventory.js";
+import {
+  AdoptionManifestDigest,
+  AlchemyLogicalResourceId,
+  InfrastructureCommandInput,
+} from "../src/schemas.js";
+import { validateStableAdoptionCommand } from "../src/stable-adoption-command.js";
 
 const decodeAdoptionManifestUnknown = (input: unknown) =>
   Schema.decodeUnknownEffect(AdoptionManifest)(input, {

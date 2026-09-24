@@ -8,7 +8,6 @@
     "../../alchemy.preview.run.ts",
     "../../alchemy.stable.run.ts",
     "../../docs/standards/alchemy-infrastructure-drift.control.json",
-    "../../stacks/**/*.ts",
     "./scripts/**/*.ts",
     "./schemas/**/*.json",
     "./src/**/*.ts",

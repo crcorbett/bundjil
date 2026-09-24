@@ -68,8 +68,6 @@ export const InfrastructureInventoryPrincipalFingerprint = Schema.String.pipe(
 );
 export type InfrastructureInventoryPrincipalFingerprint =
   typeof InfrastructureInventoryPrincipalFingerprint.Type;
-export type InfrastructureInventoryPrincipalFingerprintEncoded =
-  typeof InfrastructureInventoryPrincipalFingerprint.Encoded;
 
 export const InfrastructureInventorySourceSha = Schema.String.pipe(
   Schema.check(Schema.isPattern(/^[a-f0-9]{40}$/u)),
@@ -77,8 +75,6 @@ export const InfrastructureInventorySourceSha = Schema.String.pipe(
 );
 export type InfrastructureInventorySourceSha =
   typeof InfrastructureInventorySourceSha.Type;
-export type InfrastructureInventorySourceShaEncoded =
-  typeof InfrastructureInventorySourceSha.Encoded;
 
 export const InfrastructureInventoryDigest = Schema.String.pipe(
   Schema.check(Schema.isPattern(/^[a-f0-9]{64}$/u)),
@@ -86,8 +82,6 @@ export const InfrastructureInventoryDigest = Schema.String.pipe(
 );
 export type InfrastructureInventoryDigest =
   typeof InfrastructureInventoryDigest.Type;
-export type InfrastructureInventoryDigestEncoded =
-  typeof InfrastructureInventoryDigest.Encoded;
 
 export const InfrastructureInventoryReadMessage = Schema.NonEmptyString.pipe(
   Schema.check(Schema.isMaxLength(500)),
@@ -95,8 +89,6 @@ export const InfrastructureInventoryReadMessage = Schema.NonEmptyString.pipe(
 );
 export type InfrastructureInventoryReadMessage =
   typeof InfrastructureInventoryReadMessage.Type;
-export type InfrastructureInventoryReadMessageEncoded =
-  typeof InfrastructureInventoryReadMessage.Encoded;
 
 export const InfrastructureInventoryTarget = Schema.Struct({
   stage: InfrastructureStage,
@@ -108,8 +100,6 @@ export const InfrastructureInventoryTarget = Schema.Struct({
 });
 export type InfrastructureInventoryTarget =
   typeof InfrastructureInventoryTarget.Type;
-export type InfrastructureInventoryTargetEncoded =
-  typeof InfrastructureInventoryTarget.Encoded;
 
 export const PhotonInventoryProjectObservation = Schema.Union([
   Schema.TaggedStruct("Missing", { projectId: PhotonProjectId }),
@@ -120,8 +110,6 @@ export const PhotonInventoryProjectObservation = Schema.Union([
 ]);
 export type PhotonInventoryProjectObservation =
   typeof PhotonInventoryProjectObservation.Type;
-export type PhotonInventoryProjectObservationEncoded =
-  typeof PhotonInventoryProjectObservation.Encoded;
 
 export const PhotonReadOnlyInventory = Schema.Struct({
   project: PhotonInventoryProjectObservation,
@@ -132,8 +120,6 @@ export const PhotonReadOnlyInventory = Schema.Struct({
   billing: PhotonBillingObservation,
 });
 export type PhotonReadOnlyInventory = typeof PhotonReadOnlyInventory.Type;
-export type PhotonReadOnlyInventoryEncoded =
-  typeof PhotonReadOnlyInventory.Encoded;
 
 export const InfrastructureObservedManifest = Schema.Struct({
   schemaVersion: Schema.Literal("1"),
@@ -144,8 +130,6 @@ export const InfrastructureObservedManifest = Schema.Struct({
 });
 export type InfrastructureObservedManifest =
   typeof InfrastructureObservedManifest.Type;
-export type InfrastructureObservedManifestEncoded =
-  typeof InfrastructureObservedManifest.Encoded;
 
 export const InfrastructureInventoryArtifact = Schema.Struct({
   schemaVersion: Schema.Literal("1"),
@@ -161,8 +145,6 @@ export const InfrastructureInventoryArtifact = Schema.Struct({
 });
 export type InfrastructureInventoryArtifact =
   typeof InfrastructureInventoryArtifact.Type;
-export type InfrastructureInventoryArtifactEncoded =
-  typeof InfrastructureInventoryArtifact.Encoded;
 export const InfrastructureInventoryArtifactJson = Schema.fromJsonString(
   InfrastructureInventoryArtifact
 );

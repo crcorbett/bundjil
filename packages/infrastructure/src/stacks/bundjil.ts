@@ -1,11 +1,14 @@
 // oxlint-disable-next-line eslint-plugin-jsdoc/check-tag-names -- Effect language-service file directive.
 /** @effect-diagnostics anyUnknownInErrorContext:off */
 
+import { RemovalPolicy } from "alchemy/RemovalPolicy";
+import { Stage } from "alchemy/Stage";
+import { Config, Effect, Match, Schema } from "effect";
+
 import type {
   AdoptionManifest,
   AdoptionManifestResource,
-} from "@bundjil/infrastructure";
-import { InfrastructureStage } from "@bundjil/infrastructure";
+} from "../adoption-manifest.js";
 import {
   PhotonBillingObservationResource,
   PhotonLineObservationResource,
@@ -13,17 +16,15 @@ import {
   PhotonProjectObservationResource,
   PhotonSharedUserResource,
   PhotonWebhookObservationResource,
-} from "@bundjil/infrastructure/photon";
+} from "../photon/providers.js";
+import { InfrastructureStage } from "../schemas.js";
 import {
   VercelDeploymentObservationResource,
   VercelEnvironmentVariable,
   VercelMarketplaceBinding,
   VercelProject,
   VercelProjectDomain,
-} from "@bundjil/infrastructure/vercel";
-import { RemovalPolicy } from "alchemy/RemovalPolicy";
-import { Stage } from "alchemy/Stage";
-import { Config, Effect, Match, Schema } from "effect";
+} from "../vercel/providers.js";
 
 const failConfiguration = (message: string) =>
   Schema.decodeUnknownEffect(Schema.Never)(message).pipe(
@@ -112,8 +113,10 @@ const deployAdoptionResource = (
     Effect.provideService(RemovalPolicy, resource.removalPolicy)
   );
 
-export const BundjilInfrastructureStack = (manifest: AdoptionManifest) =>
-  Effect.gen(function* bundjilInfrastructureStack() {
+export const BundjilInfrastructureStack = Effect.fn(
+  "InfrastructureStack.declare"
+)((manifest: AdoptionManifest) =>
+  Effect.gen(function* () {
     const rawStage = yield* Stage;
     const stage = yield* Schema.decodeUnknownEffect(InfrastructureStage)(
       rawStage
@@ -135,4 +138,5 @@ export const BundjilInfrastructureStack = (manifest: AdoptionManifest) =>
       retainedResourceCount: manifest.resources.length,
       observedManifestDigest: manifest.digest,
     };
-  });
+  })
+);

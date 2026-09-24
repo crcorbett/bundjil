@@ -21,6 +21,7 @@ apps/
 
 packages/
   infrastructure/     Private Alchemy resources, providers, state-safe contracts.
+    src/stacks/        Stage-aware Alchemy resource declarations.
   channel/            Provider-neutral direct-text Channel contracts.
   sendblue/           Sendblue ChannelTransport adapter.
   photon/             Photon Spectrum ChannelTransport adapter.
@@ -47,8 +48,7 @@ tooling/
 .claude/              Symlinked Claude skill/config surface.
 .local/references/    Ignored local source references for Eve and Effect.
 
-alchemy.run.ts         Root Alchemy stack router; no provider transport details.
-stacks/                Stage-aware infrastructure topology and stack outputs.
+alchemy*.run.ts        Thin Alchemy entrypoints; no provider transport details.
 ```
 
 ## Ownership Rule
@@ -197,12 +197,20 @@ plane.
   authority-validated report adapter around the same root stack, native
   desired plan, and native `sync --dry-run`; it does not implement a second
   drift engine or expose repair;
-- keeps root stack topology in `alchemy.run.ts` and `stacks/**`, provider
-  clients private to their eventual owning adapters, and Vercel Git deployment
+- keeps root Alchemy entrypoints thin and its resource declarations behind
+  `@bundjil/infrastructure/stack`; provider clients remain private to their
+  owning adapters, and Vercel Git deployment
   ownership outside Alchemy configuration reconciliation;
-- exposes only its root contract and explicit testing fixture surface; it
-  exposes no raw client, provider DTO, generic callback, app environment
-  binding, or provider-operation authority;
+- keeps operator commands under `packages/infrastructure/scripts/**` rather
+  than in the root Alchemy graph. Unlike Site's Cloudflare Website graph,
+  Bundjil also has adopted Vercel and Photon resources, report-only drift,
+  and a Git-owned deployment path. Those capabilities must not be folded into
+  one deployment declaration merely to match Site's smaller layout;
+- keeps the root export limited to Alchemy entrypoint composition and base
+  identity brands. Its scripts and tests import owner files directly; the
+  `./stack`, `./testing`, `./vercel`, and `./photon` paths stay explicit. No
+  raw client, provider DTO, generic callback, app environment binding, or
+  provider-operation authority is exported;
 - exposes the private `@bundjil/infrastructure/vercel` read/import subpath with
   state-safe Vercel contracts, five named services, live/memory Layers, and
   retained custom Resources. HTTP clients, response DTOs, bearer credentials,

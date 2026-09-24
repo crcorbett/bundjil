@@ -47,7 +47,6 @@ export const AdoptionResourceOwner = Schema.Union([
   Schema.TaggedStruct("PhotonProject", { projectId: PhotonProjectId }),
 ]);
 export type AdoptionResourceOwner = typeof AdoptionResourceOwner.Type;
-export type AdoptionResourceOwnerEncoded = typeof AdoptionResourceOwner.Encoded;
 
 const AdoptionResourceFields = {
   stage: InfrastructureStage,
@@ -210,8 +209,6 @@ export const AdoptionManifestResource = Schema.Union([
   PhotonBillingAdoptionManifestResource,
 ]);
 export type AdoptionManifestResource = typeof AdoptionManifestResource.Type;
-export type AdoptionManifestResourceEncoded =
-  typeof AdoptionManifestResource.Encoded;
 
 const AdoptionManifestWithoutChecks = Schema.Struct({
   schemaVersion: Schema.Literal("1"),
@@ -254,11 +251,9 @@ export const AdoptionManifest = AdoptionManifestWithoutChecks.pipe(
   )
 );
 export type AdoptionManifest = typeof AdoptionManifest.Type;
-export type AdoptionManifestEncoded = typeof AdoptionManifest.Encoded;
 
 export const AdoptionManifestJson = Schema.fromJsonString(AdoptionManifest);
 export type AdoptionManifestJson = typeof AdoptionManifestJson.Type;
-export type AdoptionManifestJsonEncoded = typeof AdoptionManifestJson.Encoded;
 
 export const AdoptionManifestBuildMessage = Schema.NonEmptyString.pipe(
   Schema.check(Schema.isMaxLength(300)),
@@ -266,8 +261,6 @@ export const AdoptionManifestBuildMessage = Schema.NonEmptyString.pipe(
 );
 export type AdoptionManifestBuildMessage =
   typeof AdoptionManifestBuildMessage.Type;
-export type AdoptionManifestBuildMessageEncoded =
-  typeof AdoptionManifestBuildMessage.Encoded;
 
 export class AdoptionManifestBuildError extends Schema.TaggedErrorClass<AdoptionManifestBuildError>()(
   "AdoptionManifestBuildError",
@@ -290,8 +283,6 @@ export const AdoptionProviderScopes = Schema.Struct({
   photon: PhotonInventoryScope,
 });
 export type AdoptionProviderScopes = typeof AdoptionProviderScopes.Type;
-export type AdoptionProviderScopesEncoded =
-  typeof AdoptionProviderScopes.Encoded;
 
 export const AdoptionBindingProfile = Schema.Literals([
   "observedOnly",
@@ -299,8 +290,6 @@ export const AdoptionBindingProfile = Schema.Literals([
   "productionPhotonManaged",
 ]);
 export type AdoptionBindingProfile = typeof AdoptionBindingProfile.Type;
-export type AdoptionBindingProfileEncoded =
-  typeof AdoptionBindingProfile.Encoded;
 
 export const AdoptionManifestReadmission = Schema.Struct({
   digest: AdoptionManifestDigest,
@@ -308,8 +297,6 @@ export const AdoptionManifestReadmission = Schema.Struct({
 });
 export type AdoptionManifestReadmission =
   typeof AdoptionManifestReadmission.Type;
-export type AdoptionManifestReadmissionEncoded =
-  typeof AdoptionManifestReadmission.Encoded;
 
 const AdoptionManifestReadmissionResources = Schema.NonEmptyArray(
   Schema.Struct({

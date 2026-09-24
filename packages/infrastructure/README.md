@@ -7,9 +7,10 @@ receipts, and retained custom Resources.
 
 ## Public exports
 
-- `@bundjil/infrastructure` — shared infrastructure contracts, services,
-  configuration, receipts, inventory, drift, state, adoption, and synthetic
-  provider capabilities.
+- `@bundjil/infrastructure` — the narrow Alchemy entrypoint composition
+  contract: adoption loading and provider Layers, R2 state, and the retained
+  base identity brands. Package-owned scripts and tests import their owning
+  source modules directly instead of expanding this public entry.
 - `@bundjil/infrastructure/testing` — decoded deterministic test fixtures.
 - `@bundjil/infrastructure/vercel` — Vercel-owned Schemas, identities,
   services, safe errors, and explicit read/write-capability Layers. Preview
@@ -18,6 +19,8 @@ receipts, and retained custom Resources.
   filesystem, parser, and primitive-string failures remain private.
 - `@bundjil/infrastructure/photon` — retained Photon observation Resources and
   the separately composed Preview webhook-binding capability.
+- `@bundjil/infrastructure/stack` — the two Alchemy resource declarations used
+  by the root adoption and Preview configuration entrypoints.
 
 Raw provider clients, wire DTOs, credentials, secret values, and unchecked
 provider failures are not public exports.

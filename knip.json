@@ -6,11 +6,12 @@
     ".": {
       "entry": [
         "alchemy.run.ts",
-        "stacks/**/*.ts",
+        "alchemy.preview.run.ts",
+        "alchemy.stable.run.ts",
         "tooling/codec-provenance.fixture.ts"
       ],
       "ignoreDependencies": ["vercel"],
-      "project": ["stacks/**/*.ts", "tooling/**/*.ts"]
+      "project": ["alchemy.*.run.ts", "tooling/**/*.ts"]
     },
     "apps/agent": {
       "entry": [
@@ -36,11 +37,17 @@
     },
     "packages/infrastructure": {
       "entry": [
+        "scripts/**/*.ts",
         "test/**/*.compile.ts",
         "test/**/*.test.ts",
         "test-alchemy/**/*.test.ts"
       ],
-      "project": ["src/**/*.ts", "test/**/*.ts", "test-alchemy/**/*.ts"]
+      "project": [
+        "scripts/**/*.ts",
+        "src/**/*.ts",
+        "test/**/*.ts",
+        "test-alchemy/**/*.ts"
+      ]
     }
   }
 }

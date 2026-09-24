@@ -51,29 +51,23 @@ export const SyntheticMemoryFailureMode = Schema.Literals([
   "eventualConsistency",
 ]);
 export type SyntheticMemoryFailureMode = typeof SyntheticMemoryFailureMode.Type;
-export type SyntheticMemoryFailureModeEncoded =
-  typeof SyntheticMemoryFailureMode.Encoded;
 
 export const SyntheticMemoryConfig = Schema.Struct({
   resources: Schema.Array(SyntheticResourceAttributes),
   failureMode: SyntheticMemoryFailureMode,
 });
 export type SyntheticMemoryConfig = typeof SyntheticMemoryConfig.Type;
-export type SyntheticMemoryConfigEncoded = typeof SyntheticMemoryConfig.Encoded;
 
 export const SyntheticMemoryDrift = Schema.Struct({
   physicalId: SyntheticPhysicalResourceId,
   observedValue: SyntheticDesiredValue,
 });
 export type SyntheticMemoryDrift = typeof SyntheticMemoryDrift.Type;
-export type SyntheticMemoryDriftEncoded = typeof SyntheticMemoryDrift.Encoded;
 
 export const SyntheticMemoryWriteCount = Schema.Struct({
   count: Schema.Int.pipe(Schema.check(Schema.isGreaterThanOrEqualTo(0))),
 });
 export type SyntheticMemoryWriteCount = typeof SyntheticMemoryWriteCount.Type;
-export type SyntheticMemoryWriteCountEncoded =
-  typeof SyntheticMemoryWriteCount.Encoded;
 
 export interface SyntheticResourcesMemoryControlContract {
   readonly setFailureMode: (

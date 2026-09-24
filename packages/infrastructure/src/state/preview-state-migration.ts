@@ -32,8 +32,6 @@ export const PreviewStateResourceFingerprint = Schema.String.pipe(
 );
 export type PreviewStateResourceFingerprint =
   typeof PreviewStateResourceFingerprint.Type;
-export type PreviewStateResourceFingerprintEncoded =
-  typeof PreviewStateResourceFingerprint.Encoded;
 
 export const PreviewStateBackupPath = Schema.String.pipe(
   Schema.check(
@@ -50,35 +48,26 @@ export const PreviewStateBackupPath = Schema.String.pipe(
   Schema.brand("@bundjil/infrastructure/state/PreviewStateBackupPath")
 );
 export type PreviewStateBackupPath = typeof PreviewStateBackupPath.Type;
-export type PreviewStateBackupPathEncoded =
-  typeof PreviewStateBackupPath.Encoded;
 
 export const PreviewStateResourceType = Schema.NonEmptyString.pipe(
   Schema.brand("@bundjil/infrastructure/state/PreviewStateResourceType")
 );
 export type PreviewStateResourceType = typeof PreviewStateResourceType.Type;
-export type PreviewStateResourceTypeEncoded =
-  typeof PreviewStateResourceType.Encoded;
 
 export const PreviewStateNamespaceId = Schema.NonEmptyString.pipe(
   Schema.brand("@bundjil/infrastructure/state/PreviewStateNamespaceId")
 );
 export type PreviewStateNamespaceId = typeof PreviewStateNamespaceId.Type;
-export type PreviewStateNamespaceIdEncoded =
-  typeof PreviewStateNamespaceId.Encoded;
 
 export const PreviewStateFqn = Schema.NonEmptyString.pipe(
   Schema.brand("@bundjil/infrastructure/state/PreviewStateFqn")
 );
 export type PreviewStateFqn = typeof PreviewStateFqn.Type;
-export type PreviewStateFqnEncoded = typeof PreviewStateFqn.Encoded;
 
 export const PreviewStateInstanceId = Schema.NonEmptyString.pipe(
   Schema.brand("@bundjil/infrastructure/state/PreviewStateInstanceId")
 );
 export type PreviewStateInstanceId = typeof PreviewStateInstanceId.Type;
-export type PreviewStateInstanceIdEncoded =
-  typeof PreviewStateInstanceId.Encoded;
 
 export const PreviewStateMigrationErrorMessage = Schema.NonEmptyString.pipe(
   Schema.brand(
@@ -87,16 +76,12 @@ export const PreviewStateMigrationErrorMessage = Schema.NonEmptyString.pipe(
 );
 export type PreviewStateMigrationErrorMessage =
   typeof PreviewStateMigrationErrorMessage.Type;
-export type PreviewStateMigrationErrorMessageEncoded =
-  typeof PreviewStateMigrationErrorMessage.Encoded;
 
 export const PreviewStateMigrationCount = Schema.Int.pipe(
   Schema.check(Schema.isGreaterThanOrEqualTo(0)),
   Schema.brand("@bundjil/infrastructure/state/PreviewStateMigrationCount")
 );
 export type PreviewStateMigrationCount = typeof PreviewStateMigrationCount.Type;
-export type PreviewStateMigrationCountEncoded =
-  typeof PreviewStateMigrationCount.Encoded;
 
 export const PreviewStateMigrationFailureReason = Schema.Literals([
   "stateListFailed",
@@ -126,8 +111,6 @@ export const PreviewStateMigrationFailureReason = Schema.Literals([
 ]);
 export type PreviewStateMigrationFailureReason =
   typeof PreviewStateMigrationFailureReason.Type;
-export type PreviewStateMigrationFailureReasonEncoded =
-  typeof PreviewStateMigrationFailureReason.Encoded;
 
 export const PreviewStateForbiddenValue = Schema.Redacted(
   Schema.NonEmptyString.pipe(
@@ -135,8 +118,6 @@ export const PreviewStateForbiddenValue = Schema.Redacted(
   )
 );
 export type PreviewStateForbiddenValue = typeof PreviewStateForbiddenValue.Type;
-export type PreviewStateForbiddenValueEncoded =
-  typeof PreviewStateForbiddenValue.Encoded;
 
 const PreviewStateBinding = Schema.Struct({
   sid: Schema.String,
@@ -170,8 +151,6 @@ export const PreviewStateBackupResource = Schema.Struct({
   removalPolicy: Schema.Literal("retain"),
 });
 export type PreviewStateBackupResource = typeof PreviewStateBackupResource.Type;
-export type PreviewStateBackupResourceEncoded =
-  typeof PreviewStateBackupResource.Encoded;
 
 export const PreviewStateBackup = Schema.Struct({
   schemaVersion: Schema.Literal("1"),
@@ -182,7 +161,6 @@ export const PreviewStateBackup = Schema.Struct({
   resources: Schema.Array(PreviewStateBackupResource),
 });
 export type PreviewStateBackup = typeof PreviewStateBackup.Type;
-export type PreviewStateBackupEncoded = typeof PreviewStateBackup.Encoded;
 
 export const PreviewStateMigrationResult = Schema.Struct({
   status: Schema.Literals(["planned", "retired", "restored"]),
@@ -195,8 +173,6 @@ export const PreviewStateMigrationResult = Schema.Struct({
 });
 export type PreviewStateMigrationResult =
   typeof PreviewStateMigrationResult.Type;
-export type PreviewStateMigrationResultEncoded =
-  typeof PreviewStateMigrationResult.Encoded;
 
 export const PreviewStateMigrationPolicy = Schema.Struct({
   stage: InfrastructureStage,
@@ -207,8 +183,6 @@ export const PreviewStateMigrationPolicy = Schema.Struct({
 });
 export type PreviewStateMigrationPolicy =
   typeof PreviewStateMigrationPolicy.Type;
-export type PreviewStateMigrationPolicyEncoded =
-  typeof PreviewStateMigrationPolicy.Encoded;
 
 export class PreviewStateMigrationError extends Schema.TaggedErrorClass<PreviewStateMigrationError>()(
   "PreviewStateMigrationError",

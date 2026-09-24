@@ -1,15 +1,16 @@
 // oxlint-disable-next-line eslint-plugin-jsdoc/check-tag-names -- Effect language-service file directive.
 /** @effect-diagnostics anyUnknownInErrorContext:off */
 
-import type { VercelPreviewConfigurationInput } from "@bundjil/infrastructure/vercel";
-import {
-  VercelPreviewEnvironmentMetadata,
-  VercelPreviewFeedback,
-} from "@bundjil/infrastructure/vercel";
 import { adopt } from "alchemy/AdoptPolicy";
 import { destroy } from "alchemy/RemovalPolicy";
 import { Stage } from "alchemy/Stage";
 import { Config, Effect, Schema } from "effect";
+
+import {
+  VercelPreviewEnvironmentMetadata,
+  VercelPreviewFeedback,
+} from "../vercel/configuration-providers.js";
+import type { VercelPreviewConfigurationInput } from "../vercel/preview-configuration-authority.js";
 
 const PreviewStage = Schema.Literal("preview");
 
@@ -18,10 +19,10 @@ const failStage = (message: string) =>
     Effect.mapError((schemaFailure) => new Config.ConfigError(schemaFailure))
   );
 
-export const BundjilPreviewVercelConfigurationStack = (
-  input: VercelPreviewConfigurationInput
-) =>
-  Effect.gen(function* bundjilPreviewVercelConfigurationStack() {
+export const BundjilPreviewVercelConfigurationStack = Effect.fn(
+  "PreviewVercelConfigurationStack.declare"
+)((input: VercelPreviewConfigurationInput) =>
+  Effect.gen(function* () {
     const rawStage = yield* Stage;
     const stage = yield* Schema.decodeUnknownEffect(PreviewStage)(
       rawStage
@@ -46,7 +47,7 @@ export const BundjilPreviewVercelConfigurationStack = (
         phase: input.phase,
         feedback,
         environmentMetadata: null,
-      } as const;
+      };
     }
     const environmentMetadata = yield* VercelPreviewEnvironmentMetadata(
       "PreviewEnvironmentMetadata",
@@ -64,5 +65,6 @@ export const BundjilPreviewVercelConfigurationStack = (
       phase: input.phase,
       feedback,
       environmentMetadata,
-    } as const;
-  });
+    };
+  })
+);

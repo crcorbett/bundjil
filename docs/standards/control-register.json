@@ -104,7 +104,7 @@
       ],
       "commands": ["bun run check:docs", "bun run check:controls"],
       "fixturePaths": [
-        "tooling/documentation-policy.test.ts",
+        "tooling/documentation-policy-audit.test.ts",
         "tooling/control-policy.test.ts"
       ],
       "admissionEvidence": "Semantic owner fixtures plus typed freshness candidates reject self-source, self-review, self-publication, incomplete publication, and candidate-root ownership.",

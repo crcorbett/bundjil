@@ -16,8 +16,8 @@ import {
   AdoptionBindingProfile,
   AdoptionManifestJson,
   buildAdoptionManifest,
-  InfrastructureInventoryArtifactJson,
-} from "../src/index.js";
+} from "../src/adoption-manifest.js";
+import { InfrastructureInventoryArtifactJson } from "../src/inventory.js";
 
 const { dirname, isAbsolute } = nodePath;
 

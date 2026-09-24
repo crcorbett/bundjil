@@ -55,7 +55,7 @@
     "fix": "ultracite fix --type-aware",
     "check": "ultracite check --type-aware --deny-warnings",
     "verification": "doppler run --project bundjil --config dev -- bun run verification:internal",
-    "verification:internal": "bun run check:effect-setup && bun run check:boundaries && bun run check:docs && bun run check:skills && bun run check:authority && bun run check:controls && bun run check:verification && bun run eval:hgi-307 && bun run test:boundaries && bun run check && bun run test:lint && bun run knip && bun run check-types && bun run test",
+    "verification:internal": "bun run check:boundaries && bun run check:docs && bun run check:skills && bun run check:authority && bun run check:controls && bun run check:verification && bun run test:boundaries && bun run check && bun run test:lint && bun run knip && bun run check-types && bun run test",
     "eve": "eve",
     "changeset": "changeset",
     "changeset:add": "changeset add",

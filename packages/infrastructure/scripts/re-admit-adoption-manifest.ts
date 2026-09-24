@@ -15,11 +15,11 @@ import {
 
 import {
   AdoptionManifestJson,
-  AlchemyLogicalResourceId,
   buildAdoptionManifestReadmissionDigest,
-  InfrastructureInventoryArtifactJson,
   reAdmitAdoptionManifest,
-} from "../src/index.js";
+} from "../src/adoption-manifest.js";
+import { InfrastructureInventoryArtifactJson } from "../src/inventory.js";
+import { AlchemyLogicalResourceId } from "../src/schemas.js";
 
 const { dirname, isAbsolute } = nodePath;
 

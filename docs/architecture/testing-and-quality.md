@@ -25,7 +25,6 @@ bun run check:skills
 bun run check:authority
 bun run check:controls
 bun run check:verification
-bun run eval:hgi-307
 bun run test:boundaries
 bun run check
 bun run test:lint
@@ -43,7 +42,13 @@ TypeScript compiler is patched with the configured Effect language service.
 `bun run check:docs` validates current metadata, links, indexes, lifecycle,
 documented commands, package README coverage, successor routes, portability,
 and owner-aware contradictions. It writes bounded console diagnostics and full
-JSON detail to `tmp/docs-policy-report.json`. `bun run check:skills` rejects
+JSON detail to `tmp/docs-policy-report.json`. It does not pin one dated Alchemy
+merge receipt to every later commit; that receipt remains preserved as
+historical evidence while current owners and paths remain checked.
+The old HGI-301 test that pinned exact wording in docs and skills is also
+retired; current semantic claims are checked by the documentation policy and
+skill instructions by the skill policy. Its dated fixture remains as history.
+`bun run check:skills` rejects
 broken/missing skill mirrors, invalid metadata/reference routes,
 contradictory executable examples, and stale
 Site-specific overlays in the relevant repo-owned skills, and confirms the
@@ -176,7 +181,7 @@ detail is retained at `tmp/control-policy-report.json`; `bun run test:controls`
 owns positive and adversarial fixtures. The gate is repository-only and grants
 no workflow, deployment, provider, message, or Production authority.
 
-`bun run eval:hgi-307` validates the accepted historical epoch: all twelve
+`bun run eval:hgi-307` is an opt-in check of the accepted historical epoch: all twelve
 fresh-context scenario receipts, the exact scenario-manifest digest, distinct
 four-clock fields, intervention decisions, every docs/README path inventory,
 and the full docs/README/lint/skills/config/tests/CI/runbooks/rollback impact
@@ -184,10 +189,10 @@ ledger. Repository-local evaluated skills are read from the epoch's exact Git
 base commit rather than the mutable working tree; external skill identities
 remain the epoch's stored digest receipts. Current skill behavior is owned by
 the repository skill-policy checks and a separately qualified successor epoch.
-GitHub CI therefore checks out full repository history before running
-verification; a shallow checkout cannot supply the intentionally historical
-skill object and must not be treated as an evaluator failure or bypassed by
-weakening the epoch identity.
+Ordinary CI does not replay this dated receipt. It uses a shallow checkout and
+runs the current policy checks, lint, types, build, and behavior tests. Run the
+historical evaluator only with full Git history when explicitly reviewing that
+epoch; a shallow checkout cannot supply its exact base-commit skill object.
 
 App Vitest configurations that exercise workspace packages must select the
 `@bundjil/source` export condition and inline `@bundjil/*` for SSR resolution.
