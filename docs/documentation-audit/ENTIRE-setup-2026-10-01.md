@@ -33,7 +33,7 @@ Work branch: `codex/entire-setup`. Tools: Entire CLI `0.11.3`, Codex CLI
 | Config, commands, CI and automation   | Change required / Preserve | `.entire/settings.json`, `.entire/.gitignore`, `.codex/hooks.json`, `.claude/settings.json`, `.gitignore`; preserve `package.json` and `.github/workflows/**`.         | Shared settings, absolute local Git hooks, focused checks and full verification.  | Automatic checkpoint publication is scoped to the selected Entire remote. |
 | SPEC, plan and lifecycle              | N/A                        | Current SPEC/task index and active-plan router inspected; this is ordinary repository tooling setup.                                                                   | No product scope or active implementation task changed.                           | This receipt is evidence, not an active plan or a deployment approval.    |
 
-## Observation and remaining checks
+## Observation
 
 The Sydney mirror reports ready for `/gh/crcorbett/bundjil`, with public
 visibility. GitHub `origin` remains `https://github.com/crcorbett/bundjil.git`.
@@ -44,8 +44,9 @@ Shared settings have `telemetry: false`, `absolute_git_hook_path: true`,
 
 The native import preview found 1,291 turns across 119 available selected
 Codex transcripts. This includes compressed archives and historical worktrees.
-Temporary copies adjust only the initial working-folder metadata; session IDs,
-original timestamps and original transcript files are preserved. Another 55
+Before the redaction correction, temporary copies adjusted only the initial
+working-folder metadata; session IDs, original timestamps and original
+transcript files are preserved. Another 55
 indexed historical chats have no transcript file in the current local stores.
 There was no earlier local Claude Code history to import.
 
@@ -82,7 +83,7 @@ all 119 transcript bodies matched their original snapshots, with only the
 temporary initial working folder changed; one original had newer appended
 messages. Those newer messages were not part of this snapshot.
 
-Hosted inspection then found two old credential values inside a quoted
+Hosted inspection then found two old Sendblue credential values inside a quoted
 password-manager export. Entire's default scanner missed their nested field
 shape. No credential value is reproduced in this receipt. The backfill cannot
 be accepted as safe publication at that point. A shared custom redaction rule
@@ -90,11 +91,14 @@ now removes all standalone 32-character hexadecimal values, and temporary
 copies are explicitly scrubbed before a replacement import. Originals remain
 untouched. This masks benign identifiers with the same shape as well.
 
-Removing the task-created hosted imports was rejected by automatic approval
-review because that broad remote deletion needed explicit user approval. The
-local imported refs were removed; the fresh-session checkpoint and source
-branch were preserved. Hosted replacement is held pending that exact approval.
-The old credentials' current validity is unknown. Any provider credential
+Automatic approval review initially rejected removal of the task-created
+hosted imports because it needed explicit user approval. Cooper then approved
+removing exactly those 1,291 imported records and replacing them with redacted
+copies. Remote readback confirms all 1,291 original imported refs were removed;
+the fresh-session checkpoint and source branch were preserved. The sampled
+hosted session then reported that its transcript was unavailable. A native
+replacement preview found all 1,291 turns ready to import, with none skipped.
+The Sendblue credentials' current validity is unknown. Any provider credential
 rotation is a separate action requiring its own approval.
 
 The corrected temporary snapshot masks 4,579 standalone 32-character
@@ -102,8 +106,26 @@ hexadecimal values across 47 transcripts; all 119 copies pass the absence
 check. A separate local native-import fixture confirms Entire removes a fake
 nested credential using the shared rule. That fixture was never published.
 The full `bun run verification` and `entire doctor` pass on the corrected
-configuration. Hosted replacement remains held for the exact deletion
-approval; it must not be described as complete or safely redacted yet.
+configuration.
+
+The native replacement imported all 1,291 turns from the same 119 snapshots,
+with the same record IDs. All saved full chats, transcript sections and prompts
+were checked: none contain the missed 32-character credential format. A repeat
+native preview reports zero new turns and all 1,291 already imported. A normal
+push uploaded the replacements. Independent remote readback confirms every
+replacement matches its local saved content and the fresh checkpoint is intact.
+
+Hosted pages now display the corrected history. The main historical chat shows
+606 checkpoints; the sampled old worktree chat shows five. Both displayed
+transcripts contain redactions and no matches for the missed credential format.
+The previously exposed API Key and Secret Key fields now show redactions.
+
+- [Historical main chat](https://entire.io/gh/crcorbett/bundjil/session/019f3c64-2576-70c2-90c0-e6b212f79ee1)
+- [Corrected historical worktree chat](https://entire.io/gh/crcorbett/bundjil/session/019fcf21-b678-79c2-9692-a14833cd77ee)
+
+These checks establish the current published records. They do not prove that
+prior downloads or provider-held copies have been erased. No Sendblue credential
+was changed; validity and rotation remain separate, unverified work.
 
 ## Rollback and non-claims
 
