@@ -1,0 +1,1 @@
+Please send a concise progress update now, then continue. Do not broaden scope or wait on network-bound verification; report any blocker.
