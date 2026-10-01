@@ -1,0 +1,1 @@
+No. This isn't correct, maybe use executor MCP + Parallel Task to research using codex oauth for model access via subscription. This is definitely possible, because it works with Hermes agent, OpenClaw, Pi agents. So I think we should be able to use it here.
