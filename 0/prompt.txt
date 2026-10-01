@@ -1,0 +1,21 @@
+Implement exactly task `implement-local-access-token-profile-import` from:
+- docs/product-specs/codex-local-profile-import-workaround.md
+- docs/product-specs/codex-local-profile-import-workaround.tasks.json
+- docs/exec-plans/active/codex-local-profile-import-workaround.md
+
+You own only @bundjil/codex-oauth package files, tests, docs, and scripts under packages/codex-oauth/**. Do not edit apps/codex-proxy, root docs, task ledgers, execution plans, lockfiles, or git history. You are not alone in the codebase: do not revert other changes and accommodate existing code.
+
+Build the package-owned trusted-local access-token-only importer:
+- source cache only through a Context service and explicit Effect Config; no direct process.env;
+- decode the minimal cache shape through Effect Schema and reject non-chatgpt auth modes;
+- import access token only, never use/persist refresh_token/id_token, and do not infer identity from opaque token/JWT values;
+- use explicit subject config and do not use account ID from the cache by default;
+- reuse existing encrypted store layers/contracts;
+- command must produce schema-backed sanitized output;
+- deterministic fixture/memory source tests only. Never read real cache in tests or print credentials.
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when code is fallible, async, runtime-owned, collection-heavy, or crosses a package, RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded identifiers from the owning package. Do not define standalone DTO mirrors. Keep primary operations flat named Effect.gen flows with typed errors in .pipe(...). Do not use JSON.stringify, manual JSON parsing, unsafe casts, script-local DTOs, or trivial helpers. Follow docs/architecture/effect-patterns.md.
+
+Run package check-types/test/build and bun run verification if practical. Report exact changed files, output summary, deliberate limitations; do not commit.
