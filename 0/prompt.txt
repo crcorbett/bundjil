@@ -1,0 +1,6 @@
+Also spin up another thread to draft a spec and investigate the following:
+“Can we get the thread to improve the implementation? We want to copy over many of the lint rules from Projects/site if they dont already have them. We should use Effect Clock for better timing testing. We should explore things like Effect Atom (vs multiple Refs), HashSet, HashMap, Array/Chunk etc
+
+These can help reduce verbosity when eg a non empty array is required, or state/context is required across layers or something. I prefer strict Effect approaches, that remain flat and sequential and can handle onNone etc cleanly.
+
+We also want lint rules to help enforce these approaches like in the site project”
