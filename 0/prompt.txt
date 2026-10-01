@@ -1,0 +1,5 @@
+How can we use Effect HTTP API service from platform to create a proxy, should this become another app in the monorepo that can be deployed to Vercel to act as the edge proxy?
+
+Research Effect in deepwiki (with executor personal).
+
+See also ~/Projects/Mobius/apps/api for how we can create simple API services with Effect v4 (effect-smol) that can be easily deployed to Vercel.
