@@ -1,0 +1,1 @@
+Stop further exploration and return your current pass-1 findings immediately. If evidence is incomplete, say so explicitly; do not continue scanning.
