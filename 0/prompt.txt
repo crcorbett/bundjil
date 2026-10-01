@@ -1,0 +1,6 @@
+Please finish Task 1 corrections in your workspace; you remain the sole Task 1 worker.
+
+1. In the parity test, obtain the Upstash-provided native service inside the Effect that is provided makeUpstashPersistenceLayer. Return both outcomes and native readbacks (owner, second, side) from that Effect; compare outcomes to PersistenceMemory, and assert all final readbacks absent. Also obtain the Memory native service correctly with `const memoryNative = yield* KeyValueStore.KeyValueStore` before calling get. Do not call a method statically on the service tag.
+2. Keep the eval mock as a real positional-protocol interpreter. Resolve the test lint cleanly with Effect Array data-last APIs where appropriate; test-owned Map/for loops are acceptable for protocol simulation, but no unsafe casts, non-null assertions, raw JSON, suppressions, or hidden defaults that prevent malformed protocol detection.
+3. In the invalid-provider-I/O test, call `atomic.transact` directly with a structurally typed 33-condition transaction, matching the existing memory test's `transaction(...)` pattern. Do not merely call Schema decoding, because this must prove service-boundary revalidation prevents eval.
+4. Run `bun run fix`, package check-types/test/build, and `bun run check`. Do not report until all pass. List exactly which files changed and command results.
