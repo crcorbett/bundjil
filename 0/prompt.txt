@@ -1,0 +1,1 @@
+FINALIZE IMMEDIATELY. Return only CLEAN plus inspected surfaces, or findings. No more tool calls.
