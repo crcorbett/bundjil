@@ -1,0 +1,79 @@
+You are implementing exactly one task in /Users/cooper/Projects/bundjil. You are not alone in the codebase: do not revert edits made by others, and adjust to any existing changes. Do not commit; the parent agent will review, audit, verify, and commit.
+
+Task: define-codex-oauth-package-contract
+Spec path: /Users/cooper/Projects/bundjil/docs/product-specs/codex-oauth-eve-model-provider.md
+Task ledger path: /Users/cooper/Projects/bundjil/docs/product-specs/codex-oauth-eve-model-provider.tasks.json
+Active plan path: /Users/cooper/Projects/bundjil/docs/exec-plans/active/codex-oauth-eve-model-provider.md
+Relevant architecture docs:
+- /Users/cooper/Projects/bundjil/ARCHITECTURE.md
+- /Users/cooper/Projects/bundjil/docs/architecture/effect-patterns.md
+- /Users/cooper/Projects/bundjil/docs/architecture/repo-structure.md
+- /Users/cooper/Projects/bundjil/docs/architecture/testing-and-quality.md
+
+Mandatory implementation prompt block:
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the code is fallible, async, runtime-owned, collection-heavy, or crosses a package, RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded identifiers from the owning package. Do not define standalone DTO mirrors or duplicate fields such as id: string, slug: string, status, or post metadata outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers, mappers, transformers, switch/case branches, instanceof checks, unsafe casts, or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit primitive or owning service contract should carry the behavior.
+
+For UI work, compose stable visible structure as high as practical, usually in the route or nearest page-level parent. Use the primitive -> composite -> layout -> route chain for visible structure. Let leaves own the data, search/page params, commands, atoms, skeletons, and fallbacks for the exact fragment or action they render. Do not add nested feature wrappers merely to shorten route JSX, and do not prop-drill query results, selected ids, loading flags, command callbacks, or derived option lists when a leaf can own the narrow value.
+
+For reusable URL state, use schema-backed field URL atoms for search params and read-only page-param atoms for route identity. Keep TanStack Router as the app URL writer, and do not import app route files, routeTree.gen, Route.useSearch(), or Route.useParams() into reusable packages.
+
+Task object:
+{
+  "id": "define-codex-oauth-package-contract",
+  "title": "Define @bundjil/codex-oauth schemas and profile services",
+  "status": "pending",
+  "description": "Create the package contract with canonical schemas, tagged errors, profile storage, OAuth service tags, storage keys, and memory layers without provider network calls.",
+  "implementationNotes": [
+    "Use package layout src/schemas.ts, src/errors.ts, src/storage-keys.ts, src/profile-store.service.ts, src/oauth.service.ts, src/oauth-client.service.ts, src/live.layer.ts, src/mock.layer.ts, and src/index.ts.",
+    "Use effect/unstable/persistence/KeyValueStore for local Effect v4.",
+    "Define CodexProfileStore, CodexOAuthService, and CodexOAuthClient as the first stable service tags.",
+    "Use hashed subject keys under bundjil/oauth/v1/provider/codex/profile/{subjectHash}.",
+    "Do not add live OAuth endpoint exchange, Codex Responses HTTP calls, or Eve model replacement in this task."
+  ],
+  "mandatoryVerification": [
+    "Flat meaningful Effect.gen programs for primary operations.",
+    "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError where relevant.",
+    "Canonical Effect Schema contracts and schema-derived types from @bundjil/codex-oauth.",
+    "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers.",
+    "Tests cover schema decode/encode, stable key derivation, missing profile, expired token, remove/revoke, storage error mapping, memory layer seeding, and no token leakage in error messages.",
+    "bun run --filter @bundjil/codex-oauth test",
+    "bun run --filter @bundjil/codex-oauth build",
+    "bun run check-types"
+  ],
+  "completionCriteria": [
+    "@bundjil/codex-oauth exports schemas, errors, profile/OAuth service tags, and memory/live layers.",
+    "Package README documents contracts, layers, and safe secret handling.",
+    "No provider network dependency or Eve app model change is introduced."
+  ],
+  "implementationImprovementAudit": { "requiredPasses": 3, "completedPasses": 0, "evidence": [] },
+  "commitAfterPassing": true
+}
+
+Write scope:
+- packages/codex-oauth/**
+- package.json / lockfile only if needed for workspace deps
+- docs/product-specs/codex-oauth-eve-model-provider.tasks.json only for task evidence if verification passes
+- docs/exec-plans/active/codex-oauth-eve-model-provider.md only for concise implementation evidence
+Do not touch apps/agent or apps/codex-proxy for this task.
+
+Implementation guidance:
+- Match existing package patterns from packages/core, packages/eve-effect, and packages/effect-start.
+- Use ESM NodeNext local imports with .js extensions.
+- Use @bundjil/source conditional exports like existing packages.
+- Use effect/unstable/persistence/KeyValueStore for storage boundaries.
+- Keep live provider behavior deterministic and non-networked for this task; live layers may wire KeyValueStore, but OAuthClient live should fail with a safe unsupported-runtime tagged error until the next task.
+- Do not log or snapshot access tokens, refresh tokens, authorization codes, raw OAuth responses, or private prompts.
+- Use mock/memory layers for tests.
+
+Verification to run:
+1. bun run --filter @bundjil/codex-oauth test
+2. bun run --filter @bundjil/codex-oauth build
+3. bun run check-types
+4. bun run verification if practical
+
+Final report must include changed files, commands run with pass/fail, and any blockers. Do not claim completion if a verification gate fails.
