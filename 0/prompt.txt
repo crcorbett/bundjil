@@ -1,0 +1,61 @@
+Implement exactly task implement-sendblue-eve-channel from /Users/cooper/Projects/bundjil/docs/product-specs/sendblue-eve-channel.tasks.json.
+
+You own only:
+- /Users/cooper/Projects/bundjil/apps/agent/agent/channels/sendblue.ts
+- /Users/cooper/Projects/bundjil/apps/agent/agent/lib/sendblue/**
+- /Users/cooper/Projects/bundjil/apps/agent/test/sendblue-channel*.test.ts
+- /Users/cooper/Projects/bundjil/apps/agent/agent/agent.ts only if Eve registration genuinely requires it
+- /Users/cooper/Projects/bundjil/apps/agent/package.json and /Users/cooper/Projects/bundjil/bun.lock only if genuinely required
+
+Do not edit specs, ledgers, plans, README files, Vercel/Sendblue/1Password state, or commit. You are not alone in the codebase; preserve the two accepted Sendblue slices and other user work.
+
+Read:
+- /Users/cooper/Projects/bundjil/AGENTS.md
+- /Users/cooper/Projects/bundjil/docs/product-specs/sendblue-eve-channel.md
+- /Users/cooper/Projects/bundjil/docs/product-specs/sendblue-eve-channel.tasks.json
+- /Users/cooper/Projects/bundjil/docs/architecture/effect-patterns.md
+- /Users/cooper/Projects/bundjil/docs/architecture/eve-agent.md
+- /Users/cooper/Projects/bundjil/docs/architecture/repo-structure.md
+- /Users/cooper/Projects/bundjil/docs/architecture/testing-and-quality.md
+- /Users/cooper/Projects/bundjil/.local/references/eve/docs/channels and installed Eve type/source definitions for the exact current defineChannel/send/waitUntil/event API
+- existing Sendblue services/tests.
+
+Implement:
+- A canonical SendblueChannel service with flat named authorize/decode/classify/claim inbound and completed-message outbound operations.
+- Auth before request.text; one Schema.fromJsonString decode; explicit Ignore | Duplicate | Dispatch and typed rejected decisions.
+- Only direct, text-bearing, inbound RECEIVED allowed-service events for the configured line continue. Ignore outbound/status/typing/group/media/empty/unsupported/unknown sender without creating an Eve session.
+- Construct Eve auth only from mapped stable principal, opaque continuation token, and minimal channel state.
+- Thin apps/agent/agent/channels/sendblue.ts using installed Eve defineChannel APIs and one app-owned ManagedRuntime/framework edge. Register background model work with waitUntil only after claim.
+- message.completed outbound filtering for visible non-empty assistant text only; no reasoning/tool/intermediate payloads.
+- Stable outbound coordinates; claim before SendblueClient.sendMessage; complete with provider handle on success; uncertain on delivery uncertainty and never auto-resend; release retryable only when failure is safely known before provider acceptance.
+- Direct Request/Response and event tests covering the entire task matrix with injected fake Eve send and memory/client Layers.
+- Live Layer composition using accepted Config, verifier, identity, router, replay Upstash, client, FetchHttpClient, and claim ID services.
+
+Mandatory implementation rules:
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the code is fallible, async, runtime-owned, collection-heavy, or crosses a package, RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded identifiers from the owning package. Do not define standalone DTO mirrors or duplicate fields such as id: string, slug: string, status, or post metadata outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers, mappers, transformers, switch/case branches, instanceof checks, unsafe casts, or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit primitive or owning service contract should carry the behavior.
+
+For UI work, use the primitive -> composite -> layout -> route chain. Let leaves own the data, commands, loading, empty, error, retry, skeleton, and fallback behavior for the exact fragment they render. Do not add nested feature wrappers merely to shorten route JSX, and do not prop-drill query results, selected ids, loading flags, command callbacks, or derived option lists when a leaf can own the narrow value.
+
+For reusable URL state, use schema-owned search and route-identity contracts. Keep the app router as the URL writer, and do not import app route modules into reusable packages.
+
+Quality/security:
+- Thin Eve file: no provider, parsing, identity, storage, classification, or delivery policy.
+- No raw causes that can retain request/body/header/secret/message/phone/provider data.
+- No raw JSON.parse/stringify, manual object readers/guards/mappers, direct env, raw fetch, process-local replay, unsafe casts, generic helper modules, or swallowed background failures.
+- Primary success paths linear and named; expected tagged error mapping belongs in .pipe(...).
+- Use installed Eve APIs exactly; do not invent wrapper contracts around the framework.
+
+Verification:
+- focused new tests
+- bun run --filter @bundjil/agent check-types
+- bun run --filter @bundjil/agent test
+- bun run --filter @bundjil/agent build
+- Eve channel discovery/info check with no secret metadata
+- bun run verification
+- git diff --check
+
+Edit files directly, report files and evidence, and do not commit.
