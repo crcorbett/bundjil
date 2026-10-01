@@ -1,0 +1,32 @@
+You are the single sequential implementation worker for task enable-sendblue-production-last in /Users/cooper/Projects/bundjil. You are not alone in the codebase; do not revert other edits. Start at clean pushed main b9ad04b.
+
+Read AGENTS.md, .agents/skills/prd-implementer/SKILL.md, docs/product-specs/vercel-production-promotion.md, the exact task in docs/product-specs/vercel-production-promotion.tasks.json, docs/exec-plans/active/vercel-production-promotion.md, docs/product-specs/sendblue-eve-channel.md, docs/product-specs/sendblue-eve-channel.tasks.json, docs/exec-plans/active/sendblue-eve-channel.md, docs/architecture/effect-patterns.md, docs/architecture/eve-agent.md, docs/architecture/testing-and-quality.md, and apps/agent/README.md.
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when code is fallible, async, runtime-owned, collection-heavy, or crosses a package, command, config, or service boundary. Reuse canonical schemas/types/services/errors. No DTO mirrors, unsafe casts, raw JSON helpers, manual readers/mappers, switch/case branching, or tiny wrapper/helper sprawl. Keep primary operations flat and linear, with expected typed errors handled in the following .pipe(...) through catchTag/catchTags/mapError.
+
+Personal Vercel team: REDACTED. Agent project: REDACTED. Current restored platform pair: agent REDACTED, proxy REDACTED; previous accepted agent dpl_5y9a6SJHybFvPd3ayGnSddHiCJnD, proxy REDACTED; all source e53e7a48270db4bb571d90c771186f92a0282922. Existing Sendblue Production vars/webhook are absent. Preview has exactly one receive webhook and Preview-only bindings/bypass that must remain.
+
+Use `bunx vercel`. Executor Personal MCP is available as mcp__executor_personal and exposes Sendblue/Vercel tools; search/describe before calls. The personal 1Password item is `SendBlue API` in vault Private. Never print secrets, full numbers, full webhook URLs, bodies, prompts, or handles.
+
+Do exactly this task:
+1. BEFORE the first Sendblue Production mutation, build a mode-0600 sanitized snapshot and run `sendblue-final-promotion`. It must require accepted current/previous references, completed soak+rollback, exact personal scope/source/config/protection/OIDC, and known inactive Sendblue Production. Fail closed on mismatch.
+2. Provision independent Production channel credentials/config:
+   - Reuse only the provider account API key/secret and owned Sendblue line needed to call the same Sendblue account.
+   - Generate new independent Production webhook secret, routing key, replay prefix/namespace, and Vercel automation bypass. They must differ from Preview.
+   - Configure dedicated Sendblue replay URL/token from the existing personal Marketplace Upstash binding (preferred app-owned names), with independent prefix, TTL, lease, allowed services, from number, and sender identity allowlist.
+   - Store all required app variables as sensitive Production-only bindings. Do not add OAuth/profile/cipher inputs.
+   - Save new Production secret fields and sanitized operational metadata back to the existing personal-vault `SendBlue API` record without exposing values.
+3. Create a new dedicated Vercel Production automation bypass without deleting the pre-existing Preview bypasses. Keep platform bypass distinct from sb-signing-secret. Deploy the agent from a clean ignored detached e53e7a4 worktree after Production vars are set, source-only with no prebuilt/inline env/build env. Retain dpl_8wu... as the non-channel rollback target.
+4. Add a second Sendblue `receive` webhook for Production without removing/replacing the Preview webhook. Target the stable Production Eve route /eve/v1/sendblue/webhook, using the Production Vercel bypass only at the platform boundary and independent webhook secret at the route. Record no full URL.
+5. Prove Production:
+   - direct route matrix: missing/invalid secret 401, malformed authenticated 400, ignored/loop event 200 where applicable, valid accepted 202, storage fail-closed 503 using an isolated proof fixture only if it can be done without mutating the accepted config;
+   - allowlisted identity and opaque routing;
+   - one provider-originated inbound produces one Eve dispatch, one Codex subscription proxy completion, and one delivered outbound Sendblue reply;
+   - sequential and concurrent replay of the same inbound handle plus outbound Eve event produces no duplicate dispatch/send; provider message count unchanged after replays;
+   - query agent/proxy Production logs/errors and Sendblue message/webhook readback; record only counts/statuses/suffix/digest booleans and leak booleans.
+6. Confirm exactly two receive webhooks remain: existing Preview and new Production. Confirm Production replay/route/platform credentials are independent of Preview and all bypasses remain scoped as intended.
+7. Document disable/rollback: remove Production webhook first, revoke Production bypass, then return agent alias to dpl_8wu... and remove/revoke Production Sendblue vars; do not execute rollback after successful acceptance.
+8. Edit ONLY docs/exec-plans/active/vercel-production-promotion.md and docs/exec-plans/active/sendblue-eve-channel.md with sanitized worker evidence. Do not mark task/audits or edit task ledgers. No commit/push.
+9. Run agent focused tests/build, replay/concurrency tests, bun run verification, jq empty, git diff --check; clean all temp material.
+
+If 1Password CLI requires interactive auth, stop after the final preflight and before any secret/bypass mutation and report the exact blocker. If a real inbound requires user handset action, complete all non-interactive preparation and report the exact minimal action only at that point. Do not replace or delete the Preview webhook.
