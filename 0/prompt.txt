@@ -1,0 +1,17 @@
+Rerun terminal audit pass 2 of 5 for Bundjil. The prior pass-2 attempt was INCONCLUSIVE due to time, reported no actionable finding, and is discarded. Pass 1 remains CLEAN. You must return a verdict promptly from a bounded read-only review. Do not edit, build, generate outputs, commit, push, deploy, use credentials, mutate providers, or run the full suite.
+
+Worktree: /Users/cooper/.codex/worktrees/d4b4e069-1303-427d-957e-756d18e049a9/bundjil
+Base: 763199f
+Installed Effect: 4.0.0-beta.101; immutable source revision: 1caab3cc30f626efbf15e59d74f539a487e5c85c.
+
+Read the governing instructions and existing active SPEC/task/plan. Then inspect only this bounded checklist:
+1. git diff --name-status/stat from 763199f, Knip/public-export evidence already present, and repo/package architecture owners;
+2. production call graph in packages/codex/src/{index,runtime,provider/{direct,http-client,openai-compatible-proxy,stream-mapper,sse,stream-events,contracts,config}}.ts;
+3. composition callers in apps/codex-proxy/src/{server,live.layer,local.layer,mock.layer}.ts and packages/codex/src/testing/index.ts;
+4. Photon changed production files;
+5. changed tests only as needed to verify the topology assertions.
+No broad repository scans after this checklist.
+
+Audit actual production/test/CLI call graphs, flat/lazy named Effect flow, runtime/Layer lifetime, package/file placement, exports/private transport, dead paths, helper/wrapper sprawl, state/collection semantics, duplicated contracts and raw primitive leakage.
+
+Return CLEAN with precise inspected surfaces and residual non-claims, or actionable findings with exact file/line, invariant, failure mode, minimal correction/proof. An incomplete verdict is unacceptable; if time is short, synthesize immediately from inspected evidence.
