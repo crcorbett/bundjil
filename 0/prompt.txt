@@ -1,0 +1,1 @@
+So would the codex subscription be best when using the codex agent sdk instead of Eve? Then we can use Codex sub fully for the agent and customise it that way?
