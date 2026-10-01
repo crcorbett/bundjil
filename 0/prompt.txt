@@ -1,0 +1,1 @@
+What can we do to continue without the upstash? Can we use a local.layer.ts or something?
