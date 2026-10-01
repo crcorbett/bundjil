@@ -1,0 +1,10 @@
+Continue task 1 with these last provider-neutral corrections only:
+
+- Convert PersistenceMemory.get and AtomicKeyValueStore.transact to the language-service-recommended Effect.fn forms without changing semantics.
+- Inline conditionConflicts and applyMutation into the single transact SynchronizedRef.modify; they have one call site and do not meet helper admission. Keep withoutExpiredEntries because it has three call sites and owns expiry normalization.
+- Fix the bounds test to use 32 unique condition keys and 32 unique mutation keys and call atomic.transact successfully, then call atomic.transact with 33 entries and prove the store remains unchanged. Do not merely Schema-decode duplicate fixtures.
+- Add successful Remove coverage.
+- Add stale-owner compare-and-set overwrite rejection as well as remove rejection.
+- Add negative TTL rejection and replace plain native .map in the TTL invalid collection with Effect Array.map.
+- Add safe public error rendering/leak assertion using Schema.UnknownFromJsonString with private key/value markers, proving they do not appear.
+- Run bun run fix, package check-types/test/build. Report test count and language-service diagnostics. Do not touch Upstash, ledger/plan, or commit.
