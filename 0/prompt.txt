@@ -1,0 +1,3 @@
+Can you investigate how we can, with Eve and Vercel etc use our existing Codex subscription to power the AI?
+
+You can use executor personal MCP and Parallel AI + DeepWiki to assist with the research.
