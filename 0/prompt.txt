@@ -1,0 +1,99 @@
+<recommended_plugins>
+Here is a list of plugins that are available but not installed. If the user's query would benefit from one of these plugins, use the `request_plugin_install` tool to suggest that they install it. Pass the parenthesized ID as `plugin_id`. For example, suggest the Google Drive plugin if the query could possibly be better answered with access to Google Drive.
+
+- Atlassian Rovo (atlassian-rovo@openai-curated-remote)
+- Box (box@openai-curated-remote)
+- Google Calendar (google-calendar@openai-curated-remote)
+- Google Drive (google-drive@openai-curated-remote)
+- Slack (slack@openai-curated-remote)
+</recommended_plugins>
+
+# AGENTS.md instructions for /Users/cooper/Projects/bundjil
+
+<INSTRUCTIONS>
+# Repo Atlas
+
+Start here for repo conventions.
+
+## Current Shape
+
+- `package.json` owns Bun workspaces, dependency catalogs, and root scripts.
+- `turbo.json` owns workspace task orchestration.
+- `tsconfig.base.json` owns strict TypeScript and Effect language-service
+  settings.
+- `packages/core` owns framework-neutral Bundjil domain primitives and Effect
+  programs.
+- `packages/effect-start` owns reusable TanStack Start middleware glue for
+  running Effect HTTP programs.
+- `packages/eve-effect` owns Eve-facing Effect Schema contracts, tagged
+  errors, named operation services, and the Eve schema bridge.
+- `apps/agent` owns the committed Vercel Eve app, including the root agent,
+  instructions, app-owned config, and Eve tools.
+- `apps/codex-proxy` owns the private Effect HTTP proxy app for Codex
+  provider proof, including app-owned config, Vercel fetch entrypoint, local
+  dev host, routes, mock streaming, and smoke tests.
+- `docs/architecture` owns durable rules for Effect patterns, repo structure,
+  package ownership, and verification.
+
+## Working Agreements
+
+- Use Bun from the repo root.
+- Prefer workspace packages over app-local shared logic.
+- Use Effect for fallible, async, stateful, boundary-crossing, or
+  dependency-injected code.
+- Decode unknown host/provider data once with the owning Schema, pass only its
+  decoded `Type` to services, and encode its decoded value before every
+  outward write. Keep `Encoded` values, provider DTOs, SDK instances, and exact
+  third-party primitives inside named adapters.
+- Provider clients expose named operations with schema-derived inputs/outputs,
+  `Config.schema` plus redacted secrets, safe Schema tagged errors, and
+  live/mock Layers. Do not expose generic SDK callbacks or raw clients, use
+  public raw semantic identifiers, branch on native error classes, or let
+  unchecked SDK outputs escape.
+- Keep primary Effect operations flat and sequential. Keep one-use mapping,
+  decoding, and error logic inline; do not create helper/common/utils sprawl.
+- Keep app code out of packages unless the package explicitly owns that
+  framework boundary.
+- Keep channel-specific Sendblue, Cloudflare, Eve, Vercel Connect, and Notion
+  code in app-owned boundaries until a shared contract is proven stable.
+- Run the smallest useful check during iteration. Boundary/provider work must
+  run `bun run check:boundaries`, `bun run check:effect-setup`, and
+  `bun run check:skills`; run `bun run verification` before handing work back.
+- Before adding a new app, channel, provider integration, or durable package
+  boundary, create a SPEC through `prd-writer` and execute it through
+  `prd-implementer`.
+
+## Architecture Guides
+
+- `docs/architecture/effect-patterns.md` defines Effect TS rules for schemas,
+  services, config, layers, errors, and control flow.
+- `docs/architecture/repo-structure.md` defines app/package ownership and
+  import/export rules.
+- `docs/architecture/testing-and-quality.md` defines verification scope and
+  commands.
+- `docs/architecture/eve-agent.md` documents the committed Eve app runtime.
+- `docs/architecture/frontend-composition.md` defines conditional React,
+  leaf-component, state ownership, and browser verification rules.
+
+## Local Reference Repositories
+
+These references are local-only and ignored by git:
+
+- `.local/references/personal-agent-template` is a shallow clone of
+  `vercel-labs/personal-agent-template` for Vercel personal-agent app patterns.
+- `.local/references/effect-v4` points to
+  `~/.local/share/effect-solutions/effect`, the Effect v4 source clone
+  recommended by the Effect project setup guide.
+
+Use these repositories to inspect real implementation patterns, type
+definitions, and examples before inventing local abstractions.
+
+</INSTRUCTIONS>
+
+<environment_context>
+  <cwd>/Users/cooper/Projects/bundjil</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-07-18</current_date>
+  <timezone>Europe/Madrid</timezone>
+  <filesystem><workspace_roots><root>/Users/cooper/Projects/bundjil</root><root>/Users/cooper/.codex/visualizations/2026/07/07/019f3c64-2576-70c2-90c0-e6b212f79ee1</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
