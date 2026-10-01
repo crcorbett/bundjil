@@ -1,0 +1,76 @@
+You are the sole sequential implementation subagent for this exact task. You are not alone in the codebase. Do not revert existing changes; preserve and work with them.
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,
+HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit,
+Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
+code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
+RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded
+identifiers from the owning package. Do not define standalone DTO mirrors or
+duplicate fields such as id: string, slug: string, status, or post metadata
+outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers,
+mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
+or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit
+primitive or owning service contract should carry the behavior.
+
+For UI work, compose stable visible structure as high as practical, usually in
+the route or nearest page-level parent. Use the primitive -> composite ->
+layout -> route chain for visible structure. Let leaves own the data,
+search/page params, commands, atoms, skeletons, and fallbacks for the exact
+fragment or action they render. Do not add nested feature wrappers merely to
+shorten route JSX, and do not prop-drill query results, selected ids, loading
+flags, command callbacks, or derived option lists when a leaf can own the
+narrow value.
+
+For reusable URL state, use schema-backed field URL atoms for search params and
+read-only page-param atoms for route identity. Keep TanStack Router as the app
+URL writer, and do not import app route files, routeTree.gen,
+Route.useSearch(), or Route.useParams() into reusable packages.
+
+Task object:
+{
+  "id": "define-encrypted-profile-contract",
+  "title": "Define encrypted profile schemas and cipher service",
+  "status": "in_progress",
+  "description": "Add versioned encrypted profile contracts and a CodexOAuthProfileCipher service in @bundjil/codex-oauth.",
+  "implementationNotes": [
+    "Define an EncryptedCodexOAuthProfileV1 schema with version, algorithm, key id, nonce, ciphertext, subject hash, and timestamps.",
+    "Define schema-backed tagged errors for key config, encryption, decryption, decode, unsupported version, and key mismatch failures.",
+    "Use Effect Config with Redacted values for encryption key material and non-secret config for key id and algorithm.",
+    "Provide deterministic or memory-safe test layers and a WebCrypto-compatible live layer.",
+    "Prove encrypted stored values do not contain raw token fields or OAuth payload fragments.",
+    "Keep JSON string boundaries on Effect Schema codecs."
+  ],
+  "mandatoryVerification": [
+    "Flat meaningful Effect.gen programs for encrypt and decrypt operations.",
+    "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError.",
+    "Canonical Effect Schema contracts and schema-derived types from @bundjil/codex-oauth.",
+    "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers.",
+    "Tests cover round trip, wrong key, wrong key id, malformed ciphertext, unsupported version, and leak checks.",
+    "bun run --filter @bundjil/codex-oauth test",
+    "bun run --filter @bundjil/codex-oauth check-types"
+  ],
+  "completionCriteria": [
+    "@bundjil/codex-oauth exports encrypted profile schemas, cipher service tag, live/test layers, and safe errors.",
+    "No hosted storage layer composes raw token profiles after this task."
+  ],
+  "implementationImprovementAudit": {
+    "requiredPasses": 3,
+    "completedPasses": 0,
+    "evidence": []
+  },
+  "commitAfterPassing": true
+}
+
+Spec: docs/product-specs/codex-hosted-live-oauth-storage.md
+Task list: docs/product-specs/codex-hosted-live-oauth-storage.tasks.json
+Active plan: docs/exec-plans/active/codex-hosted-live-oauth-storage.md
+Architecture docs: ARCHITECTURE.md; docs/architecture/effect-patterns.md; docs/architecture/repo-structure.md; docs/architecture/testing-and-quality.md; docs/architecture/eve-agent.md.
+Prior task decision: hosted account OAuth start/callback routes are deferred because the CLI uses a localhost callback and no supported Vercel redirect is established. Do not implement or alter OAuth routes, token exchange, proxy live mode, refresh locks, hosted persistence, apps/agent, or apps/codex-proxy.
+
+You own packages/codex-oauth changes required for this cipher contract, its tests and package README updates, plus the current spec/task-plan evidence files. Keep changes narrowly scoped. Use existing error/schemas/index patterns. Use Effect Schema codecs for every JSON-string boundary; do not use JSON.stringify. Redacted.value(...) may appear only where the WebCrypto key import or encryption/decryption primitive actually needs raw bytes, never in errors/logs/snapshots/docs. Put Config access in an explicit config service/layer boundary and preserve app-owned final environment composition for later tasks.
+
+Run focused tests, check-types, build if runtime exports change, jq empty, git diff --check, and bun run verification as final gate when practical. Report all changed files, design choices, command evidence, known risks, and whether completion criteria are fully met. Do not commit; parent will review/audit/commit.
