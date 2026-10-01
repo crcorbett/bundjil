@@ -1,0 +1,17 @@
+Parent review: the current 46 tests pass, but the task is NOT accepted. Continue editing the same owned package surfaces and resolve every blocker below. Do not edit task ledger/active plan. Do not commit.
+
+1. CodexOAuthProfileCommitConflict must never contain or render expected/current/new credential revisions. Remove expectedRevision from the error schema and constructors; retain only sanitized operation/profile identity/hash/message.
+2. Raw CodexProfileStore.putProfile must remain legacy import/bootstrap only. In oauth.service, remove every fallback that writes a subscription profile through profileStore.putProfile. Subscription completeLogin/refresh/permanent-failure must require and use CodexOAuthProfileCommit. No optional commit service for subscription mutations.
+3. initialWrite semantics must be atomic create-only, not overwrite. Memory initialWrite must conflict if any profile exists. Upstash Lua must distinguish create-only from CAS: initialWrite succeeds only when neither profile/revision exists; refresh/reauth require exact revision. Do not return success for result=0 under initialWrite.
+4. Concurrent login replacement must be modeled as an explicit fenced replacement operation with expectedRevision, or else remain a later operation unavailable in this task. The task requires concurrent login replacement coverage; implement a canonical replace/login operation with expected revision, atomically in memory and Upstash, rather than abusing initialWrite.
+5. Ensure the profile payload and revision fence cannot diverge. The same Lua operation writes encrypted profile + revision. Memory does equivalent atomic Ref.modify.
+6. Add dedicated tests that actually call CodexOAuthProfileCommit operations, proving: initial write, duplicate initial conflict, matching refresh, stale refresh rejection, lease-expiry/delayed stale mutation, concurrent login replacement winner, stale reauth marking, and raw put rejection for subscription.
+7. Add Upstash adapter tests with a mocked eval implementation proving script keys/arguments and atomic create/CAS semantics. Existing fixture-only changes are insufficient.
+8. Add V1 plaintext decrypt migration test proving even a legacy V1 carrying refreshToken decodes as CodexAccessTokenImportProfile with no refresh token and is never subscription-capable. Add V2 subscription round trip and missing-required-fields rejection.
+9. Observer must be wired into refresh/commit behavior and tests must prove counters/events while serialized observer/error output excludes token, account id, plaintext, and all revision fixture values. A standalone unused observer service is insufficient.
+10. Fix the Effect language-service unnecessaryPipeChain hint.
+11. Recheck no raw JSON.parse/stringify, unsafe casts, manual subject hash construction, switch, or Object.values/entries.
+12. Update package README contract.
+13. Run package check-types, test, build, root bun run verification, and git diff --check. Report exact changed files and results.
+
+Use existing codexOAuthProfileSubjectHash. Keep Effect schemas/services/layers and schema-owned JSON. Do not broaden beyond this task.
