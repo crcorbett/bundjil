@@ -1,0 +1,12 @@
+Parent Task 3 correction: preserve the exact historical encoded record and claim key while still avoiding double prefixing.
+
+Before migration, deriveReplayKey returned `${options.prefix}${kind}:${digest}`, so SendblueReplayClaim.key and the encoded claimed/terminal SendblueReplayRecord.key contained the full prefixed physical key. Your current version stores only `${kind}:${digest}` in the claim/record. Although the adapter physical key is unchanged, the value bytes changed and existing claimed records can no longer satisfy Equals, violating the SPEC.
+
+Correct design requirements:
+- Restore prefix in SendblueReplayStoreOptions and pass config.replayStore.prefix.
+- For a new claim derive both the logical persistence suffix (`${kind}:${digest}`) and the historical full claim/record key (`${options.prefix}${kind}:${digest}`). Atomic transact must use only the logical suffix; makeReplayClaim and Schema-encoded records must use the full key.
+- Public transition methods receive only the historical full claim key, so derive the logical suffix at the app-owned compatibility boundary by validating that claim.key starts with the configured prefix and stripping it. Decode/validate the remaining non-empty logical key and map mismatch/invalid data to SendblueReplayStoreError. This compatibility conversion owns a real boundary and is allowed even if one transition call site invokes it.
+- The expected encoded claim record for Equals must be byte-for-byte identical to the old implementation.
+- Update tests to assert claim.key is full prefixed, native memory lookup uses the logical suffix, and claimed/complete encoded strings contain the full prefixed key. Add a stale claim fixture encoded in the historical form if needed to prove transition compatibility.
+- Keep prefix application once in UpstashPersistenceLive.
+- Run fix, agent check-types/test/build, root check, and report.
