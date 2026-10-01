@@ -1,0 +1,34 @@
+Parent review found corrections required before Task 5 acceptance. Apply all in the same Task 5 slice, rerun focused docs/stale checks and git diff --check, but do not rerun the full repository suite yet and do not commit.
+
+1. Restore acceptance sequencing:
+- task ledger top status remains in_progress
+- Task 5 status must be in_progress
+- Task 5 implementationImprovementAudit completedPasses must be 0 and evidence []
+- active plan status and Task 5 status must say implementation/reconciliation ready for parent audit, not Complete/Completed
+- keep the three Subagent Review Input sections in the plan
+- SPEC may say implementation complete pending parent audit, but not final accepted.
+
+2. Correct config ownership:
+- active-plan Subagent Input 1 incorrectly says each app owns its redacted bindings. Codex package owns Codex profile/Upstash Effect Config composition; apps/codex-proxy owns runtime mode/private HTTP config; apps/agent owns replay/provider config; shared provider adapter accepts schema-decoded Redacted options and owns no env reads.
+- task-ledger subagent evidence will be removed per point 1.
+- docs/architecture/effect-patterns.md currently says apps decode all env bindings and packages receive options. Replace with composition owners decoding via Effect Config/Redacted; the shared persistence adapter receives schema-decoded options and never reads process env.
+
+3. Correct the ARCHITECTURE test graph. Persistence package tests prove native/atomic adapter parity. Codex profile and agent replay compatibility are separate consumer suites, not downstream fixtures inside those two persistence test files.
+
+4. Expand the symbol-level admission ledger so it genuinely covers every new non-test abstraction/file/export/subpath introduced in this SPEC. Exact symbols may be grouped only as a named family. Include:
+- public Schema/type family and tagged error
+- AtomicKeyValueStoreShape/service/decode transaction operations
+- PersistenceMemory state/expiry helper/get/transact/native adapter/Layer
+- Upstash options/client factory/provider response+command Schemas, static script, physical-key helper, serializer, scan/error/transact construction, internal factory, public Layer/subpath
+- Codex JSON codecs, conflict/error constructors, transactProfileCommit, profile/refresh Layers, config constants/config loader/Codex composition Layer
+- Sendblue replay record codec, key/record/claim/transition helpers, service factory/live/memory Layers, shared app persistence/live runtime composition
+- proxy live composition symbols
+- Preview proof Config/Schemas/tagged error/fetch-text Promise boundaries/request constructor/program/CLI exit boundary
+- package root/subpath exports and Vercel/Turbo packaging config files
+Clearly record the admission reason or removal outcome. Do not claim every symbol is multi-consumer; one-use symbols are admitted only when they own a material Schema, provider protocol, CLI, packaging, crypto, or domain boundary. State that modified Codex operational scripts were reviewed as Layer rewiring and added no generic helper.
+
+5. Record that packages/effect-persistence/README.md, apps/agent/README.md, and apps/codex-proxy/README.md were reviewed and already current, so no Task 5 edit was required.
+
+6. Wrap the newly introduced overlong prose in effect-patterns.md and eve-agent.md consistently with surrounding Markdown.
+
+Do not modify source code. Report changed files and focused checks.
