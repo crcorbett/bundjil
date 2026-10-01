@@ -1,0 +1,1 @@
+Status check: please report whether you are still working, blocked, or finished. Include current changed files and the last verification command/result. If you are stuck, stop and provide the blocker; do not keep running indefinitely.
