@@ -1,0 +1,1 @@
+Please report status immediately. If you have completed edits, stop and provide changed files plus verification results. If still editing, summarize current progress and remaining blockers in under 10 lines.
