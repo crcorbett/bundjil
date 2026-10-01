@@ -1,0 +1,5 @@
+Parent audit pass 2 found three prose-quality corrections. Please make only these documentation fixes and rerun bun run check plus git diff --check:
+1. apps/agent/README.md: rewrite the awkward “A rejected dispatch owner-fenced compare-and-deletes...” sentence grammatically, e.g. “On a rejected dispatch, the owner-fenced retryable transition compare-and-deletes the claim...”.
+2. docs/architecture/eve-agent.md: “Known provider rejections release a claim for bounded retry” overstates the implementation. Say they release the claim so a later operator/provider retry can make a new claim, and state there is no automatic/background provider retry.
+3. docs/product-specs/sendblue-eve-channel.md top metadata: the Status line no longer has a Markdown line break while Owner/Last reviewed do. Convert the three metadata lines to a clean bullet list or another no-trailing-whitespace format so rendered lines remain distinct.
+Do not mark task complete or add parent audit evidence.
