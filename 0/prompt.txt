@@ -1,0 +1,10 @@
+Implement exactly the documentation task `document-workaround-operations` in /Users/cooper/Projects/bundjil. You are not alone in the codebase: do not revert or overwrite other work; accommodate it.
+
+Read the target SPEC, task ledger, AGENTS.md, and relevant Effect/Eve/testing architecture docs. Own and edit only README.md, docs/README.md, packages/codex-oauth/README.md, apps/codex-proxy/README.md, and applicable docs/architecture/*.md. Do NOT edit task ledger or active plan; parent owns acceptance. No source/deployment configuration changes.
+
+Document the access-token-only Codex workaround as operable and reversible: distinguish mock default, explicit local filesystem proof, personal Vercel preview live Upstash mode, blocked hosted OAuth/account link, and later Eve integration out of scope. Add concise runbook local import, preview import, self-test, expiry/re-import, rollback to mock. Examples name variables and sanitized statuses only; no values, model outputs, account/cache identifiers, or raw Upstash values. State Vercel deploys preview only, we did not set any production Bundjil mode/key/profile or deploy production, and Marketplace may auto-bind Upstash credentials to production. Never imply durable refresh: imports are access-token only, require reauthentication, and fail closed on expiry.
+
+Apply this mandatory standard:
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when applicable. Reuse canonical schemas, types, service contracts, errors, and branded identifiers. Keep one-off Effect logic inline and avoid DTO mirrors, manual codecs, unsafe casts, and trivial helpers.
+
+Run docs/stale-claim scans and git diff --check only. Report changed files, commands/results, residual risks.
