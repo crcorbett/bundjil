@@ -1,0 +1,1 @@
+Hmm stop those threads and remove them. They weren’t created in this project properly (they ended up as normal chats not part of the project). Try recreate them, and ensure they set a goal to complete. Use sol + high
