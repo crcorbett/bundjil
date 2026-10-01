@@ -1,0 +1,3 @@
+No there is a way to allow codex subscription sign in’s! This is what we previously explored! https://learn.chatgpt.com/docs/auth?surface=app 
+
+https://github.com/numman-ali/opencode-openai-codex-auth
