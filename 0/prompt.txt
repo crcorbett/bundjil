@@ -1,0 +1,26 @@
+Resume the same task and correct the implementation before returning. Latest parent direction supersedes prior prompts where inconsistent. Do not edit task ledger/active plan. Do not commit.
+
+Current evidence: package tests pass 46/46 only because old tests migrated; mandatory matrix missing. check-types has unnecessaryPipeChain at mock.layer.ts:349. No build/root verification accepted.
+
+Required:
+1. Fenced login semantics: initial write atomically requires both profile/revision absent. Add explicit replacement operation with canonical schema input and operation name requiring observed expected revision. Refresh and reauth require expected revision. Lua handles absent initial and exact revision CAS; typed conflict for every failed condition.
+2. Canonical ownership: remove duplicate CodexOAuthProfileCommitOperation schema from schemas.ts vs errors/contracts.ts. Keep one owner/import everywhere. No DTO mirrors. Remove expectedRevision from public conflict payload; retain operation/profile/hash/message only.
+3. Memory atomicity: current revision Ref then separate SchemaStore is invalid. Use one shared atomic memory state for profile+revision, or correctly scoped serialization around one canonical state used by both memory profile store and commit. CodexOAuthMemory must compose one shared instance.
+4. Upstash Lua: initial requires profile key and revision key absent; replacement/refresh/reauth require revision equals expected; write encrypted envelope+revision together. Faithful mocked eval tests prove create-only, matching replacement, stale rejection, winner preservation. No app read/write race.
+5. Service scope: do NOT classify generic CodexOAuthTokenProviderError as permanent or mark reauth. Transient/permanent classification is later task enable-refresh-capable-live-proxy. Keep current behavior compiling and legacy fallback preserved.
+6. Focused mandatory tests:
+- encrypted V1 plaintext -> access-token-import and old refresh token dropped
+- subscription omissions rejected
+- V2 encrypted round trip
+- initial only absent
+- matching replacement/refresh
+- stale preserves winner
+- stale worker after simulated lease expiry cannot commit after newer revision
+- concurrent replacement one winner/loser conflict
+- stale reauth cannot overwrite winner
+- encoded observer snapshot/event has no token/account/revision field or values/secret markers
+- faithful Upstash mocked CAS invariants
+7. Quality: fix hint. No switch, unsafe casts, raw JSON.parse/stringify, manual subject hashing, duplicate operation schemas, helper sprawl, raw secret/revision output. Flat primary operations and typed errors. Observer must be meaningfully wired to commit/refresh evidence without leaking revisions.
+8. Raw putProfile remains legacy import/bootstrap only. No subscription mutation fallback through raw put.
+9. Update package README contract.
+10. Run package check-types/test/build, bun run verification, git diff --check. Return exact files/results or precise blocker.
