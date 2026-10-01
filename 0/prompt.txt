@@ -1,0 +1,1 @@
+Start a thread to [$prd-implementer](/Users/cooper/Projects/bundjil/.agents/skills/prd-implementer/SKILL.md) and [$docs-maintainer](/Users/cooper/Projects/bundjil/.agents/skills/docs-maintainer/SKILL.md) the effect runtime spec which has been committed to main
