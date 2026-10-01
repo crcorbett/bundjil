@@ -1,0 +1,51 @@
+<codex_delegation>
+  <source_thread_id>01a02232-784a-7d82-a881-99dc1a3499f7</source_thread_id>
+  <input>Set up Doppler for Bundjil's environment variables and credentials, using the proven Site and Pollsor patterns but adapting them to Bundjil's actual consumers. Work in a Codex worktree based on the current default branch. Do not merge or deploy.
+
+First establish the current contract:
+1. Read Bundjil's AGENTS.md, applicable local skills, documentation router, architecture, deployment and credential runbooks, package.json files, workflows, Vercel configuration, Alchemy entrypoints/state handling, active SPEC/tasks/plans, and current git status.
+2. Inspect the installed Bun, Doppler, Alchemy and provider versions and use their current official documentation.
+3. Trace every environment variable and credential from its source to its exact consumer before deciding whether it belongs in Doppler.
+4. Build a secret inventory with: logical name, current name, consumer, purpose, required environments, current storage owner, desired Doppler config, whether the value is secret or ordinary configuration, and migration/cleanup status.
+5. Treat local, CI, Preview, Production, provider state and public behaviour as separate claims.
+
+Apply these lessons from Site and Pollsor:
+- Use the same name for the same logical secret across environments. Do not add environment names to keys merely because values differ.
+- Preserve least privilege. A config or job receives only the secrets it actually needs.
+- Do not add dummy or empty secrets to make Doppler's dashboard look uniform. Dismiss a missing-secret warning only after proving the omission is intentional.
+- Create only configs supported by real consumers. Pollsor correctly needed a CI-only config for Turbo credentials; it did not need invented Development, Preview and Production copies. Determine Bundjil's shape from evidence.
+- Friendly root Bun commands used by people should run through Doppler with an explicit project and fixed config.
+- Shared internal package.json commands should remain credential-neutral and own the real operation.
+- GitHub fetches Doppler secrets once with the official Secrets Fetch action pinned to the exact v2.0.0 commit:
+  dopplerhq/secrets-fetch-action@451892f16195f9ac360e1a5bcbf0b5fd0e957534 # v2.0.0
+- Map only named action outputs into the exact step that needs them. Do not broadly inject every secret and do not call the local Doppler wrapper from GitHub.
+- Fork pull requests and ordinary untrusted checks receive no provider credentials.
+- Ignore the external Doppler binary in all applicable Knip configurations and update any governed render or candidate digests required by Bundjil after configuration changes.
+- Keep legacy provider secrets until the new path is merged and proven. Delete or revoke them only in a separate, exact cleanup after explicit user approval.
+
+Bundjil-specific facts to verify, not assume:
+- The repository is crcorbett/bundjil.
+- Personal Vercel previously showed projects bundjil-agent and bundjil-codex-proxy, but earlier hosted credential custody and deployment proof were incomplete.
+- Vercel Git is intended to own deployment provenance. Do not add Alchemy ownership merely because Alchemy exists; distinguish infrastructure state from runtime/deployment credentials.
+- Earlier records mention BUNDJIL_PRODUCTION_AGENT_VERCEL_TOKEN and bundjil-alchemy-state. Determine whether either is still current, what consumes it, and whether its naming/ownership is correct.
+- Local verification may use the documented non-secret synthetic Executor endpoint. Never replace it with a production Executor credential or expose a real toolkit URL.
+- Preserve Bundjil's strict Effect/Schema, redaction, replay and receipt boundaries.
+
+Provider and secret work:
+- Use the Cooper Chrome profile only for any browser-based provider access. Never use Work or Tilt Legal profiles.
+- Before mutation, confirm the personal Doppler workplace, GitHub repository, Personal Vercel team, exact projects and exact environment.
+- Create a Doppler project/config/service-token layout only after the inventory proves it.
+- Prefer OIDC with Doppler's official fetch action if the current plan and identity controls support it. Otherwise use read-only, config-scoped, expiring service tokens stored in exact GitHub Environments.
+- Read back only names, scopes, expiry and metadata. Never print, commit, upload or place secret values in logs, screenshots, receipts, tests, PR text or chat.
+- Do not rotate or delete an existing provider credential until all consumers have moved and independent readback proves the replacement.
+- Stop before any account, workplace, team, project or environment mismatch.
+
+Implementation and delivery:
+- If repository policy requires an approved SPEC or plan before this cross-cutting change, create or update the correct active owner before implementation.
+- Implement the smallest correct repository and provider change, including root scripts, internal commands, GitHub workflows, contract tests, docs/runbooks and Knip configuration.
+- Verify focused tests, documentation checks, lint/format, typechecks, Knip, the repository's real verification command, and hosted CI after opening the PR.
+- Create a focused branch, commit, push and open a PR targeting main. Wait for checks and fix failures caused by this change.
+- Report local proof, hosted CI, Doppler metadata readback, GitHub secret-name readback, Vercel/provider readback and any public behaviour separately.
+- Do not merge, deploy, publish, delete old secrets, revoke old tokens or widen provider permissions without explicit user approval.
+- End with the PR URL, final CI state, exact remaining cleanup requiring approval, and clear non-claims.</input>
+</codex_delegation>
