@@ -1,0 +1,46 @@
+Implement exactly task implement-sendblue-contracts-and-client from /Users/cooper/Projects/bundjil/docs/product-specs/sendblue-eve-channel.tasks.json.
+
+You own only:
+- /Users/cooper/Projects/bundjil/apps/agent/agent/sendblue/**
+- /Users/cooper/Projects/bundjil/apps/agent/test/sendblue-*.test.ts
+- /Users/cooper/Projects/bundjil/apps/agent/package.json if a dependency is actually required
+- /Users/cooper/Projects/bundjil/bun.lock only if dependency metadata changes
+
+Do not edit the SPEC, task ledger, execution plan, README files, Vercel state, Sendblue account, or 1Password. You are not alone in the codebase; do not revert or overwrite other changes and accommodate the current worktree.
+
+Read:
+- /Users/cooper/Projects/bundjil/AGENTS.md
+- /Users/cooper/Projects/bundjil/docs/product-specs/sendblue-eve-channel.md
+- /Users/cooper/Projects/bundjil/docs/product-specs/sendblue-eve-channel.tasks.json
+- /Users/cooper/Projects/bundjil/docs/architecture/effect-patterns.md
+- /Users/cooper/Projects/bundjil/docs/architecture/repo-structure.md
+- /Users/cooper/Projects/bundjil/docs/architecture/testing-and-quality.md
+- existing app/package Effect services and tests for local v4 conventions.
+
+Task requirements:
+- Create app-owned canonical Effect Schema contracts, branded identifiers, safe tagged errors, and schema-derived types under apps/agent/agent/sendblue.
+- Create distinct sendblue/config.ts using Effect Config, Config.redacted, ConfigProvider-compatible loading, E.164 and schema validation, required fail-closed fields, and test-only API base URL override.
+- Implement exactly one named SendblueClient.sendMessage operation using Effect v4 HttpClient schema body/response APIs, Context.Service, Layer, and safe transport/status/schema/timeout/uncertain error classification.
+- Provide live and deterministic test/memory Layers.
+- Write focused tests for Config and client behavior described by the task.
+- Do not expose or require real credentials in tests.
+
+Mandatory implementation rules:
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the code is fallible, async, runtime-owned, collection-heavy, or crosses a package, RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded identifiers from the owning package. Do not define standalone DTO mirrors or duplicate fields such as id: string, slug: string, status, or post metadata outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers, mappers, transformers, switch/case branches, instanceof checks, unsafe casts, or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit primitive or owning service contract should carry the behavior.
+
+For UI work, use the primitive -> composite -> layout -> route chain. Let leaves own the data, commands, loading, empty, error, retry, skeleton, and fallback behavior for the exact fragment they render. Do not add nested feature wrappers merely to shorten route JSX, and do not prop-drill query results, selected ids, loading flags, command callbacks, or derived option lists when a leaf can own the narrow value.
+
+For reusable URL state, use schema-owned search and route-identity contracts. Keep the app router as the URL writer, and do not import app route modules into reusable packages.
+
+Verification:
+- bun run --filter @bundjil/agent check-types
+- targeted Sendblue tests
+- bun run --filter @bundjil/agent test
+- bun run --filter @bundjil/agent build
+- bun run verification when practical
+
+Edit files directly. Report changed files, commands/results, and any unresolved issue. Do not commit.
