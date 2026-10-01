@@ -1,0 +1,52 @@
+You are the sequential implementation worker for exactly task 1 of the Bundjil Executor MCP rollout.
+
+You are not alone in the codebase. Work with the current files and do not revert or overwrite edits you did not make. Do not commit, push, provision, rotate, or mutate any provider state; the parent owns acceptance and commits.
+
+SPEC: /Users/cooper/Projects/bundjil/docs/product-specs/executor-mcp-connection.md
+Task ledger: /Users/cooper/Projects/bundjil/docs/product-specs/executor-mcp-connection.tasks.json
+Active plan: /Users/cooper/Projects/bundjil/docs/exec-plans/active/executor-mcp-connection.md
+Architecture: /Users/cooper/Projects/bundjil/docs/architecture/effect-patterns.md, repo-structure.md, eve-agent.md, frontend-composition.md, testing-and-quality.md
+AGENTS: /Users/cooper/Projects/bundjil/AGENTS.md
+
+Exact task object:
+{"id":"freeze-executor-eve-contract-and-policy-inventory","title":"Freeze the current Eve/Executor contract and initial authority inventory","status":"pending","dependsOn":[],"description":"Revalidate the pinned Eve MCP definition and current Executor hosted/toolkit/browser-approval behavior, then produce a sanitized candidate integration and operation-policy inventory before runtime code or Production provisioning.","implementationNotes":["Inspect the ignored current Eve and Executor references plus official documentation. Record source commit/version, relevant file paths, and documented behavior without copying external source into Bundjil.","Use the existing broad personal Executor credential only through a 1Password reference or mode-0600 ephemeral material for read-only initialize, tools/list, skills, and catalog inventory. Do not execute a downstream mutation.","Confirm that the hosted toolkit endpoint exists, root and toolkit routes differ, the remote MCP surface is skills/execute/resume, absent mode defaults to model, and browser-mode resume accepts only executionId.","Inventory only candidate connections needed for the first capability. Classify each selected operation as read-only, reversible mutation, destructive/irreversible, or authority management, and propose approve/require_approval/block without provider data.","Explicitly exclude Executor core toolkit/policy/key/credential management and any operation that would let Bundjil enlarge its own authority.","Create docs/exec-plans/active/executor-mcp-connection.md when implementation begins and link this task ledger; do not revise accepted prior SPEC evidence."],"mandatoryVerification":["Direct read-only MCP initialize/tools-list evidence returns success with no secret, protected URL, provider data, or raw response retained in the repo.","Source evidence proves browser mode, model-mode default, browser resume input shape, toolkit dedicated URL, selected-connection implicit deny, and approve/require_approval/block semantics.","The sanitized inventory has an explicit owner, operation category, and policy for every selected entry; unclassified entries are excluded/blocked.","Review all proposed code boundaries against docs/architecture/effect-patterns.md and docs/architecture/repo-structure.md; no SDK, proxy, DTO mirror, custom MCP client, helper layer, pass-through service, generic module, or speculative abstraction is planned.","Record the initial helper/module budget: name every anticipated module and abstraction, its owner/reason, expected call sites and direct test; reject anything without a current boundary or materially complex tested policy.","Before implementation delegation, prepare the exact one-task prompt containing this SPEC, the task object, architecture docs, file ownership, accepted helper/module budget, linear Effect/lint/secret/frontend rules, and verification gates; delegated work cannot self-approve parent audit passes.","Confirm no frontend file is in scope. Any React/route/visible-text/URL-state need stops this task for a separate frontend SPEC with highest-parent composition and leaf-owned data/command/state rules.","Run JSON validation, documentation formatting/lint as applicable, git diff --check, and a secret/protected-URL scan."],"browserVerification":["None in this task; no approval page is opened and no state-changing live operation is run."],"completionCriteria":["Current contract evidence, a minimal sanitized authority inventory, and the accepted helper/module budget are recorded in the active plan.","The first Preview capability and every selected operation policy are explicitly accepted before provisioning.","All three audit passes are recorded."],"implementationImprovementAudit":{"requiredPasses":3,"completedPasses":0,"evidence":[]},"commitAfterPassing":true}
+
+
+Mandatory implementation rules:
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,
+HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit,
+Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
+code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
+RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded
+identifiers from the owning package. Do not define standalone DTO mirrors or
+duplicate fields such as id: string, slug: string, status, or post metadata
+outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers,
+mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
+or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit
+primitive or owning service contract should carry the behavior.
+
+For UI work, use the primitive -> composite -> layout -> route chain. Let
+leaves own the data, commands, loading, empty, error, retry, skeleton, and
+fallback behavior for the exact fragment they render. Do not add nested
+feature wrappers merely to shorten route JSX, and do not prop-drill query
+results, selected ids, loading flags, command callbacks, or derived option
+lists when a leaf can own the narrow value.
+
+For reusable URL state, use schema-owned search and route-identity contracts.
+Keep the app router as the URL writer, and do not import app route modules into
+reusable packages.
+
+Task-specific scope:
+- This is a read-only research/evidence slice. Do not change runtime code.
+- Inspect current ignored Eve and Executor references and official docs/source.
+- Use mcp__executor_personal only for read-only skills/catalog/contract probes. Call its skills({name:"execute"}) guide before execute. Never run a downstream mutation and never emit raw protected URLs, credentials, raw payloads, provider data, or prompts into files/output.
+- Confirm current Eve public MCP connection API, Executor hosted tools, browser/model mode behavior, toolkit URL/policy semantics, and resume input.
+- Select the smallest defensible first Preview capability from the currently connected catalog, with a sanitized operation inventory and approve/require_approval/block rationale. Explicitly exclude authority-management operations.
+- Record the initial module/helper budget and exact task-2 delegation contract in the active plan.
+- Update only the active plan and, if needed for corrected current truth, the SPEC/task ledger. Keep the frontend hard stop.
+- Run all task-1 verification gates possible without mutation. Do not mark parent audits complete; report evidence for the parent to verify.
+- Report changed files and concise sanitized verification evidence.
