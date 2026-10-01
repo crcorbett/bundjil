@@ -1,0 +1,3 @@
+<subagent_notification>
+{"agent_path":"019f3d46-3751-7c01-a3c7-f5a230064192","status":"shutdown"}
+</subagent_notification>
