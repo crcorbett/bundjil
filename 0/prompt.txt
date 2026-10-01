@@ -1,0 +1,5 @@
+<codex_delegation>
+  <source_host_id>slingshot:env_e_6a0672dd80bc8326ad6dcc62f6a9a363</source_host_id>
+  <source_thread_id>019f3c64-2576-70c2-90c0-e6b212f79ee1</source_thread_id>
+  <input>Please acknowledge this handoff request and prepare to create separate Bundjil workstreams for Production channel proof, Photon replay-oracle investigation, and repository structure audit. Do not mutate files or providers yet.</input>
+</codex_delegation>
