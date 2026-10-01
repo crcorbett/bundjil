@@ -1,0 +1,1 @@
+Wait doesn’t photon support message sending? Otherwise can’t you get the thread to use messages app and [@Computer Use](plugin://computer-use@openai-bundled/) ??
