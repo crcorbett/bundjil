@@ -1,0 +1,40 @@
+Implement exactly one task from /Users/cooper/Projects/bundjil/docs/product-specs/codex-oauth-eve-model-provider.tasks.json: deploy-codex-proxy-vercel.
+
+Repo: /Users/cooper/Projects/bundjil on main. Read these first: /Users/cooper/Projects/bundjil/docs/product-specs/codex-oauth-eve-model-provider.md, sibling .tasks.json, docs/exec-plans/active/codex-oauth-eve-model-provider.md, docs/architecture/effect-patterns.md, docs/architecture/repo-structure.md, docs/architecture/testing-and-quality.md, apps/codex-proxy/README.md.
+
+Mandatory prd-implementer prompt block:
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the code is fallible, async, runtime-owned, collection-heavy, or crosses a package, RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded identifiers from the owning package. Do not define standalone DTO mirrors or duplicate fields such as id: string, slug: string, status, or post metadata outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers, mappers, transformers, switch/case branches, instanceof checks, unsafe casts, or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit primitive or owning service contract should carry the behavior.
+
+For UI work, compose stable visible structure as high as practical, usually in the route or nearest page-level parent. Use the primitive -> composite -> layout -> route chain for visible structure. Let leaves own the data, search/page params, commands, atoms, skeletons, and fallbacks for the exact fragment or action they render. Do not add nested feature wrappers merely to shorten route JSX, and do not prop-drill query results, selected ids, loading flags, command callbacks, or derived option lists when a leaf can own the narrow value.
+
+For reusable URL state, use schema-backed field URL atoms for search params and read-only page-param atoms for route identity. Keep TanStack Router as the app URL writer, and do not import app route files, routeTree.gen, Route.useSearch(), or Route.useParams() into reusable packages.
+
+Task object summary:
+- id: deploy-codex-proxy-vercel
+- Link apps/codex-proxy to a Vercel project named bundjil-codex-proxy under Cooper's personal Vercel account, not Tilt Legal.
+- Use preview deployment first. Production deploy is allowed only after preview verification is recorded, but it is acceptable to skip production if preview proof is recorded and docs say production remains pending.
+- Set BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN via Vercel env vars; never commit env files. Keep BUNDJIL_CODEX_PROXY_MODE mock for hosted proof.
+- Hosted live Codex proof is opt-in; verify health/auth/mock streaming only unless credentials are explicitly available.
+- Do not log token values, authorization codes, raw OAuth responses, prompts, or full model output.
+
+Write scope:
+- You may edit apps/codex-proxy deployment entrypoint/config if needed, apps/codex-proxy/README.md, docs/product-specs/codex-oauth-eve-model-provider.md, docs/product-specs/codex-oauth-eve-model-provider.tasks.json, docs/exec-plans/active/codex-oauth-eve-model-provider.md, and architecture docs if deployment shape changes.
+- Do not change apps/agent and do not wire Eve to the proxy in this task.
+- Do not introduce live Codex network calls.
+- Do not commit or print secrets. If you need an internal token, generate/use it only in shell/env/Vercel and report sanitized proof only.
+
+Required verification:
+- Confirm Vercel project/account is Cooper personal, not Tilt Legal.
+- Confirm env vars are set without printing values.
+- bun run --filter @bundjil/codex-proxy build
+- Preview deployment succeeds.
+- Direct HTTP preview checks: GET /health 200, unauthenticated POST /v1/chat/completions 401, invalid-token POST 401, authenticated mock POST streams text/event-stream with data lines and [DONE]. Do not print token.
+- Check Vercel logs/CLI output for no token values, authorization codes, raw OAuth responses, private prompts, or full upstream response bodies.
+- Update app README/spec/task ledger/active plan with sanitized preview URL/evidence.
+- Run bun run verification before reporting.
+
+Important: you are not alone in the codebase. Do not revert edits made by others. Work with the current main state. Report changed files and exact sanitized verification evidence. If Vercel auth/account/project operations are blocked, record the concrete blocker and do not fake deployment proof.
