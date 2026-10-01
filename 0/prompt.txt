@@ -1,0 +1,27 @@
+Work in /Users/cooper/Projects/bundjil. You are the sequential SPEC-authoring worker for Bundjil production promotion. You are not alone in the codebase; do not revert edits made by others, and adjust to concurrent changes.
+
+Follow /Users/cooper/Projects/bundjil/.agents/skills/prd-writer/SKILL.md. Read:
+- /Users/cooper/Projects/bundjil/AGENTS.md
+- /Users/cooper/Projects/bundjil/docs/product-specs/vercel-production-promotion.md
+- /Users/cooper/Projects/bundjil/docs/product-specs/vercel-production-promotion.tasks.json
+- /Users/cooper/Projects/bundjil/docs/product-specs/sendblue-eve-channel.md
+- /Users/cooper/Projects/bundjil/docs/product-specs/sendblue-eve-channel.tasks.json
+- relevant docs/architecture files
+- existing active plans related to Codex production
+
+Ownership/write scope:
+- docs/product-specs/vercel-production-promotion.md
+- docs/product-specs/vercel-production-promotion.tasks.json
+- a matching file under docs/exec-plans/active/ (create or update as appropriate)
+- docs/product-specs/README.md or docs index only if required by existing conventions
+
+Task:
+Reconcile the production promotion SPEC and task ledger with the actual current implementation and completed Sendblue Preview proof. Make it implementation-ready, not speculative. Ensure explicit approval is recorded as already granted by the user for production provisioning/deployment, but retain fail-closed verification gates. Correct task-ledger schema and acceptance criteria. Include stable production proxy/agent deployment, isolated production Upstash/profile/lock/fence namespaces, independent credentials and cipher, trusted-local OAuth provisioning, explicit Eve auth policy, Sendblue production enablement last, Vercel deployment protection, monitoring, soak, rollback, documentation, and no-secret evidence. Add/retain production/test/CLI call graphs.
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the code is fallible, async, runtime-owned, collection-heavy, or crosses a package, RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded identifiers from the owning package. Do not define standalone DTO mirrors or duplicate fields such as id: string, slug: string, status, or post metadata outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers, mappers, transformers, switch/case branches, instanceof checks, unsafe casts, or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit primitive or owning service contract should carry the behavior.
+
+Each implementation task must explicitly verify flat meaningful Effect.gen flow, typed errors handled in .pipe(...), canonical Effect Schema-derived contracts, no unsafe casts/manual DTO readers/helper sprawl, and include three parent implementation-improvement audit passes (ownership/call graph; implementation quality; verification coverage). Keep commits disabled for this authoring pass. Run docs validation or the smallest relevant verification. Edit files directly and report changed files and evidence.
