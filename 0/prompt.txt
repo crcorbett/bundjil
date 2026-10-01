@@ -1,0 +1,1 @@
+Please send a concise progress update when you hit a stopping point. Keep scope strictly to Task 2; do not begin encrypted persistence, refresh locking, or OAuth routes.
