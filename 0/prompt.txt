@@ -1,0 +1,1 @@
+Ok why did the audits pick up on issues? Why weren’t these issues caught in the spec drafting / implementation phase? Is there things to do based on audit or implementation history / trajectory to avoid these issues in the future? [$docs-maintainer](/Users/cooper/Projects/bundjil/.agents/skills/docs-maintainer/SKILL.md)
