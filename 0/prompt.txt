@@ -1,0 +1,3 @@
+<subagent_notification>
+{"agent_path":"019f60d5-e208-7a50-8d39-54af1463e8d7","status":{"completed":"Stopped before any Production mutation.\n\nCurrent blocker: the `vercel` CLI is not available on `PATH`, and 1Password vault access did not return a usable `personal-vault` result before the operation was interrupted. I did not retrieve or print any secret.\n\nConfirmed before stopping:\n- `HEAD` and `origin/main`: `9a34a34e5ebc320fb30cd96c8651585d2fc0e770`\n- Tracked worktree was clean.\n- No agent Production variables, deployments, aliases, bypasses, or documentation were changed."}}
+</subagent_notification>
