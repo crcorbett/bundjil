@@ -1,0 +1,30 @@
+Task 2 is not accepted. Continue the same task in the shared workspace; do not commit.
+
+Parent review found these required corrections:
+
+1. Complete the Effect HttpClient migration for every Task 2 global fetch:
+- packages/codex-oauth/src/codex-responses-fetch.service.ts
+- packages/codex-oauth/scripts/prove-hosted-staged-refresh.ts
+- apps/codex-proxy/scripts/prove-preview.ts
+- apps/codex-proxy/scripts/smoke-test.ts
+Use @effect/platform HttpClient/HttpClientRequest/HttpClientResponse and owner codecs. Do not wrap global fetch in Effect.tryPromise/Effect.promise. Preserve headers, status behavior, SSE text bytes, and testability.
+
+2. Remove Task 2 debt from tooling/boundary-exceptions.ts as the source is migrated. Work through every exception owned by @bundjil/codex-oauth and the Codex-specific apps/codex-proxy entries. A remaining entry is allowed only for an actual third-party/framework interface and must be exact and justified; do not keep entries merely because check:boundaries passes.
+
+3. Correct schema provenance mistakes:
+- apps/codex-proxy/src/env.ts currently decodes VERCEL with CodexProxyLocalProfileStoreDirectory. Add/use a correctly owner-named runtime-marker Schema.
+- Vercel protection bypass is not an OpenAICompatibleProxyInternalToken. Add/use its own owner-named redacted Schema.
+- Do not use decodeUnknownEffect for known inline object construction in proof/smoke scripts. Construct the canonical decoded type via the owner Schema's make API (or an already decoded typed value), then encodeEffect at the outbound boundary. decodeUnknownEffect is only for host/provider unknown input.
+
+4. Keep operator scripts as coherent linear Effect programs. Avoid ending with repeated standalone await Effect.runPromise(...) output encoders. Include final Schema encoding and Console.log/Console.error in a named Effect program with one run boundary and typed errors handled in its outer pipe. Do not introduce tiny encoding wrappers.
+
+5. Audit all remaining Codex raw public primitives, inline Schema.String/NonEmptyString fields, raw config primitives, unsafe assertions, response text/json reads, and raw outbound body writes represented by the registry. Reuse owner schemas from schemas.ts/errors/contracts.ts. Add a missing owner schema only for a real semantic concept (error message, path, redirect, header/token, SSE fragment, proof result field, etc.). Parser-local SSE line fragments may remain private only, while decoded event unions must drive Match.
+
+6. Preserve the already passing 103 Codex tests and 24 proxy tests. Add focused tests where new HttpClient layers or codec paths change seams. Run:
+- bun run check:boundaries
+- bun run check
+- bun run knip
+- Codex/proxy check-types, builds, tests, smoke test
+- git diff --check
+
+Reapply the mandatory Effect block from the original prompt. Report changed files and evidence, and explicitly list every remaining Codex/proxy exception with why it is an unavoidable external constraint.
