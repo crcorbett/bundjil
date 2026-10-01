@@ -1,0 +1,7 @@
+Parent review notes to address before completion:
+1. Effect v4 Config.literal arguments are literal first, env name second: Config.literal("true", "BUNDJIL_SENDBLUE_TEST_MODE").
+2. Sendblue's documented service union is iMessage | SMS | RCS, not MMS.
+3. Do not retain raw HttpClient/Config/Schema causes in safe tagged errors where they can carry auth headers, identity JSON, phone numbers, or response/request bodies. Use a safe reason/message/status contract and prove String(error) cannot leak API key, secret, sender mapping, content, or provider body.
+4. A HttpClient test defect via Effect.die bypasses mapError; inject the actual typed failure channel required by HttpClient.make so transport classification is genuinely tested.
+5. Prefer Match/schema-owned status classification over nested stringly ternaries if the current code remains.
+Continue and rerun focused gates.
