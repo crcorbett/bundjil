@@ -1,0 +1,15 @@
+Run terminal audit pass 1 of 5 for the active Bundjil Effect-native runtime specification. This is report-only: do not edit files, commit, push, deploy, use credentials, or mutate providers.
+
+Worktree: /Users/cooper/.codex/worktrees/d4b4e069-1303-427d-957e-756d18e049a9/bundjil
+Branch: codex/automatic-production-effect-runtime
+Comparison base: 763199f
+Current accepted finding sequence includes ENP-FND-050.
+
+Read AGENTS.md, .agents/skills/prd-implementer/SKILL.md, .agents/skills/docs-maintainer/SKILL.md, /Users/cooper/.agents/skills/strict-effect-ts/SKILL.md, the active SPEC/task ledger/plan, and relevant architecture/package owners. Use installed effect@4.0.0-beta.101 and immutable local Effect source revision 1caab3cc30f626efbf15e59d74f539a487e5c85c only; never Effect v3.
+
+Pass 1 scope: architecture and boundaries. Audit the complete diff from 763199f plus current uncommitted candidate for Effect contracts, Schemas, branded boundaries, exact decode/encode ownership, closed safe errors, redacted Config, services/Layers, provider adapters, secret-negative ingress/egress, runtime/resource ownership, and public export containment. Inspect the actual call graph and tests, with special attention to the Codex streaming scope/Deferred exactly-once ownership correction.
+
+Return either:
+- CLEAN with exact inspected surfaces and residual non-claims; or
+- numbered actionable findings ordered by severity, each with file/line, violated invariant/requirement, concrete failure mode, and minimal correction/proof.
+Do not report style preferences, speculative redesign, or already-recorded provider non-claims as defects.
