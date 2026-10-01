@@ -1,0 +1,3 @@
+Why is this needed? What is the problem? Didn't we have the proxy working previously?
+
+"The blocker is missing isolated Preview Codex profile/persistence/cipher configuration plus a proof-only Vercel protection path."
