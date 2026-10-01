@@ -1,0 +1,7 @@
+mcp__executor_personal should be available in this thread.
+
+It exposes:
+
+* mcp__executor_personal.skills
+* mcp__executor_personal.execute
+* mcp__executor_personal.resume
