@@ -1,0 +1,1 @@
+Ok I have connected it up to Vercel now. You’ll see this. Continue and restart the goal
