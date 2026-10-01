@@ -1,0 +1,3 @@
+<subagent_notification>
+{"agent_path":"019f5d92-aa3a-73f1-a7a6-46eccfb78c02","status":{"completed":"Vercel requires approval to connect the existing Upstash resource to `bundjil-agent` for Preview only. Approve the pending Vercel action to continue."}}
+</subagent_notification>
