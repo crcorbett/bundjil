@@ -1,0 +1,1 @@
+Stop the current attempt and report the exact blocker immediately. No Production deployment exists and the worktree is clean. Do not print secrets. If blocked only on 1Password interactive auth, use the already-authenticated `op` CLI session or Vercel CLI; otherwise state the failing command and sanitized error.
