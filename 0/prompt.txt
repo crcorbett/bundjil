@@ -1,0 +1,9 @@
+Fix and complete the atomic suite:
+- Construct the shared transaction with Schema.decodeUnknownSync(AtomicKeyValueStoreTransaction)(literal) so non-empty tuple typing is canonical and cast-free.
+- Fix the rejected scan test by yielding KeyValueStore.KeyValueStore inside an Effect provided with the rejected-scan layer, then yield store.size; do not access size on the service tag.
+- Split/extend eval outcomes so 1 -> applied and 0 -> conflict are both asserted.
+- Add duplicate condition, duplicate mutation, and 33-entry atomic.transact failures with evalCalls === 0.
+- Add a rejected eval Promise case alongside malformed response and render both safely.
+- Add the requested stateful protocol mock parity test with PersistenceMemory; at minimum compare initial apply, duplicate absent conflict, multi-key fenced replacement apply, stale overwrite/remove conflict, successful owner remove, and native readback/all-or-nothing side key behavior.
+- Assert exact args in the eval call, not only keys/script.
+Run bun run fix, package check-types/test/build, bun run check. Do not stop until commands finish. No consumers/ledger/plan/commit.
