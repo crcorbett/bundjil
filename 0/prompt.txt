@@ -1,0 +1,7 @@
+MANDATORY TERMINAL AUDIT PASS 1 OF 5, FRESH RESTART. Report-only, finish within 10 minutes, no full-suite rerun, no edits/mutations.
+
+Exact candidate: /Users/cooper/.codex/worktrees/d4b4e069-1303-427d-957e-756d18e049a9/bundjil, branch codex/automatic-production-effect-runtime, all uncommitted changes. Read governing instructions, strict Effect/docs skills, both active plans/SPEC/task ledgers, affected READMEs. Use only effect@4.0.0-beta.101 and source revision 1caab3cc30f626efbf15e59d74f539a487e5c85c.
+
+Architecture/Effect boundary audit. Confirm ENP-FND-044..049 and inspect complete diff for Schema ownership, safe errors/redaction, Config, Layers/runtime/cause semantics, flat flow/no sprawl, exports, Photon diagnostics, HTTP/SSE resources and cancellation. Scrutinize current streaming ownership: response Scope precedes execute so acquisition failure closes; ownership watchdog starts only after validated status/media/metadata; header timeout independent; body Stream.unwrap claims Deferred; scope finalizer completes Deferred; unclaimed stream closes at idle deadline; consumed/cancelled stream closes normally. Latest verification: 136 boundaries, 17 lint, 9 typechecks, 15 workspace tasks, 155 Codex, 43 proxy, 80 agent, 45 Photon.
+
+Findings severity/file:line/mechanism/proof gap/ENP IDs. Provider non-proof limitation only. If clean begin exactly PASS 1 ZERO FINDINGS.
