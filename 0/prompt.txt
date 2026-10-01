@@ -1,0 +1,64 @@
+You are implementing exactly one serial task in /Users/cooper/Projects/bundjil. You are not alone in the codebase. Do not revert other agents' or user edits; keep your edits confined to the owned files below and adjust to existing changes.
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,
+HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit,
+Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
+code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
+RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded
+identifiers from the owning package. Do not define standalone DTO mirrors or
+duplicate fields such as id: string, slug: string, status, or post metadata
+outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers,
+mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
+or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit
+primitive or owning service contract should carry the behavior.
+
+For UI work, use the primitive -> composite -> layout -> route chain. Let
+leaves own the data, commands, loading, empty, error, retry, skeleton, and
+fallback behavior for the exact fragment they render. Do not add nested
+feature wrappers merely to shorten route JSX, and do not prop-drill query
+results, selected ids, loading flags, command callbacks, or derived option
+lists when a leaf can own the narrow value.
+
+For reusable URL state, use schema-owned search and route-identity contracts.
+Keep the app router as the URL writer, and do not import app route modules into
+reusable packages.
+
+Task object:
+{
+  "id": "harden-preview-proof-contract",
+  "title": "Make preview proof assertions enforce the live contract",
+  "description": "Turn the preview proof's documented health, auth, streaming, and leak predicates into a typed success/failure contract so a failed authenticated request cannot exit successfully.",
+  "completionCriteria": [
+    "The proof exits zero only when all documented predicates hold.",
+    "The emitted success shape remains sanitized and contains no credential, prompt, or model-body content.",
+    "The durable runbook and active plan distinguish a passing proof from an attempted probe."
+  ],
+  "mandatoryVerification": [
+    "bun run --filter @bundjil/codex-proxy check-types",
+    "bun run --filter @bundjil/codex-proxy test",
+    "bun run --filter @bundjil/codex-proxy build",
+    "bun run --filter @bundjil/codex-proxy smoke-test",
+    "A deliberately malformed or unauthorized proof fixture exits non-zero.",
+    "bun run verification",
+    "git diff --check"
+  ]
+}
+
+Read:
+- docs/product-specs/codex-oauth-eve-model-provider.md
+- docs/product-specs/codex-oauth-eve-model-provider.tasks.json
+- docs/exec-plans/active/codex-oauth-eve-model-provider.md
+- AGENTS.md
+- docs/architecture/effect-patterns.md
+- docs/architecture/testing-and-quality.md
+
+Exclusive owned implementation files:
+- apps/codex-proxy/scripts/prove-preview.ts
+- apps/codex-proxy/test/** (add or alter focused tests as needed)
+- apps/codex-proxy/README.md only if an exact operator contract update is needed
+
+Do not edit the SPEC, task ledger, active plan, root docs, deploy config, or other apps. Preserve Effect Schema JSON encoding; no JSON.stringify/manual parsing at the proof boundary. Keep the primary operation flat and avoid helper sprawl. Run the required targeted checks plus root verification if practical. Report changed files, exact sanitized verification evidence, and any unresolved limitation.
