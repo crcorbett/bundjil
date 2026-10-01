@@ -1,0 +1,10 @@
+The new native test file is only partial and not formatted. Continue task 1 and finish that file.
+
+Add tests for:
+- exact SCAN calls with cursors 0 then 1, match 'test:persistence:*', count 100, duplicate de-dupe;
+- clear with at least 205 unique prefixed keys plus duplicates across pages: prove every SCAN event occurs before first DEL, exactly 3 bounded DEL batches, no duplicate deletion, no foreign key;
+- empty clear issues zero DEL;
+- malformed scan tuple, out-of-prefix returned key, and rejected scan Promise each become safe KeyValueStoreError;
+- rejected get Promise and malformed get response safe rendering via Schema.encodeUnknownSync(Schema.UnknownFromJsonString), with no private marker, key, cause, response;
+- prefix rejects each metacharacter using Effect Array.map, not native .map.
+Keep exact get/set/remove and one allocation tests. Use clear named test Effects and format normally. Run bun run fix, package check-types/test/build, bun run check. Do not edit atomic provider tests/consumers/ledger/plan or commit. Report total test count.
