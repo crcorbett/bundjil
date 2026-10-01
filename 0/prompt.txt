@@ -1,0 +1,1 @@
+OpenAI supports using Codex subscriptions/agents in other locations. So i'm interested in how we can leverage this.
