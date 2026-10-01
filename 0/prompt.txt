@@ -1,0 +1,8 @@
+Finish the native suite with one additional it.effect:
+- empty scan then clear produces zero DEL calls;
+- malformed scan response maps to safe size KeyValueStoreError;
+- rejected scan Promise maps to safe size error;
+- rejected get Promise maps to safe get error;
+- render each via Schema.UnknownFromJsonString and prove no private marker, key, cause, or raw response.
+Also strengthen the 205-key clear test: every batch length <=100 and a HashSet over all deleted keys has size 205, with zero foreign keys. Prefer Effect Array/HashSet instead of native filter/flatMap/findIndex in the assertions where practical.
+Run bun run fix, package test/check-types, bun run check. Do not change production unless a test finds a defect.
