@@ -1,0 +1,52 @@
+Work in /Users/cooper/Projects/bundjil. Implement Task 1 only from:
+- SPEC: docs/product-specs/effect-boundary-provenance-enforcement.md
+- ledger: docs/product-specs/effect-boundary-provenance-enforcement.tasks.json
+- active plan: docs/exec-plans/active/effect-boundary-provenance-enforcement.md
+Read AGENTS.md, those three files, and docs/architecture/effect-patterns.md, repo-structure.md, testing-and-quality.md first.
+
+Task id: establish-boundary-provenance-audit.
+
+You own the Task 1 code/tooling/test/doc changes. Edit files directly. Do not implement Tasks 2-4, do not mark the task accepted, and do not commit. You are not alone in the codebase: do not revert existing or concurrent changes; adapt to them. Keep runtime behavior unchanged.
+
+Required scope:
+- Add one purpose-built TypeScript compiler-API boundary audit with positive/negative fixture tests.
+- Add an exact symbol-level exception registry with owner, boundary kind, canonical codec/service, admitted syntax, and reason; stale exceptions must fail.
+- Add root commands for the audit, but do not yet enable stricter Effect diagnostic severities reserved for Task 4.
+- Add only the architecture documentation needed to describe the audit/tooling contract.
+- Initial current findings may be exact exceptions, never counts/globs/line baselines.
+- Run focused tests/checks and report changed files and evidence.
+
+Mandatory implementation rules:
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,
+HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit,
+Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
+code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
+RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded
+identifiers from the owning package. Do not define standalone DTO mirrors or
+duplicate fields such as id: string, slug: string, status, or post metadata
+outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers,
+mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
+or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit
+primitive or owning service contract should carry the behavior.
+
+Canonical Effect Schema codecs own Type and Encoded representations. Unknown
+and encoded primitives are confined to exact adapters; domain services accept
+decoded owner types. Use decodeUnknownEffect only at genuinely untrusted host
+boundaries, decodeEffect for known Encoded inputs, and encodeEffect for outward
+writes. Do not use sync Schema operations in production tooling.
+
+For UI work, use the primitive -> composite -> layout -> route chain. Let
+leaves own data and states. This task has no UI scope.
+
+Task acceptance checks:
+- TypeScript AST + type checker, not regex-only.
+- Fixture tests cover every implemented rule and stale exceptions.
+- Exact diagnostics identify file, line, rule and remediation.
+- Flat meaningful Effect flow and typed errors in outer pipes where tooling is Effectful.
+- No helper/common/utils package or generic lint framework.
+- Run the smallest useful checks and bun run verification if practical using the existing ignored Preview-local env.
+- Return a concise summary with changed paths, test output, known limitations, and any exact exceptions that should be removed in later tasks.
