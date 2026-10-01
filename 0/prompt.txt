@@ -1,0 +1,21 @@
+Parent audit found a blocking omission. The user asked for a repository audit, and packages/core/src/index.ts still exports WorkspaceSummary with name: string and packages: readonly string[]. This is a real cross-package semantic boundary, not an intentional local exception.
+
+Please correct Task 4 in the shared worktree. You now own this narrowly expanded source/docs/test correction:
+- packages/core/src/index.ts
+- packages/core/test/index.test.ts
+- packages/core/README.md
+- packages/eve-effect/src/schemas.ts
+- packages/eve-effect/src/services/bundjil-agent-operations.ts
+- affected Eve/agent tests only if needed
+- Task 4 docs/spec/ledger/plan and relevant existing docs you already changed
+
+Requirements:
+1. Move canonical workspace-name and package-name semantic ownership to @bundjil/core. Use checked branded Schemas for open semantic workspace/package values. @bundjil/eve-effect must import/re-export/reuse those exact owner contracts, not duplicate brands.
+2. Replace the exported WorkspaceSummary interface string fields with an owner Schema.Struct and schema-derived type. makeWorkspaceSummary must decode the complete structure through Effect Schema. Do not use production decodeSync, assertions, brand constructors, or casts.
+3. Treat the fixed default package list as a closed named literal vocabulary or as encoded input that is decoded by makeWorkspaceSummary. Do not leave an unexplained exported readonly string[].
+4. Preserve the current successful default and custom-name behavior. Translate the new core parse failure at the Eve operation boundary into its existing BundjilAgentSchemaError so public failure contracts remain coherent.
+5. Expand the SPEC owners/final inventory to @bundjil/core and state that @bundjil/effect-start contains no owned string domain contracts. Update core README. Correct any dates/status inconsistencies, but leave Task 4 and overall statuses in progress/planned for parent completion.
+6. Add/adjust tests for successful decoding and rejection of an empty workspace name through the Effect error channel.
+7. Run focused core/eve/agent checks/tests/builds plus bun run fix, bun run check, bun run knip, jq, git diff --check. Do not commit. Do not touch provider/deployment/frontend state.
+
+Keep the implementation linear and composable. No helpers/common/utils modules. Report exact changes and checks.
