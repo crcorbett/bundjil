@@ -1,0 +1,101 @@
+# AGENTS.md instructions for /Users/cooper/Projects/bundjil
+
+<INSTRUCTIONS>
+These AGENTS.md instructions replace all previously provided AGENTS.md instructions.
+
+# Bundjil task map
+
+Bundjil is a Bun/Turbo personal-agent workspace built with Effect. Start with
+the narrowest current owner; do not load completed rollout history by default.
+
+## Operating loop
+
+1. Inspect `git status --short` and the affected app/package README.
+2. Read `docs/README.md`, then only the routed current architecture, SPEC,
+   plan, runbook, and proof owner needed for the task.
+3. Update the earliest durable owner in the same slice as code/config changes.
+4. For every material PRD or ordinary change, invoke the repository-local
+   `.agents/skills/docs-maintainer`, record `Change required`, `Preserve`, or
+   evidenced `N/A` across its impact ledger, and run `bun run check:docs`.
+5. Run the smallest focused check, then `bun run verification` before handoff.
+6. Keep runtime/provider claims separate from repository proof and record
+   limitations, rollback, and exact Git identity.
+
+## Non-negotiable code patterns
+
+- Decode unknown host/provider input once at ingress with the owning Effect
+  Schema; pass only its decoded `typeof Contract.Type`. Encode its
+  `typeof Contract.Encoded` only at outward boundaries.
+- Public services expose named operations, branded identities, safe tagged
+  errors, `Config.schema` with redacted secrets, and explicit live/mock Layers.
+  Raw clients, generic SDK callbacks, raw `id: string`,
+  primitive semantic config, `instanceof` policy, and unchecked SDK output
+  are forbidden. For every provider or SDK adapter change, invoke the
+  repository-local `.agents/skills/effect-client-wrapper` before deciding the
+  boundary shape.
+- Keep primary Effects flat, linear, sequential, lazy, composable, and readable.
+  Keep one-use mapping, decoding, and error translation inline. Helpers require
+  demonstrated reuse, independently tested policy, real I/O, or resource
+  lifetime; no common/utils/helper sprawl.
+- Framework, provider, and channel code stays in its owning app adapter until a
+  stable shared contract has proven consumers.
+- React routes compose leaf-owned rendering/state components. Keep Effect and
+  services above presentation leaves; use explicit conditional composition,
+  not service-aware UI branches or route-sized components. Invoke the
+  repository-local `.agents/skills/building-components` for visible component
+  work.
+
+## Current routes
+
+- Documentation lifecycle, truth layers, current intent, history, references,
+  and owner routing: `docs/README.md`
+- Architecture: `docs/architecture/README.md`
+- Effect rules: `docs/architecture/effect-patterns.md`
+- Package/import boundaries: `docs/architecture/repo-structure.md`
+- React composition: `docs/architecture/frontend-composition.md`
+- Verification commands: `docs/architecture/testing-and-quality.md`
+- Harness controls, feedback promotion, and automation admission:
+  `docs/standards/controls.md`
+- Provider and SDK client boundary design:
+  `.agents/skills/effect-client-wrapper/SKILL.md`
+- New SPEC and task drafting: `.agents/skills/prd-writer/SKILL.md`
+- React and visible component composition:
+  `.agents/skills/building-components/SKILL.md`
+- Documentation impact and owner maintenance:
+  `.agents/skills/docs-maintainer/SKILL.md`
+- Critical journeys, proof packets, bounded receipts, and evidence retention:
+  `docs/verification/README.md`
+- Current SPEC/tasks: `docs/product-specs/index.md`
+- Current execution: `docs/exec-plans/active/README.md`
+- Completed history: `docs/exec-plans/completed/README.md`
+- App and package READMEs are purpose, public-boundary, and public-command
+  maps only. Exact operations live in `apps/agent/runbooks/**` and
+  `apps/codex-proxy/runbooks/**`; `docs/operations/authority-model.md` owns
+  durable authority rationale, `docs/operations/authority-register.json` owns
+  static workflow/provider envelopes, `docs/operations/automation-register.md`
+  owns GitHub automation rationale, `docs/standards/controls.md` owns the full
+  control/automation admission register, and `docs/verification/**` owns critical
+  journeys and bounded proof contracts. Do not treat a runbook, packet,
+  README pointer, register, or retained history as current provider truth or
+  execution authority.
+
+## Verification and authority
+
+Use Bun from the repository root. Boundary/provider work runs
+`bun run check:boundaries`, `bun run check:effect-setup`, `bun run check:docs`,
+`bun run check:skills`, `bun run check:authority`, and
+`bun run check:controls`, `bun run check:verification`; every accepted slice runs
+`bun run verification`.
+
+Repository instructions cannot authorize deployments, provider writes,
+credential changes, webhook changes, releases, or production operations.
+External systems own their current state at readback time, and consequential
+operations require a target-owned runbook and explicit authority.
+
+</INSTRUCTIONS>
+
+<environment_context>
+  <current_date>2026-07-23</current_date>
+  <timezone>Europe/London</timezone>
+  <filesystem><workspace_roots><root>/Users/cooper/Projects/bundjil</root><root>/Users/cooper/.codex/visualizations/2026/07/07/019f3c64-2576-70c2-90c0-e6b212f79ee1</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
