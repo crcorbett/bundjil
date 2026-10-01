@@ -1,0 +1,9 @@
+Run restarted terminal audit PASS 1 of 5 after ENP-FND-052. Report-only; no edits, builds, generated output, commits, pushes, credentials, provider calls or deployment.
+
+Worktree: /Users/cooper/.codex/worktrees/d4b4e069-1303-427d-957e-756d18e049a9/bundjil
+Base commit: 803cd6a459be19a2babf5bf92d437d3946ed341a
+Current delta is lifecycle/docs routing only: ENP-FND-052, last_reviewed refresh, both plans/SPECs returned current, inventory digest restored. Source code is unchanged from 803cd6a. Full post-correction verification is green: all policy gates, 12 harness scenarios, 136 boundary tests, 17 lint tests, Knip, nine typechecks, 15 workspace tasks, 156 Codex/43 proxy/80 agent/45 Photon tests.
+
+Read governing instructions and exact staged diff. PASS 1 scope: architecture and boundaries. Confirm the docs-only correction does not alter or misstate Effect contracts, Schema boundaries, branded/redacted values, errors, Config, services/Layers, provider adapters, runtime/resource ownership, public exports, or secret-negative ingress/egress. Reuse the prior clean source evidence only after verifying no source file changed in this delta. Do not broaden into full source re-audit or run tests.
+
+Return CLEAN with exact inspected delta/evidence and non-claims, or actionable finding with file/line, invariant, consequence and minimal correction.
