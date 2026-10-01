@@ -1,0 +1,27 @@
+You are the single sequential implementation worker for task soak-monitor-and-drill-rollback in /Users/cooper/Projects/bundjil. You are not alone in the codebase; do not revert other edits. Start at clean pushed main bfe3de2.
+
+Read AGENTS.md, .agents/skills/prd-implementer/SKILL.md, docs/product-specs/vercel-production-promotion.md, the exact task in docs/product-specs/vercel-production-promotion.tasks.json, docs/exec-plans/active/vercel-production-promotion.md, docs/architecture/effect-patterns.md, docs/architecture/eve-agent.md, docs/architecture/testing-and-quality.md, apps/agent/README.md, and apps/codex-proxy/README.md.
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when code is fallible, async, runtime-owned, collection-heavy, or crosses a package, command, config, or service boundary. Reuse canonical schemas/types/services/errors. No DTO mirrors, unsafe casts, raw JSON helpers, manual readers/mappers, switch/case branching, or tiny wrapper/helper sprawl. Keep primary operations flat and linear, with typed expected errors handled in the following .pipe(...) via catchTag/catchTags/mapError.
+
+Accepted immutable pair, all source e53e7a48270db4bb571d90c771186f92a0282922:
+- proxy current REDACTED; previous REDACTED
+- agent current REDACTED; previous dpl_5y9a6SJHybFvPd3ayGnSddHiCJnD
+- stable aliases https://bundjil-codex-proxy.vercel.app/v1 and https://bundjil-agent.vercel.app
+Use `bunx vercel` when CLI needed. Personal team is REDACTED.
+
+Do exactly this task:
+1. Build a mode-0600 sanitized snapshot and run `agent-accepted-rollback-ready`. Require current/previous accepted immutable deployment/source/config references for both apps, exact personal scope, existing sensitive variable inventory, accepted model/provider/OIDC/protection facts. Fail closed before rollback if any mismatch.
+2. Treat elapsed time since the accepted Production deployments as the practical soak. Query sanitized Production logs/errors and deployment/source/alias state for both projects. Record status/route/latency if available, auth rejection/acceptance, completion counts, terminal Eve events, storage/refresh/fence outcomes if present. Never record prompts, outputs, session ids, headers, tokens, profile/ciphertext, PII, or bypass values.
+3. Exercise the ordered rollback without environment/profile mutation:
+   a. External Sendblue Production remains disabled; verify no production webhook/channel variable is active.
+   b. Roll the agent stable alias first to accepted previous dpl_5y9a6SJHybFvPd3ayGnSddHiCJnD and verify alias/source/protection.
+   c. Roll the proxy stable alias second to accepted previous REDACTED and verify alias/source/live health/auth.
+   d. With fresh OIDC, run one minimal non-sensitive agent session through the rolled-back pair; replay partial durable stream from startIndex=0 to exactly nine ordered events ending session.waiting, no failure; correlate exactly one 200 on the previous proxy deployment.
+   e. Restore the proxy current REDACTED first, then restore the agent current REDACTED. Verify stable aliases, source, protection, and one final minimal session through the restored pair with exactly one current-proxy completion and the same nine-event/no-failure replay.
+4. Prove no Production variable/profile/namespace/cipher/subject mutation and no profile-generation downgrade. Deployment rollback must not touch Upstash/profile material; post-rollback and post-restore live completions plus unchanged variable/config fingerprints are required evidence. Run existing synthetic failure tests for health/auth/storage/refresh/reauth/wrong mode/host/scope/rollback/leak coverage.
+5. Verify no task-created bypass remains and preserve all pre-existing Preview bypasses, especially Sendblue Preview.
+6. Edit ONLY docs/exec-plans/active/vercel-production-promotion.md with sanitized worker evidence. Do not mark task/audits or edit task ledger. No commit/push.
+7. Run focused OAuth/proxy/agent checks and bun run verification, jq empty, git diff --check. Clean all temp proof material.
+
+If Vercel rollback commands are ambiguous, inspect CLI/API help before mutation. If blocked, stop and report the exact sanitized error; do not improvise destructive project changes. Report changed files and evidence.
