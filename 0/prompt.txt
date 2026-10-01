@@ -1,0 +1,14 @@
+Continue task 1 in the current extracted files. Complete only the native KeyValueStore half of upstash-layer.internal.ts now; leave atomic transact as an explicit typed failure placeholder for this round.
+
+Requirements:
+- Use Schema.NullOr(Schema.String) for get response, Schema.Tuple([Schema.String, Schema.Array(Schema.String)]) for scan page. No typeof/manual response reader.
+- Add an internal Data.TaggedError provider failure if needed, then map at the final native operation pipe to KeyValueStoreError(method + safe message only, no key/cause).
+- Prefix logical keys exactly once through the admitted key-boundary function.
+- scanKeys is one named Effect.fn or flat named Effect.gen reused by clear and size. Capture scanCursor const before tryPromise closure, iterate all pages, decode every page, union into HashSet.
+- clear: convert HashSet through Effect Array.fromIterable, return void without DEL when empty, otherwise Array.chunksOf(..., 100) and Effect.forEach sequentially; every del Promise in tryPromise. Collect first, delete second.
+- size is HashSet.size. Add spans to get/set/remove/clear/size.
+- Do not use raw arrays methods, native Map/Set, raw JSON, unsafe casts, switch, raw _tag, catchAll, or fallback success on malformed provider responses.
+- Keep one clientFactory call inside Layer.effectContext and both services from that client.
+- Ensure public upstash.layer exports exactly public options schemas/types and UpstashPersistenceLive; internal files are absent from package exports.
+- Run bun run fix and package check-types/build. Do not add tests yet, do not edit consumers/ledger/plan, do not commit.
+Report remaining compile/lint issues.
