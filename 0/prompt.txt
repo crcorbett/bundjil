@@ -1,0 +1,2 @@
+Ok I want to ensure we've pulled the latest oxlint rules from our \~/Projects/site and are using these, including the anti-slop rules
+Pass this to a new task in this project to do and merge into main and push as the goal using sol + high
