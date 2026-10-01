@@ -1,0 +1,16 @@
+Read-only second-pass review for the revised Bundjil SPEC. Do not edit files.
+
+Review:
+- docs/product-specs/codex-hosted-live-oauth-storage.md
+- docs/product-specs/codex-hosted-live-oauth-storage.tasks.json
+- docs/exec-plans/active/codex-hosted-live-oauth-storage.md
+- docs/architecture/effect-patterns.md
+- docs/architecture/repo-structure.md
+- docs/architecture/testing-and-quality.md
+- packages/codex-oauth/src/schemas.ts
+- packages/codex-oauth/src/oauth-client.service.ts
+- packages/codex-oauth/src/oauth.service.ts
+- apps/codex-proxy/src/live.layer.ts
+- apps/codex-proxy/src/server.ts
+
+Audit the draft against $prd-writer requirements and Effect v4 patterns. Focus on ownership, exact production/test/CLI call graphs, schema and service reuse, local loopback resource scoping, token/profile semantics, refresh locking and failure mutation, one-time 401 retry, Upstash/Vercel boundaries, personal-use limitations, task sequencing, mandatory per-task checks, final 3-pass audit, documentation/supersession, and claims that are inaccurate or unverifiable. Identify blockers or required edits before the spec is implementation-ready.
