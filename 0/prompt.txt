@@ -1,0 +1,8 @@
+Continue task 4 without waiting for 1Password. The fresh op prompt remains pending, but use executor-personal to complete every independent step now:
+- verify and copy the connected Preview KV values into the BUNDJIL_SENDBLUE_REPLAY_STORE_URL/TOKEN vars internally without emitting values;
+- provision Preview-only from number, sender identity map, allowlist, distinct replay prefix/TTL/lease, and any other provider-derived/nonsecret config using Sendblue/Vercel tools in one execution so phone values never appear in output;
+- create or verify the dedicated Vercel automation bypass and record only whether a secret still needs to be saved to 1Password;
+- inspect current Preview vs Production env key sets and report only names/targets/counts;
+- do not deploy until all required API/webhook/routing secrets are present;
+- do not register webhook or send live message yet.
+If an MCP mutation pauses for approval, report its execution id and exact safe scope. Preserve all source/docs changes and do not commit.
