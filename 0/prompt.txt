@@ -1,0 +1,29 @@
+Repository: /Users/cooper/Projects/bundjil. Implement exactly Task 3, "migrate-agent-delivery-idempotency-to-effect-persistence", from docs/product-specs/effect-persistence.tasks.json and governing SPEC docs/product-specs/effect-persistence.md. Read AGENTS.md and /Users/cooper/Projects/bundjil/.agents/skills/prd-implementer/SKILL.md. Tasks 1-2 are committed through d9191ae.
+
+You own Task 3 write scope:
+- apps/agent/agent/lib/sendblue/** only for persistence/replay composition and docs/comments directly affected
+- apps/agent/test/** replay/channel/config compatibility tests as required
+- apps/agent/package.json
+- bun.lock
+- directly relevant agent architecture/README docs if behavior ownership changed
+Do not edit SPEC/task ledger/active plan, codex-oauth, shared persistence package, routes/channel behavior beyond dependency injection, model/Executor config, Vercel config, root lint/TS configs, or frontend files. Report a shared-contract blocker before touching out-of-scope source.
+
+You are not alone. Do not revert others. Parent has uncommitted plan/ledger status edits. Do not commit.
+
+Required outcomes:
+- Keep SendblueReplayStore, key/digest derivation, claim IDs, record Schema codec, complete/retryable/uncertain policy, and domain errors app-owned.
+- Remove direct @upstash/redis import/dependency, client interfaces, provider response Schemas, Lua, eval/set command handling, and Redis construction from agent.
+- Build replay behavior over AtomicKeyValueStore.transact. Claim: Absent(logical key)+Set(encoded claimed record, lease TTL). Complete/uncertain: Equals(logical key, exact encoded claimed record)+Set(encoded terminal record, retention TTL). Retryable: Equals(...)+Remove. Map applied/conflict/errors to unchanged Sendblue outcomes/errors.
+- Preserve exact physical keys and encoded record strings. Existing config prefix must be passed once to the shared Upstash adapter; logical derived key must be the existing suffix only so no double prefix occurs. Lease/retention seconds convert to canonical positive whole-millisecond Duration without changing effective expiry.
+- Replace custom memory state with the same atomic domain implementation over @bundjil/effect-persistence/memory unless a concrete domain-only reason requires otherwise. One provider Layer must be composed in sendblue/live.layer.ts and injected into the replay domain Layer. ManagedRuntime stays only at Eve edge.
+- Preserve webhook auth, identity, routing, channel statuses, client behavior, Sendblue provider state, model path, Executor config, env names/aliases, and shared line behavior.
+- Use named flat linear Effects, canonical Schemas/Schema JSON codecs, Match, Effect collections. No raw JSON, unsafe casts, async domain ops, floating Promises, local Effect execution, suppressions, raw _tag branching, switch, mutable provider mocks, generic helper/common/util/repository sprawl, or one-call wrappers.
+- No TSX/React/routes/UI changes.
+
+Tests/verification:
+- Preserve/adapt compatibility fixtures for exact logical+physical key, exact record string, lease/retention TTL, one-winner concurrent claims, duplicates, stale-owner fencing, retryable removal, uncertain retention, and unchanged route outcomes.
+- Prove one configured persistence Layer is shared and no process-local production fallback exists.
+- Run bun run fix; effect-persistence test; agent check-types/test/build; root check, knip, full verification with ignored .local/secrets/executor-production.env if required; git diff --check.
+- Inspect actual diff for helper admission and forbidden patterns.
+
+Report changed files, preserved behavior, test counts, and unresolved concerns.
