@@ -1,0 +1,1 @@
+Status check. If you have not started editing, report that. If you have a patch, finish the narrow slice and summarize changed files/verification. Do not expand beyond the stated task.
