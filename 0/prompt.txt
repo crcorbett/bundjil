@@ -1,0 +1,28 @@
+Workspace: /Users/cooper/Projects/bundjil, main at pushed commit 0f30d3b. Implement only the serial task "implement-staged-production-preflight-checkpoints" from docs/product-specs/vercel-production-promotion.tasks.json via the repo prd-implementer skill.
+
+Read:
+- /Users/cooper/Projects/bundjil/.agents/skills/prd-implementer/SKILL.md
+- docs/product-specs/vercel-production-promotion.md
+- docs/product-specs/vercel-production-promotion.tasks.json
+- docs/exec-plans/active/vercel-production-promotion.md
+- docs/architecture/effect-patterns.md
+
+Ownership/write scope:
+- apps/agent/agent/production-preflight.ts
+- apps/agent/scripts/production-preflight.ts only if needed
+- apps/agent/test/production-preflight.test.ts
+- apps/agent/README.md
+- sanitized worker evidence in docs/exec-plans/active/vercel-production-promotion.md
+- package metadata only if truly required
+Do not edit task status/audit pass counts; parent owns acceptance. Do not commit or push. Do not mutate Vercel or Production.
+
+Requirements:
+- Extend the accepted read-only command to five ordered Schema-backed stages: before-first-mutation, proxy-provisioned, proxy-accepted-agent-configured, agent-accepted-rollback-ready, sendblue-final-promotion.
+- Each Schema stage must require only facts available at that point and reject both missing required fields and premature/forbidden fields.
+- before-first-mutation must model granted approval, personal team/project/stable domains, deployment protection posture, clean pushed SHA, expected absence of Bundjil Production activation, no Preview identity reuse, and read-only inventory. It must not require future variable/profile/deployment fields.
+- Progressively add proxy variables/security types/live mode/opaque identities/stored profile proof; then accepted proxy/stable URL/agent variables/bearer identity/Eve OIDC; then accepted agent and current/previous rollback refs; then soak/rollback complete plus Sendblue still unactivated.
+- Keep schemas canonical and app-owned, output sanitized, JSON through Schema, URL decoded, Effect.fn/flat Effect.gen, typed errors in pipe. No raw JSON, process.env, unsafe cast, DTO mirror, manual reader, generic helper/service layer, or helper sprawl.
+- Preserve accepted baseline behavior where reasonable but the command's fixture contract may evolve to the staged discriminated union.
+- Tests must cover success for all five stages and stage-specific missing/forbidden fields, wrong scope/targets/security types, stale host, wrong mode, missing protection/OIDC, shared identities, invalid immutable references, and read-only rejection.
+- Run agent focused checks, direct CLI mode-0600 fixture, bun run verification, jq empty, git diff --check.
+- You are not alone in the codebase. Do not revert others' changes. Report files and evidence.
