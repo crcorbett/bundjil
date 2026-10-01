@@ -1,0 +1,1 @@
+Status check: launcher patch and test are visible, but no login or test process is running. Continue to focused checks and the single 30-minute login restart now, or report the exact blocker immediately.
