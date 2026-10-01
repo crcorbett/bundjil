@@ -1,0 +1,6 @@
+Continue the same task. Parent resolved both blockers without exposing values:
+- use `bunx vercel`, not bare `vercel`;
+- all five approved bundjil-agent Production variables are now configured as sensitive and the internal bearer matches the accepted Production proxy.
+Sanitized Vercel binding identity fingerprints for the staged gate are Preview 471a62b98505c32c9cf3ab8a26551bb4df06aef73503f31285cd26f4b1c83cae and Production d0a9d589900fbcd340178b3ef0936c0a2003fb1fe73c209f3e864f6d78e30e6f; they are disjoint. The prior accepted task already proved secret-level Preview/Production bearer disjointness. Do not access 1Password again.
+
+Now run the proxy-accepted-agent-configured checkpoint, deploy two same-source/config Production agent deployments from clean 9a34a34, prove OIDC/info/session nine-event replay and exactly one accepted proxy correlation, query clean logs/errors/leaks, write sanitized evidence only to the active plan, run focused/global verification, and report. No ledger/audit edits, commit, or push. If blocked, report exact sanitized error within two minutes.
