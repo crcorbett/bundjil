@@ -1,0 +1,1 @@
+Parent successfully revoked the temporary Preview automation bypass through the Vercel protection-bypass API; four pre-existing bypass records remain unchanged. Update the evidence to remove the cleanup gap, finish verification, and return.
