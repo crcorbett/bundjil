@@ -1,0 +1,1 @@
+Can you use executor (personal) to use Vercel api and create Vercel ai gateway?
