@@ -1,0 +1,45 @@
+Workspace: /Users/cooper/Projects/bundjil. Implement exactly task "prove-sendblue-preview" from docs/product-specs/sendblue-eve-channel.tasks.json against docs/product-specs/sendblue-eve-channel.md and docs/exec-plans/active/sendblue-eve-channel.md. Tasks 1-3 are accepted; task 3 is commit 5061a86. You own Preview provisioning/proof and any narrowly required proof scripts/tests/docs for this task. You are not alone in the codebase: do not revert parent or user edits; do not commit.
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,
+HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit,
+Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
+code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
+RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded
+identifiers from the owning package. Do not define standalone DTO mirrors or
+duplicate fields such as id: string, slug: string, status, or post metadata
+outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers,
+mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
+or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit
+primitive or owning service contract should carry the behavior.
+
+For UI work, use the primitive -> composite -> layout -> route chain. Let
+leaves own the data, commands, loading, empty, error, retry, skeleton, and
+fallback behavior for the exact fragment they render. Do not add nested
+feature wrappers merely to shorten route JSX, and do not prop-drill query
+results, selected ids, loading flags, command callbacks, or derived option
+lists when a leaf can own the narrow value.
+
+For reusable URL state, use schema-owned search and route-identity contracts.
+Keep the app router as the URL writer, and do not import app route modules into
+reusable packages.
+
+Operational constraints and known state:
+- Personal Vercel only: team REDACTED, project bundjil-agent / REDACTED. Never mutate Production.
+- Existing personal Upstash integration resource: store_ES9rxXMBjgKrsO3e, integration config REDACTED. Use supported Vercel integrations.connectIntegrationResourceToProject with envVarEnvironments ["preview"] and makeEnvVarsSensitive true. Verify agent Preview KV values; never output plaintext.
+- Sendblue credentials: 1Password item UUID uh6xmsuohhxb7hqosslktodu3y, vault Private. Concealed Webhook Secret and Routing Key already exist. op CLI session expired; trigger op signin only when needed and never print values.
+- Use executor-personal for Sendblue/Vercel APIs. Call mcp__executor_personal.skills({name:"execute"}) before execute. Namespaces: tools.sendblue_api.user.personalsendblueapi and tools.vercel_api.user.personalvercelapi.
+- Configure Preview-only encrypted variables required by apps/agent/agent/lib/sendblue/config.ts. Map connected KV_REST_API_URL/TOKEN into BUNDJIL_SENDBLUE_REPLAY_STORE_* without displaying values. Use distinct Preview prefix.
+- Generate dedicated Vercel Protection Bypass for Automation secret, save concealed in the same 1Password item, and keep Deployment Protection active.
+- Deploy from clean committed source 5061a86 or later accepted commit using only Vercel-managed vars. No inline build secrets.
+- Run direct protected route matrix before registering provider webhook. Then register exactly one Sendblue receive webhook object using immutable Preview URL plus bypass query credential and independent sb-signing-secret. Never print the full protected URL.
+- Save durable non-repository operator metadata in the same 1Password item; phone values concealed.
+- Provider line suffix is 0577; recent counterpart suffix is 7386. Do not send any live message until parent confirms that counterpart belongs to the user. You may prepare identity mapping and webhook; report if confirmation is the only live-proof blocker.
+- Evidence only: variable names, statuses, counts, timings, digests/suffixes, sanitized host metadata. Never emit credentials, contents, full phone numbers, full protected URLs, raw provider bodies, or decrypted values.
+- Production env, aliases, webhooks, storage namespaces, and deployments remain untouched.
+- Run task verification, bun run verification, git diff --check. Do not mark task complete or commit. Return changed files, provider mutations, rollback inputs, live-proof status, and exact sanitized evidence.
+
+If a provisioning API is unavailable, use the narrowest supported CLI path with the same secret hygiene.
