@@ -1,0 +1,1 @@
+Ok did we have a task that was about the alchemy approach, and you suggested using photon before adopting alchemy as photon had a much better api surface to support alchemy? Find this thread
