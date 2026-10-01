@@ -1,0 +1,76 @@
+Ok let's continue. You have access to the API KEY and API SECRET via 1pass CLI 
+
+{
+  "overview": {
+    "title": "SendBlue API",
+    "ainfo": ""
+  },
+  "details": {
+    "sections": [
+      {
+        "name": "",
+        "title": "",
+        "fields": [
+          {
+            "t": "username",
+            "n": "username",
+            "k": "string",
+            "a": {
+              "guarded": "yes"
+            },
+            "inputTraits": {
+              "autocorrection": "no",
+              "autocapitalization": "none"
+            }
+          },
+          {
+            "t": "credential",
+            "n": "credential",
+            "k": "concealed",
+            "a": {
+              "guarded": "yes",
+              "generate": "off"
+            },
+            "inputTraits": {
+              "autocorrection": "no"
+            }
+          },
+          {
+            "t": "API Key",
+            "n": "4qown77wcw4otekp3enu2q3tzu",
+            "k": "concealed",
+            "v": "REDACTED",
+            "inputTraits": {
+              "autocorrection": "no",
+              "autocapitalization": "none"
+            }
+          }
+        ]
+      },
+      {
+        "name": "add more",
+        "title": "",
+        "fields": [
+          {
+            "t": "Secret Key",
+            "n": "o6tnulp3hnyvjiirssk3midgmq",
+            "k": "concealed",
+            "v": "REDACTED",
+            "inputTraits": {
+              "autocorrection": "no",
+              "autocapitalization": "none"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "createdAt": "2026-07-13T21:01:05Z",
+  "updatedAt": "2026-07-13T21:01:22Z",
+  "faveIndex": 0,
+  "trashed": "N",
+  "templateUuid": "112",
+  "uuid": "uh6xmsuohhxb7hqosslktodu3y"
+}
+
+You also have access to the SendBlue API via executor-personal MCP and sendblue tools within. You can create the webhooks, secrets, routing etc there. Make sure to save these back into the 1pass record.
