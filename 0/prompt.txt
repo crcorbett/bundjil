@@ -1,0 +1,27 @@
+You are implementing exactly one task in /Users/cooper/Projects/bundjil: `final-verification` from docs/product-specs/codex-oauth-eve-model-provider.tasks.json. Do not commit or push.
+
+You are not alone in the codebase. Do not revert or overwrite edits made by others. Work from current main at the docs commit.
+
+Task goal:
+- Run the final repository verification and update only the final-verification evidence in:
+  - docs/product-specs/codex-oauth-eve-model-provider.tasks.json
+  - docs/exec-plans/active/codex-oauth-eve-model-provider.md
+- Mark final-verification completed only if all required checks pass.
+- Confirm all prior completed tasks include implementation notes and 3-pass audit evidence.
+- Confirm secret/stale scans are clean.
+- Keep exact output sanitized; do not add secret values.
+- Do not introduce direct runtime JSON API references. Use wording like `Effect Schema JSON codecs`, `Schema.fromJsonString(...)`, and `Schema.UnknownFromJsonString` if needed.
+
+Required verification:
+- bun install --frozen-lockfile
+- bun run --filter @bundjil/codex-oauth test
+- bun run --filter @bundjil/codex-oauth build
+- bun run --filter @bundjil/codex-proxy test
+- bun run --filter @bundjil/codex-proxy build
+- bun run --filter @bundjil/codex-proxy smoke-test
+- bun run verification
+- git status --short
+- all completed tasks include implementation notes and 3-pass audit evidence
+- secret/stale scans for token values, authorization codes, raw OAuth payloads, direct runtime JSON API names, stale `Eve is not wired`, and obsolete proxy script guidance.
+
+Final response: list changed files, exact verification results, and any remaining risk. Do not commit or push.
