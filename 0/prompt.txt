@@ -1,0 +1,7 @@
+Ok continue in the existing thread/task for this in this project to draft:
+prd-writer
+  -> prd-review
+based on the research.
+
+For this:
+Ensure it properly explores the right runtime boundaries, and avoid wrappers, using native Effect layers and services
