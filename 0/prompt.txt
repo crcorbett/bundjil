@@ -1,0 +1,1 @@
+No this makes sense. Workflows are well supported in Eve right? The task should investigate and research with executor personal mcp. How does Vercel suggest using workflows with agents. Ensure our function timeouts are long enough (in Vercel.json?)
