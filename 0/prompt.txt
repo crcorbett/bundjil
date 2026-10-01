@@ -1,0 +1,7 @@
+Ok I want you to draft an extensive SPEC [$prd-writer](/Users/cooper/Projects/bundjil/.agents/skills/prd-writer/SKILL.md) that includes comprehensive research and investigations of the approaches using DeepWiki via executor personal.
+
+We want to connect to our codex oauth. If we need storage, we should use https://effect.website/docs/platform/key-value-store/ per effect-smol (which we will hook up to a free KV store provider via Vercel).
+
+You MUST iterate on the SPEC multiple times, using subagents and the executor personal MCP to conduct deeper and more comprehensive research and improvements to the SPEC and tasks. You must do this at least twice and track it when drafting the spec
+
+The SPEC must include the mandatory 3-pass Effect TS audit post implementation
