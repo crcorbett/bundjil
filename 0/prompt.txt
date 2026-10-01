@@ -1,0 +1,1 @@
+Please send a brief status: current blocker/test command if any, or complete and report changed files/evidence. Do not wait for the parent.
