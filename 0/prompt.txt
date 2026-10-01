@@ -1,0 +1,102 @@
+Implement exactly one task from /Users/cooper/Projects/bundjil/docs/product-specs/codex-oauth-eve-model-provider.tasks.json: `wire-eve-model-provider`.
+
+You are not alone in the codebase. Do not revert edits made by others. Work with the current main branch state. Edit files directly, run the task verification gates, and commit only this coherent slice if it passes.
+
+Use the prd-implementer flow for this task. Relevant instructions:
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,
+HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit,
+Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
+code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
+RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded
+identifiers from the owning package. Do not define standalone DTO mirrors or
+duplicate fields such as id: string, slug: string, status, or post metadata
+outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers,
+mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
+or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit
+primitive or owning service contract should carry the behavior.
+
+For UI work, compose stable visible structure as high as practical, usually in
+the route or nearest page-level parent. Use the primitive -> composite ->
+layout -> route chain for visible structure. Let leaves own the data,
+search/page params, commands, atoms, skeletons, and fallbacks for the exact
+fragment or action they render. Do not add nested feature wrappers merely to
+shorten route JSX, and do not prop-drill query results, selected ids, loading
+flags, command callbacks, or derived option lists when a leaf can own the
+narrow value.
+
+For reusable URL state, use schema-backed field URL atoms for search params and
+read-only page-param atoms for route identity. Keep TanStack Router as the app
+URL writer, and do not import app route files, `routeTree.gen`,
+`Route.useSearch()`, or `Route.useParams()` into reusable packages.
+
+Task object summary:
+- id: `wire-eve-model-provider`
+- title: Wire Eve to the proven model provider
+- status currently pending
+- description: Add app-owned model-provider selection so apps/agent can choose AI Gateway fallback or the deployed private Codex proxy.
+- implementation notes:
+  - Keep apps/agent/agent/config.ts as the app-owned config boundary.
+  - Add app-owned model-provider wiring only after prove-codex-auth-runtime-path, create-codex-proxy-app, and deploy-codex-proxy-vercel complete or explicitly record a local-only exception.
+  - Preserve the current Vercel AI Gateway model as a fallback until Codex proxy proof is stable.
+  - Use @ai-sdk/openai-compatible only after the runtime endpoint is proven private and compatible.
+  - The Eve app should call the proxy URL with BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN and should not know about Codex OAuth internals.
+- mandatory verification:
+  - Eve agent model remains an AI SDK-compatible LanguageModel or Gateway model string.
+  - Flat meaningful Effect.gen programs for provider selection and config parsing where fallible.
+  - Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError.
+  - Canonical Effect Schema contracts and schema-derived types from owning packages.
+  - No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers.
+  - bun run --filter @bundjil/agent test
+  - bun run --filter @bundjil/agent build
+  - bun run check-types
+  - Local /eve/v1/info verifies the selected model/provider metadata without exposing secrets.
+  - If the Codex proxy mode is enabled, local Eve session proof uses the private proxy and logs sanitized status only.
+- completion criteria:
+  - apps/agent can select AI Gateway fallback or Codex proxy through Effect Config.
+  - No provider secret is committed or logged.
+  - App README documents the provider selection, proxy env vars, and fallback behavior.
+
+Relevant paths:
+- /Users/cooper/Projects/bundjil/docs/product-specs/codex-oauth-eve-model-provider.md
+- /Users/cooper/Projects/bundjil/docs/product-specs/codex-oauth-eve-model-provider.tasks.json
+- /Users/cooper/Projects/bundjil/docs/exec-plans/active/codex-oauth-eve-model-provider.md
+- /Users/cooper/Projects/bundjil/docs/architecture/eve-agent.md
+- /Users/cooper/Projects/bundjil/docs/architecture/effect-patterns.md
+- /Users/cooper/Projects/bundjil/docs/architecture/repo-structure.md
+- /Users/cooper/Projects/bundjil/apps/agent/agent/config.ts
+- /Users/cooper/Projects/bundjil/apps/agent/agent/agent.ts
+- /Users/cooper/Projects/bundjil/apps/agent/README.md
+- /Users/cooper/Projects/bundjil/apps/agent/package.json
+- /Users/cooper/Projects/bundjil/apps/agent/test/
+- /Users/cooper/Projects/bundjil/apps/codex-proxy/README.md for proxy env names and preview proof.
+
+Important local facts:
+- `eve@0.20.0` accepts an AI Gateway model string or any AI SDK-compatible `LanguageModel` object in `defineAgent({ model })`.
+- Installed Eve docs at `node_modules/eve/docs/agent-config.md` and `node_modules/eve/docs/guides/deployment.md` are authoritative for Eve model config.
+- Vercel/AI SDK docs say `@ai-sdk/openai-compatible` exposes `createOpenAICompatible({ name, baseURL, apiKey, headers })`, and provider models are created via `provider("model-id")`.
+- The deployed preview proxy proof is recorded as `https://bundjil-codex-proxy-llqa9rwss-cooper-corbetts-projects.vercel.app`; live Codex mode is still unavailable, and production is skipped. Do not claim live Codex proof.
+- If you add `@ai-sdk/openai-compatible`, add it to `apps/agent` dependencies and update `bun.lock` through Bun.
+- Do not commit or print `BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN`, `AI_GATEWAY_API_KEY`, `VERCEL_OIDC_TOKEN`, Codex tokens, OAuth codes, or raw model/proxy response bodies.
+
+Expected implementation shape, unless the codebase proves a better local pattern:
+- Extend app-owned config with an Effect Schema-backed provider mode, likely `gateway` default and `codex-proxy` opt-in.
+- Keep `BUNDJIL_AGENT_MODEL` as the Gateway fallback model id defaulting to `google/gemini-2.5-flash`.
+- Add `BUNDJIL_AGENT_MODEL_PROVIDER` or similarly named config to choose gateway vs proxy.
+- For proxy mode, decode `BUNDJIL_CODEX_PROXY_BASE_URL`, `BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN` via `Config.url`/Schema/`Config.redacted`, and optional `BUNDJIL_CODEX_PROXY_MODEL` defaulting to the current model id or explicit proxy model id.
+- Build the provider in app-owned code using `createOpenAICompatible`, with `apiKey` or authorization header sourced from redacted config, and pass the resulting LanguageModel to Eve.
+- Add tests that prove default Gateway string selection and proxy LanguageModel metadata/headers without doing network calls. Prefer injected fetch or provider construction checks if practical.
+- Update docs/spec/task ledger/active plan with sanitized evidence and the three implementation audit pass placeholders/results for your slice.
+
+Before finishing, run at minimum:
+- bun install --frozen-lockfile if dependencies changed after install
+- bun run --filter @bundjil/agent test
+- bun run --filter @bundjil/agent build
+- bun run check-types
+- bun run verification if practical
+
+Final report: changed files, commit hash if committed, exact verification commands and results, and any skipped live proof with reason.
