@@ -1,0 +1,1 @@
+What about a proxy? Would that be best so that the Eve agent remains fairly similar, and makes its calls to a proxy service? Is that what openclaw/hermes/pi do?
