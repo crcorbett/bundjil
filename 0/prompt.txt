@@ -1,0 +1,10 @@
+Parent completed the remaining live proof using current authoritative surfaces:
+
+- Vercel Agent Runs lists exactly one Production run in the 1h window, trigger channel:sendblue, model bundjil-codex-proxy/gpt-5.5, deployment dpl_6g91e8CEg7JTkQnAEtvAdeR6CWrT, one turn, zero subagents, no failed/cancelled run.
+- Fresh project OIDC + Production bypass replayed the real Eve session from startIndex=0. Curl timed out only because the durable stream stays open. It returned 15 ordered events: session.started, turn.started, message.received, step.started, seven message.appended events, message.completed, step.completed, turn.completed, session.waiting. waiting=1, failure=0; the mode-0600 temporary stream was removed.
+- Current proxy Production logs contain exactly one POST /v1/chat/completions 200 in the proof window.
+- Parent fetched the exact recent provider inbound into a mode-0600 temporary payload and POSTed it again to the Production route using route auth and Vercel header bypass. Real-handle replay returned 200; provider outbound inventory remained 7 before/after and proxy completion count remained 1 before/after. All temporary payloads were removed.
+- Runtime leak scan compared current agent/proxy 1h logs against all Sendblue secrets, bypass, line/sender, exact inbound content, and provider message handle: sensitive_value_hits=0 and credential_marker_hits=0. Temporary scan files removed.
+- Parent independently observed webhook 202, one proxy 200, and exactly one subsequent provider outbound DELIVERED iMessage.
+
+Update only the two active plans to mark live proof complete with this sanitized evidence and the rollback order. Do not include title/content, numbers, handles, session/run ids, full URLs, credentials, or token counts. Re-run focused agent checks, bun run verification, jq empty, git diff --check. Do not edit task ledgers/audits or commit/push. Return changed files and final evidence summary.
