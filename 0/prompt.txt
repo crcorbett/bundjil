@@ -1,0 +1,1 @@
+Draft SPEC for this [$prd-writer](/Users/cooper/Projects/bundjil/.agents/skills/prd-writer/SKILL.md)
