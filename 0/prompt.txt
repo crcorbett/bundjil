@@ -1,0 +1,1 @@
+Can we please add more documentation, particularly regarding Effect TS rules, patterns, repo structures, patterns etc. See again ~/Projects/site and ~/Projects/Mobius for other references
