@@ -1,0 +1,1 @@
+Please continue through completion. When practical, send a concise status in your final report that distinguishes currently failing checks from checks not yet run. Do not stop at the current partial migration; update the exact registry and finish focused verification before reporting.
