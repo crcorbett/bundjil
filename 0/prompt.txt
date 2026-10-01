@@ -1,0 +1,5 @@
+It might also be useful to include a local version of [vercel-labs/personal-agent-template](https://github.com/vercel-labs/personal-agent-template) in .local or something, alongside the effect v4 codebase too so that these can be easily referenced. 
+
+Ensure this guide has been properly followed:
+
+https://www.effect.solutions/project-setup
