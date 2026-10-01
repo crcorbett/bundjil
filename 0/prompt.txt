@@ -1,0 +1,1 @@
+Can we use Effect Schema instead of zod with Eve? Does it support standard schema?
