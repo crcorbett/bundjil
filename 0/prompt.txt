@@ -1,0 +1,14 @@
+Continue task 1. This round is only the Upstash production adapter architecture; do not add provider tests yet.
+
+Rewrite the adapter to satisfy:
+- Public src/upstash.layer.ts exports only UpstashPersistenceKeyPrefix, its type, UpstashPersistenceOptions, its type, and UpstashPersistenceLive. Prefix rejects *, ?, [, ], and backslash. Redacted.value appears only inside the callback that constructs the real Redis client.
+- Put a narrow client interface, static Lua, provider Data.TaggedError, Schema response decoders, command serialization, and makeUpstashPersistenceLayer(options, clientFactory) in an internal source module that is not in package exports. It may be imported relatively by tests. This is an admitted provider/serialization boundary, not a generic factory.
+- One Layer build calls clientFactory exactly once and provides native KeyValueStore plus AtomicKeyValueStore from that client.
+- Every Promise is directly returned from Effect.tryPromise. Capture the loop cursor in a const before the closure. Decode get/scan/eval unknown exactly once as applicable.
+- scanKeys is a named linear Effect used by clear and size; iterate all cursors, HashSet de-dupe, prefix-scoped match only. clear returns Effect.void without DEL on empty and otherwise deletes collected keys in bounded chunks using Effect Array/Effect.forEach. No FLUSHDB/DBSIZE/unscoped scan.
+- Build atomic command through one directly tested internal provider-serialization function using Effect Array, HashMap/HashSet, Match, Option/Result as appropriate. No native Map/Set, raw _tag, native map/flatMap/forEach, unsafe lookup, switch, casts, or duplicate logical KEYS. Cross condition/mutation references to one key share one physical KEYS entry. Apply prefix exactly once.
+- Provider and response/Schema failures map to safe AtomicKeyValueStoreError or KeyValueStoreError with no key/cause/value/response retained. Add spans to native operations and transact. No orDie/ignore/catchAll fallback.
+- Preserve the canonical transaction revalidation before provider I/O.
+- Split files as required by root max-classes-per-file and helper admission.
+- Do not change consumers, ledger/plan, tests beyond formatter, or commit.
+Run bun run fix, package check-types/build, and bun run check. Report files and remaining lint/type/language-service findings.
