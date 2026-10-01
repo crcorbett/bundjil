@@ -1,0 +1,1 @@
+All visible verification processes have finished. Report the final sanitized task result now, including login output categories, stored proof booleans, test count, changed files, cleanup, and any remaining blocker. Do not expose values.
