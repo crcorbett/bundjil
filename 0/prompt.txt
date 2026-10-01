@@ -1,0 +1,10 @@
+Parent traced the two proxy failures: they were caused by stale packages/codex-oauth/dist. After `bun run --filter @bundjil/codex-oauth build`, the targeted proxy handler suite passes 19/19. No transport rollback is needed.
+
+Continue Task 2 and finish the remaining acceptance gaps:
+- restructure operator scripts into one named Effect program/run boundary with Effectful final Schema encoding and Console output; no repeated top-level await Effect.runPromise encoders;
+- remove every resolved Task 2 entry from tooling/boundary-exceptions.ts;
+- systematically migrate remaining Codex-owned raw public primitives/inline schema/config/outbound/response findings, retaining only exact unavoidable external adapter entries;
+- list any retained Codex/proxy exceptions and their external-interface justification;
+- run Codex build before proxy tests to avoid stale dist, then all focused gates, check:boundaries, check, knip, and diff check.
+
+Do not commit.
