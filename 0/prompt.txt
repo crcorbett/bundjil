@@ -1,0 +1,1 @@
+Ok is the runtime SPEC now ready? If so archive this thread, and open a new thread for the implementation
