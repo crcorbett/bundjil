@@ -1,0 +1,11 @@
+<environment_context>
+  <current_date>2026-07-14</current_date>
+  <timezone>Europe/London</timezone>
+  <filesystem><workspace_roots><root>/Users/cooper/Projects/bundjil</root><root>/Users/cooper/.codex/visualizations/2026/07/07/019f3c64-2576-70c2-90c0-e6b212f79ee1</root><root>/Users/cooper/Projects/Mobius</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+  <subagents>
+    - 019f5d4e-4953-7963-99c4-4d679d011bcc
+    - 019f5d61-c7a2-7793-8b82-ec2ffcb99f0d
+    - 019f5d92-aa3a-73f1-a7a6-46eccfb78c02
+    - 019f5dcb-d631-74a0-8e55-006105c640c1
+  </subagents>
+</environment_context>
