@@ -1,0 +1,3 @@
+<subagent_notification>
+{"agent_path":"019f607d-1139-7b93-99b6-913b9bf7152c","status":{"completed":"Blocked on 1Password CLI authentication/session access.\n\nFailing command:\n\n```sh\nop item list --vault Private --format json\n```\n\nIt produced no output and remained running for ~45 seconds. I terminated it and removed all temporary bearer material. No Vercel variable update or deployment occurred in this resumed attempt, and the worktree remains clean.\n\nThe previously corrected `proxy-provisioned` gate had passed, but this run did not reach the post-rotation gate. Live Vercel inventory still contains the earlier interrupted READY deployment from `e53e7a4`; it has not been accepted as either rollback reference."}}
+</subagent_notification>
