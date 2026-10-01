@@ -1,0 +1,71 @@
+You own task 1 only for /Users/cooper/Projects/bundjil. You are not alone in the codebase: preserve existing and parent-authored changes, do not revert files you did not create, do not edit the task ledger or active execution plan, and do not commit.
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,
+HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit,
+Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
+code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
+RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded
+identifiers from the owning package. Do not define standalone DTO mirrors or
+duplicate fields such as id: string, slug: string, status, or post metadata
+outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers,
+mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
+or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit
+primitive or owning service contract should carry the behavior.
+
+For UI work, use the primitive -> composite -> layout -> route chain. Let
+leaves own the data, commands, loading, empty, error, retry, skeleton, and
+fallback behavior for the exact fragment they render. Do not add nested
+feature wrappers merely to shorten route JSX, and do not prop-drill query
+results, selected ids, loading flags, command callbacks, or derived option
+lists when a leaf can own the narrow value.
+
+For reusable URL state, use schema-owned search and route-identity contracts.
+Keep the app router as the URL writer, and do not import app route modules into
+reusable packages.
+
+Read and follow:
+- docs/product-specs/effect-persistence.md
+- docs/product-specs/effect-persistence.tasks.json
+- AGENTS.md
+- docs/architecture/effect-patterns.md
+- docs/architecture/repo-structure.md
+- docs/architecture/testing-and-quality.md
+- local Effect v4 KeyValueStore source under .local/references/effect-v4
+- existing package manifests/tsconfigs/tests for established repo patterns
+
+Task object:
+{
+  "id": "implement-effect-persistence-contract-and-adapters",
+  "title": "Implement the provider-neutral persistence package and adapters",
+  "status": "pending",
+  "dependsOn": [],
+  "description": "Create @bundjil/effect-persistence with the canonical AtomicKeyValueStore transaction contract, coherent memory Layer, and explicit Upstash Layer that also provides Effect's native KeyValueStore.",
+  "implementationNotes": [
+    "Scaffold the package with the repo's source export condition, build/typecheck/test scripts, strict tsconfig inheritance, Effect language-service support, and no app/framework dependency.",
+    "Define AtomicKeyValueStoreKey, Value, Ttl, Condition, Mutation, Transaction, Outcome, Operation, and AtomicKeyValueStoreError as canonical Effect Schemas/schema-derived types; TTL is a positive finite whole-millisecond Duration, and the Upstash subpath owns Schema.Redacted URL/token options plus a prefix that rejects Redis glob metacharacters.",
+    "Expose one AtomicKeyValueStore.transact operation and re-decode its canonical transaction Schema at the public operation boundary in memory and Upstash. Validate non-empty collections of at most 32 conditions and 32 mutations, unique condition keys, unique mutation keys, and positive finite integer millisecond TTL before state mutation or provider I/O.",
+    "Implement the public PersistenceMemory Layer backed by one SynchronizedRef state and Clock so native KeyValueStore and AtomicKeyValueStore observe the same values and expiries; every atomic transaction performs expiry cleanup, condition evaluation, and all mutations in one SynchronizedRef.modify snapshot.",
+    "Use Effect Array/HashSet or another justified Effect-native collection path for bounded duplicate-key validation instead of ad hoc mutable collection helpers.",
+    "Implement UpstashPersistenceLive(options), accepting schema-decoded redacted URL/token and prefix options; use one Layer.effectContext or one private backing-client Layer so a Layer build constructs exactly one telemetry-disabled, non-deserializing client and provides both services from it.",
+    "Implement prefix-scoped clear/size by decoding every SCAN page, de-duplicating keys with Effect HashSet, collecting before delete, and documenting weak consistency under concurrent writes; never use these maintenance operations for coordination.",
+    "Use one static provider transaction program with Schema-encoded or positional arguments. Never expose eval/client/Lua through public exports and never generate command source from user data.",
+    "Map provider and Schema failures to safe tagged errors without keys, values, arguments, payloads, credentials, rejected input, raw responses, or unknown causes; native KeyValueStoreError values omit optional key and cause fields.",
+    "Do not add claim/lock/replay/repository convenience services, generic helpers/common modules, pass-through wrappers, or env loading."
+  ],
+  "completionCriteria": [
+    "The package provides native KeyValueStore plus AtomicKeyValueStore through explicit memory and Upstash subpaths.",
+    "No consumer migration or compatibility shim is required to test the package contract, but this foundation commit is not independently mergeable or deployable before a production consumer migration passes.",
+    "The package README clearly distinguishes ordinary persistence from atomic coordination and documents the unstable Effect import path."
+  ]
+}
+
+Write scope:
+- packages/effect-persistence/**
+- root package.json, bun.lock, and root workspace/static-analysis registration only when genuinely required
+Do not migrate Codex OAuth or Sendblue consumers in this task. Do not change React, TSX, routes, visible text, provider routing, Vercel config, environment names, or production state.
+
+Implement the full task, including deterministic contract tests and package README. Run focused typecheck, tests, and build; run bun run fix, bun run check, bun run knip, and bun run verification when practical. If the repository-wide gate needs the documented ignored Executor environment, report that without printing or retaining values. Report changed files, precise verification evidence, unresolved issues, and a symbol-level list of every new non-test helper/factory/service/schema alias with its owner/admission reason.
