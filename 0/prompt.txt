@@ -1,0 +1,1 @@
+Parent review found two stale top-level plan lines. Update the plan Status from Task 4 Preview correction to Task 5 documentation reconciliation pending, and change Ordered Tasks item 4 from in progress to completed. Leave item 5 pending. Run git diff --check and report; no commit.
