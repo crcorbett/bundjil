@@ -1,0 +1,1 @@
+Please send a concise progress update when you reach a stopping point. Keep the task scoped to the sanitized OAuth/CLI research documentation; do not begin later implementation tasks.
