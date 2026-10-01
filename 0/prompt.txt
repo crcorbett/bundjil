@@ -1,0 +1,1 @@
+Status check: please continue, but prioritize completing the coherent docs patch and report when ready. Do not run the full root verification; parent will run it.
