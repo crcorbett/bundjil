@@ -1,0 +1,18 @@
+Resume task enable-sendblue-production-last. Parent has persisted these four generated Production values in the existing personal 1Password item "SendBlue API": Production Webhook Secret, Production Routing Key, Production Replay Prefix, and Vercel Production Bypass. Use the mode-0600 local bundle directly; do not access op/1Password.
+
+Continue full production provisioning and proof now:
+- Set all runtime BUNDJIL_SENDBLUE_* fields from apps/agent/.local/agent-production-sendblue.env as sensitive Production Vercel variables. BUNDJIL_SENDBLUE_PRODUCTION_VERCEL_BYPASS is helper-only for the Vercel protection bypass, not runtime config.
+- Create a new dedicated Production automation bypass on bundjil-agent using the bundle value; preserve every existing Preview bypass.
+- Deploy the agent from the clean accepted e53e7a4 source worktree only, with no prebuilt/inline/build env. Retain deployment REDACTED as rollback.
+- Add a second Sendblue receive webhook targeting the stable Production route with the Production Vercel query bypass and separate Bundjil Production webhook secret. Preserve the existing Preview receive webhook. Exactly two receive webhooks must remain.
+- Prove the Production route matrix: missing/invalid secret 401; malformed authenticated 400; ignored/loop 200 where applicable; valid accepted 202; storage fail-closed 503 only through an isolated proof fixture.
+- Prove allowlisted identity and opaque routing; provider-originated inbound -> exactly one Eve dispatch -> exactly one Codex subscription proxy completion -> exactly one delivered outbound reply. Prove sequential and concurrent replay create no duplicate.
+- Inspect Vercel/Sendblue logs and proof without recording content, numbers, handles, full credential-bearing URLs, or credentials.
+- Do not execute rollback after success. Document rollback order: remove Production webhook, revoke Production bypass, return alias to REDACTED, remove Production Sendblue vars.
+- Edit only docs/exec-plans/active/vercel-production-promotion.md and docs/exec-plans/active/sendblue-eve-channel.md. Run focused agent checks plus bun run verification.
+- Do not edit ledgers/audits, do not commit or push. Do not remove the local bundle until all proof is complete and parent no longer needs it.
+- You are not alone in the repo; preserve others' work.
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the code is fallible, async, runtime-owned, collection-heavy, or crosses a package, RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded identifiers from the owning package. Do not define standalone DTO mirrors or duplicate fields outside their canonical schema/type owner. Keep one-off Effect logic inline at the consumer. Do not add helper/wrapper sprawl, unsafe casts, manual adapters, switch/case, or JSON.stringify. Keep primary effects flat and linear with tagged error handling in the following pipe. No UI changes are expected.
