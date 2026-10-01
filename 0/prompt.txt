@@ -1,0 +1,1 @@
+Stop and report the exact current blocker immediately. No stable alias has changed and the worktree is clean. Do not make a rollback mutation until reporting.
