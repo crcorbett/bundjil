@@ -1,0 +1,24 @@
+Parent accepts Task 4 after three distinct audits. Update docs/exec-plans/active/effect-persistence.md and docs/product-specs/effect-persistence.tasks.json: mark verify-persistence-preview-and-production-rollout completed, set completedPasses to 3 with three concise evidence entries, update ordered task status, and preserve Task 5 pending. Do not commit.
+
+Parent audit pass 1 ownership/call graph PASSED:
+- shared package remains provider-neutral; Codex and app own their domain codecs/policies; app owns channel identity/routing; proxy owns hosted HTTP boundary and direct runtime packaging dependency
+- Preview used isolated storage and no provider webhook; Production retained one stable receive route and unchanged personal Vercel scope/bindings
+- accepted agent and proxy metadata correlate exact pushed clean SHA 93b0498; prior READY immutable rollback refs were retained; actual Production handset turn exercised existing replay data and encrypted profile through one workflow and one private proxy completion
+- no provider account/line/model/Executor/OAuth protocol mutation
+
+Pass 2 proof/evidence/helper quality PASSED:
+- committed proxy proof is one linear Effect program using Config.url, Config.redacted/option, canonical request/response Schemas, tagged error, normalized SSE essence, and Schema JSON codecs
+- request constructor is reused across four probes; fetch/text helpers own Promise error boundaries; no generic helper module or one-line wrapper sprawl
+- packaging assertions use Schema; direct runtime dependency/build order is explicit; static scans found no production process.env, raw JSON stringify, unsafe casts, suppression, switch, Object.values/entries, or tracked .local proof
+- output retained only statuses/counts/booleans; temp env/session/provider artifacts were mode 600 and removed; log searches had zero credential/content matches
+- first pre-upload tracked .gitignore mutation was explicitly rejected and replaced from a separate clean checkout
+
+Pass 3 verification/rollback PASSED:
+- Preview native+atomic, encrypted envelope, replay claim, Eve stream/replay, protected route/SSE, provider inventory, and safe-log evidence all passed
+- Production READY health/auth-negative checks, direct OIDC session, one inbound/one delivered outbound, one workflow, one proxy completion, zero duplicate/provider error/Preview ingress/runtime error/leak findings passed
+- first environment-free repository test failed closed on required Executor config; broad Preview env passed verification but its stale local provider selection failed build; neither indicates source failure. Accepted canonical mode-600 .local/secrets/executor-production.env rerun passed full verification and full 7-workspace build.
+- accepted counts: persistence 23, OAuth 103, proxy 24, agent 57; root fix/check/Knip/verification/build/diff-check all passed
+- rollback deployments and unchanged env names/prefix classifications were captured before promotion; no rollback was required
+- Browser/React screenshots not applicable because no visible/browser route changed.
+
+Use the plan's Evidence Policy. Do not add timestamps, message content, phone, protected URL, session/workflow IDs, tokens, values, or provider payloads. Run task JSON parse and git diff --check, then report changed files.
