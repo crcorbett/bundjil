@@ -1,0 +1,1 @@
+Do you need to ensure this is also described in lint rules, documentation and skills (including prd skills)?
