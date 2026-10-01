@@ -1,0 +1,8 @@
+Continue the SAME revalidate-personal-preview-configuration task. Parent review confirms the missing proxy subject variables are a completion blocker and the canonical non-secret mapping is documented:
+- BUNDJIL_CODEX_PROFILE_ID = default
+- BUNDJIL_CODEX_CONNECTOR_ID = bundjil-local
+- BUNDJIL_CODEX_INSTALLATION_ID = agent-dev
+- BUNDJIL_CODEX_SUBJECT_ID = personal-owner
+These must match the trusted-local login command's principal/connector/installation/profile subject. The user has approved all requirements.
+
+Use Executor Personal Vercel API to add or update exactly these four variables for the PREVIEW environment only on personal project bundjil-codex-proxy. Do not target production or development, do not deploy, do not touch Tilt Legal, and do not alter any secret values. Then re-read only environment metadata (names/targets, not values) to prove all four are preview-only and production remains without BUNDJIL_* activation. Repeat the safe Upstash namespace connectivity check only if needed; never read values. Update your existing active-plan evidence to replace the blocker with readiness evidence. Run bun run check, jq empty task ledger, and git diff --check. Do not mark task completed or add parent audit evidence. Report the API action status and sanitized verification.
