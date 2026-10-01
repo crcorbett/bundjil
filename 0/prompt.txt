@@ -1,0 +1,21 @@
+Continue Task 4 only for docs/product-specs/effect-persistence.md and docs/product-specs/effect-persistence.tasks.json, using Terra Medium as already assigned. Review the current clean main at 93b0498 and the live evidence below. Update docs/exec-plans/active/effect-persistence.md with sanitized evidence only; do not mark Task 4 complete and do not commit. Inspect the source and current plan for any unresolved gap, especially build warning relevance, clean-source gate, rollback coverage, proof helper quality, and log privacy. No provider mutation.
+
+Preview accepted evidence:
+- Personal Vercel team only; clean source 93b0498 for agent and source-equivalent accepted proxy Preview after direct packaging/SSE corrections.
+- Generic isolated native+atomic Upstash proof: applied, conflict, shared visibility both directions, all-or-nothing, three observed entries, cleanup empty.
+- Encrypted profile envelope read-only proof: ciphertext present, v2 envelope, marker absent; hosted completion proves decryptability.
+- Replay store proof: claimed, duplicate, retryable cleanup, reclaim, temporary claim removed.
+- Eve Preview direct session: POST 202, stream 200, replay 200; nine events in both, one message.completed and one session.waiting in both, zero failures. Accepted proxy logs after the agent deployment show exactly one /v1/chat/completions 200, proving replay caused no second model call.
+- Accepted agent logs: one session POST 202, two stream GETs 200, five workflow 200; no error/fatal and no leak-query matches.
+- Sendblue read-only inventory: one receive webhook, zero Preview deployment webhook URLs.
+
+Production promotion evidence so far:
+- Prior rollback deployments captured before promotion: agent REDACTED and proxy dpl_5Nrw5hbs8oUwcP8NdSdfoHA3SBez, both READY.
+- Required Production env names and write-only sensitive bindings confirmed without values; direct local auth proof was correctly rejected because pulled sensitive values are placeholders.
+- First proxy deployment was not accepted after detecting Vercel link mutated .gitignore pre-upload. Local artifacts were removed and worktree restored clean. Replacement proxy dpl_5kbRiDzbGkdRYMcsSCJidZkJ3njB and agent REDACTED were deployed from a separate git-clean checkout exactly at pushed 93b0498 and are READY.
+- Production agent direct OIDC session: POST 202, one 200 stream, nine events, one message.completed, one session.waiting, zero failures; the parked stream was intentionally client-stopped after proof and temp files removed.
+- New Production proxy bounded logs: two health 200s, six expected auth-negative 401s from proof attempts, and exactly one runtime-authenticated /v1/chat/completions 200 from the agent session; no runtime errors and no leak-query matches.
+- New Production agent bounded logs: one POST 202, one stream 200, five workflow 200; no runtime errors and no leak-query matches.
+- Handset proof is pending user message. Keep task open.
+- Agent Vercel build succeeded with explicit filtered Turbo graph but emitted warnings that app env vars were absent from upstream dependency build task declarations. Determine from turbo.json/build ownership whether warnings are harmless or require a source correction; do not dismiss without inspection.
+Report changed files, findings, and any required correction. Do not include phone, message, OAuth subject, provider payload, protected URLs, tokens, or workflow/session IDs.
