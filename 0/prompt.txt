@@ -1,0 +1,5 @@
+Create a new thread in this project (with Sol (High)) to investigate:
+- defining bundjil infrastructure (namely Vercel, SendBlue) via Alchemy
+- existing Alchemy + Effect approaches in ~/Projects/site which can be replicated for infrastructure definition
+
+Alchemy can give us super robust Infrastructure as Code setup for our new agents. This will likely require some custom providers for Vercel + SendBlue.
