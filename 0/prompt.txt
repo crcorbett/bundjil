@@ -1,0 +1,14 @@
+Task 1 is not accepted. Correct the existing implementation in your workspace; do not commit or touch Tasks 2-4.
+
+Parent findings:
+1. The checker instantiates TypeChecker but only calls getTypeFromTypeNode and discards it. It misses aliases/imported semantic raw types. Use semantic TypeChecker inspection and add a failing fixture such as private type Raw = string used by an exported interface.
+2. Implement the SPEC's exported inline Schema.String/Schema.NonEmptyString field rule and fixture. It should distinguish owner-named field Schemas from anonymous exported Struct/TaggedStruct/TaggedErrorClass fields.
+3. Detect unsafe branded/type assertions and non-null assertions at boundaries, not only 'as string'. Add fixtures for 'as AccountId' and '!'.
+4. Implement typed codec misuse checks: decodeUnknownEffect when input is statically the codec Encoded type and encodeUnknownEffect when input is statically the codec Type. Add fixtures that resolve real Effect Schema types from the repo/tooling project.
+5. Add a defensible outbound-write rule and fixtures for raw HTTP/persistence body/value versus a value produced by Schema.encodeEffect or framework schemaBodyJson. Keep it narrow enough to avoid generic lint behavior.
+6. The diagnostics must not claim rules that are not implemented. Cover every implemented rule with positive and negative fixtures.
+7. Review exception granularity: one symbol/rule entry must not silently admit multiple unrelated occurrences. Include an occurrence discriminator stable under formatting if needed, and stale/duplicate checks.
+8. Make the executable/fallible CLI path follow the repo's Effect rules where practical: flat Effect flow and typed outer error mapping. The compiler traversal may remain a purpose-built pure algorithm; do not create helper sprawl.
+9. Run test:boundaries, check:boundaries, tooling typecheck, and git diff --check. Report corrections and remaining limitations.
+
+Keep exact current exceptions; do not migrate Task 2/3 source.
