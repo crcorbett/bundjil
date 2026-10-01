@@ -1,0 +1,3 @@
+Ok have the thread continue with this and set itself a new goal. We want pushes to main to automatically deploy though, production promotion shouldn't be manual.
+
+Also archive the older investigation threads.
