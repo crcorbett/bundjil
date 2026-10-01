@@ -1,0 +1,3 @@
+Continue task 1. Do only the deterministic test matrix now; do not edit production source except a minimal compile fix required by a test.
+
+Expand packages/effect-persistence/test/atomic-key-value-store.test.ts into the complete memory/Schema contract suite from the prior two prompts. This is the only deliverable for this round. Group related assertions into clear named it.effect cases, but cover every required case. Avoid raw JSON and unsafe casts. Run package test and check-types. Return exact test count and any failing case. Do not run root check, do not touch Upstash, ledger/plan, consumers, or commit.
