@@ -1,0 +1,19 @@
+Implement exactly task compose-access-only-live-proxy-mode from:
+- docs/product-specs/codex-local-profile-import-workaround.md
+- docs/product-specs/codex-local-profile-import-workaround.tasks.json
+- docs/exec-plans/active/codex-local-profile-import-workaround.md
+
+You own only apps/codex-proxy/**. Do not edit packages/codex-oauth, docs, task ledgers, execution plans, lockfiles, or git history. You are not alone in the codebase: do not revert other edits and adjust to current state.
+
+Implement app-owned live-mode composition using existing @bundjil/codex-oauth layers:
+- compose encrypted KeyValueStore profile storage, cipher/config, Upstash store, Upstash refresh lock, unsupported OAuth client, OAuth service, direct provider, HTTP/fetch, and private OpenAI-compatible proxy;
+- retain mock as default and fully working;
+- layer selection must happen after decoded CodexProxyConfig, not import-time process.env;
+- live calls must use getValidToken only; do not introduce refresh or API-key fallback;
+- map missing/expired profile and missing live config to safe 502 with a generic re-import instruction; preserve 401 auth behavior and normal upstream 502 behavior;
+- add deterministic tests with mocked Codex fetch / existing package test layers only; no Upstash or network credentials;
+- update app README only if necessary to accurately reflect what this task delivers.
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when code crosses a runtime/service boundary. Reuse canonical contracts/errors. No new DTOs, unsafe casts, JSON.stringify/JSON.parse, process.env, local manual readers/mappers, or trivial wrappers. Keep primary operations flat named Effect.gen with typed errors in .pipe(...).
+
+Run apps/codex-proxy check-types/test/build/smoke-test and bun run verification if practical. Report exact changed files and verification, but do not commit.
