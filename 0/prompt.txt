@@ -1,0 +1,10 @@
+Continue the same bounded provider-neutral/memory round and finish it.
+
+1. Move AtomicKeyValueStoreError into the spec-required src/errors.ts so the root max-classes-per-file rule passes. Keep stable root exports.
+2. Resolve the Effect language-service suggestions by using Effect.fn for the two primary inline memory operations where appropriate.
+3. Audit withoutExpiredEntries, conditionConflicts, and applyMutation. Keep only a repeated boundary/material algorithm; inline the one-use condition/mutation helpers into the single SynchronizedRef.modify if they cannot meet the explicit helper-admission rule. Record the decision.
+4. Add the full memory/Schema tests listed in the previous prompt. Three tests are not sufficient. Use @effect/vitest, Effect collections, Match, Schema codecs, TestClock, and Effect.all concurrency. Test 32 accepted and 33 rejected without unsafe casts; duplicate conditions and mutations separately; invalid/zero/fractional/infinite TTL through the Schema codec; Schema JSON round trips with Schema.fromJsonString/Schema.toCodecJson; errors must not render private key/value test markers using Schema.UnknownFromJsonString.
+5. Prove native set clears an unexpired atomic TTL (set before expiry, advance beyond old expiry), and atomic persistent Set clears an unexpired earlier TTL via Equals.
+6. Prove conflict causes zero mutation across multiple keys, and stale owner cannot remove or overwrite a newer value.
+7. Run bun run fix, package check-types/test/build, and bun run check. Do not touch Upstash beyond formatter output; do not edit ledger/plan or commit.
+Return exact test count and remaining issues.
