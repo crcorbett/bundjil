@@ -1,0 +1,1 @@
+Do we need to update the SPEC at all? Are the docs/SPEC completely up-to-date and reflect our actual implementation thus far?
