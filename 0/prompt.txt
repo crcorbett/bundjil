@@ -1,0 +1,7 @@
+MANDATORY TERMINAL AUDIT PASS 1 OF 5, FRESH RESTART. Report-only. Finish within 10 minutes; inspect, do not rerun the full repository suite. Do not edit or mutate Git/providers/credentials/deployments.
+
+Exact candidate: /Users/cooper/.codex/worktrees/d4b4e069-1303-427d-957e-756d18e049a9/bundjil, branch codex/automatic-production-effect-runtime, all uncommitted changes. Read AGENTS.md, strict Effect/docs/prd-implementer skills, both active plans/SPEC/task ledgers, affected READMEs and diff. Authority: installed effect@4.0.0-beta.101 and immutable source revision 1caab3cc30f626efbf15e59d74f539a487e5c85c only.
+
+Architecture/Effect boundary audit only: decode/encode, opaque/branded Schema, canonical JSON/proxies, errors/redaction, Config, services/private Layers/runtime, typed Layer recovery, flat Effects/no helper sprawl, ownership/exports, HTTP/SSE resources/progress/timeout/cancellation/finalization, Photon diagnostics. Directly confirm ENP-FND-044..047, especially HttpClient.withScope proof lifetime and dedicated streaming-scope transfer. Latest full verification already passed 136 boundary, 17 lint, nine typecheck, 15 workspace tasks, 153 Codex, 43 proxy, 80 agent, 45 Photon; inspect rather than duplicate.
+
+Findings first with severity, absolute file:line, mechanism, deterministic proof gap and ENP IDs. Provider non-proof is limitation only. If clean, begin exactly PASS 1 ZERO FINDINGS and briefly list inspected sources/corrections.
