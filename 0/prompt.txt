@@ -1,0 +1,76 @@
+You are the sole sequential implementation subagent for this exact task. You are not alone in the codebase. Do not revert existing changes; preserve and work with them.
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,
+HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit,
+Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
+code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
+RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded
+identifiers from the owning package. Do not define standalone DTO mirrors or
+duplicate fields such as id: string, slug: string, status, or post metadata
+outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers,
+mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
+or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit
+primitive or owning service contract should carry the behavior.
+
+For UI work, compose stable visible structure as high as practical, usually in
+the route or nearest page-level parent. Use the primitive -> composite ->
+layout -> route chain for visible structure. Let leaves own the data,
+search/page params, commands, atoms, skeletons, and fallbacks for the exact
+fragment or action they render. Do not add nested feature wrappers merely to
+shorten route JSX, and do not prop-drill query results, selected ids, loading
+flags, command callbacks, or derived option lists when a leaf can own the
+narrow value.
+
+For reusable URL state, use schema-backed field URL atoms for search params and
+read-only page-param atoms for route identity. Keep TanStack Router as the app
+URL writer, and do not import app route files, routeTree.gen,
+Route.useSearch(), or Route.useParams() into reusable packages.
+
+Task object:
+{
+  "id": "implement-encrypted-profile-store-and-refresh-lock",
+  "title": "Implement encrypted storage and refresh locking",
+  "status": "in_progress",
+  "description": "Compose CodexProfileStore over encrypted KeyValueStore persistence and add refresh locking for hosted rotation safety.",
+  "implementationNotes": [
+    "Add an encrypted KeyValueStore profile layer that encrypts before writes and decrypts after reads.",
+    "Keep the raw KeyValueStore profile layer for local tests/non-hosted proof.",
+    "Add CodexOAuthRefreshLock with acquisition, contention, expiry, and release errors.",
+    "Keep atomic Upstash lock operations behind a package-owned service/layer.",
+    "Use canonical subject-hash derivation for profile and lock keys.",
+    "Test concurrent refresh programs so one invocation refreshes while followers retry or read updated profile."
+  ],
+  "mandatoryVerification": [
+    "Flat Effect.gen programs for storage and lock operations.",
+    "Typed errors through catchTag, catchTags, or mapError.",
+    "Canonical Effect Schema contracts and schema-derived types.",
+    "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers.",
+    "Tests cover encrypted save/read/remove, Upstash-like adapter behavior, lock contention/expiry/owner release/refresh race/leaks.",
+    "bun run --filter @bundjil/codex-oauth test",
+    "bun run --filter @bundjil/codex-oauth check-types",
+    "bun run --filter @bundjil/codex-oauth build"
+  ],
+  "completionCriteria": [
+    "Hosted profile persistence composes through encrypted storage over Effect KeyValueStore.",
+    "Refresh coordination has a package-owned service contract and test evidence."
+  ],
+  "implementationImprovementAudit": {
+    "requiredPasses": 3,
+    "completedPasses": 0,
+    "evidence": []
+  },
+  "commitAfterPassing": true
+}
+
+Spec: docs/product-specs/codex-hosted-live-oauth-storage.md
+Task list: docs/product-specs/codex-hosted-live-oauth-storage.tasks.json
+Active plan: docs/exec-plans/active/codex-hosted-live-oauth-storage.md
+Architecture docs: ARCHITECTURE.md; docs/architecture/effect-patterns.md; docs/architecture/repo-structure.md; docs/architecture/testing-and-quality.md; docs/architecture/eve-agent.md.
+
+You own packages/codex-oauth changes required for Task 3, its tests and package README updates, plus current spec/task-plan evidence files. Reuse the completed CodexOAuthProfileCipher and current KeyValueStore/Upstash adapters. Do not implement OAuth routes/client exchange, apps/codex-proxy, apps/agent, Vercel provisioning, or live hosted proof. The prior task explicitly deferred hosted account OAuth.
+
+Use Effect Schema codecs for every JSON string boundary; do not use JSON.stringify. Redacted.value may only occur at the immediate provider boundary where raw bytes are required. Keep Upstash atomic commands and any retry policy behind package-owned services/layers. Run focused tests, check-types, build, jq validation, git diff --check, and bun run verification when practical. Report changed files, the call graph, command evidence, risks, and completion status. Do not commit; the parent reviews/audits/commits.
