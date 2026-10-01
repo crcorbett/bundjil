@@ -1,0 +1,6 @@
+Ok we need to commit our work.
+We need to update all the readmes, docs, package names etc.
+
+Please use executor to research the meaning of the word bundjil via Parallel. We need to create a great README for this. This repo is going to be about creating a personal agent (via Vercel's eve framework which can run on iMessage and email using Sendblue + Cloudflare email + Vercel Connect (for Notion, and other integrations).
+
+Only then can we push this to a public github repo called bundjil.
