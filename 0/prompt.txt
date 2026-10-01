@@ -1,0 +1,1 @@
+Please stop expanding scope and finish Task 1 now. Run the focused audit fixture test and check command, then return changed files, exact exceptions, limitations, and verification evidence. Do not run full repo verification if it is the source of delay; the parent will run it.
