@@ -1,0 +1,1 @@
+Stop and report exact current status immediately: sendblue-final-promotion result, first blocker, and confirm no Production Sendblue mutation. Do not make a mutation before reporting.
