@@ -1,0 +1,7 @@
+Ok use prd-writer to start drafting a spec to investigate how to use the Eve framework. How we can create a clean package or app for it in the repo, how we can properly wrap it with Effect TS (per $effect-client-wrapper skill) so it has proper named operations with Effect-based Schema for inputs, success, and error types.
+
+You MUST also use executor (Personal) MCP to use DeepWiki to investigate Eve, Effect-smol (v4) and how we can use these together. Your task will be to create a simple Eve agent, that we can then verify.
+
+You can use executor (Personal) to hook up Vercel AI Gateway with a small cheap model (like a flash model) to confirm correct behaviour.
+
+Begin drafting the SPEC, it must also include through and comprehensive documentation as one of the tasks as you continue.
