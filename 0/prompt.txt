@@ -1,0 +1,1 @@
+I want to make all strings proper Branded types with Effect Schema, audit what ones we have. Things like message.completed can then be handled with Effect.Match and all strings are decoded/encoded at the boundaries.
