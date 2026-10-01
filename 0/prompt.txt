@@ -1,0 +1,13 @@
+Continue the SAME run-real-local-login-tracer task with this approved workaround. Do not use 1Password again.
+
+Private preview-key rotation strategy:
+1. Inspect current bunx vercel env add/update help, without reading values.
+2. In ONE private shell command/program, generate a fresh 32-byte base64 cipher key and a non-secret key id. Do not place either value in the command text or output. Keep them in shell variables and a chmod 0600 temporary ignored env file only.
+3. Upsert BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY and BUNDJIL_CODEX_PROFILE_ENCRYPTION_KEY_ID for PREVIEW ONLY on linked personal bundjil-codex-proxy, with sensitive/encrypted handling and no output of values.
+4. Set a new PREVIEW-ONLY BUNDJIL_UPSTASH_REDIS_KEY_PREFIX such as bundjil:codex:subscription-v1: (non-secret). This intentionally isolates the new subscription profile from the old ciphertext/revision so the fresh key never attempts to decrypt the old access-only profile. Confirm the exact prefix does not collide using namespace size only; do not read keys/values. If it collides, choose a fresh suffix privately and set the same preview value/local variable.
+5. Pull preview env for the integration-backed KV credentials. Merge those into the private temporary env without printing values; confirm presence booleans only. The login does not need proxy bearer/mode.
+6. Source the private env and map subject variables as previously instructed, then run login:subscription. Keep the process alive for owner browser action. Notify parent immediately once the browser is open/waiting. Do not expose URL/query/code/state/verifier/tokens/account/provider response.
+7. Complete the safe readback proof and delete all temporary files. Do not deploy or touch production/development.
+8. Finish the proof tooling you already started. Fix the unavailable Schema.extend using Effect v4-supported Schema.Struct field composition/reuse; no unsafe workaround. Run package check-types/tests/build and root verification.
+
+This rotates only preview cipher configuration and establishes an isolated preview namespace. Production remains inactive. If Vercel CLI cannot safely upsert without echoing values, stop and report before exposing anything.
