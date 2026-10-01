@@ -1,0 +1,19 @@
+You are implementing exactly one task in /Users/cooper/Projects/bundjil: `document-codex-oauth-provider` from docs/product-specs/codex-oauth-eve-model-provider.tasks.json. Do not commit, push, or start the next task.
+
+You are not alone in the codebase. Do not revert or overwrite edits made by others; work with the current main branch state. Keep edits scoped to durable documentation only.
+
+Task goal:
+- Update comprehensive Codex OAuth provider documentation across the repo.
+- The ledger explicitly names likely files: README.md, ARCHITECTURE.md, docs/README.md, docs/architecture/eve-agent.md, docs/architecture/effect-patterns.md if generalized, docs/architecture/repo-structure.md, docs/architecture/testing-and-quality.md, apps/agent/README.md, apps/codex-proxy/README.md, and packages/codex-oauth/README.md.
+- Mark implemented behavior vs research, opt-in proof, future hosted storage/envelope encryption work, and unsupported paths clearly.
+- Include production and test call graphs, apps/codex-proxy Vercel deployment and preview-before-production verification, and note that bundjil-codex-proxy belongs in Cooper's personal Vercel account, not Tilt Legal.
+- Include the mandatory 3-pass Effect TS implementation audit rule.
+- Include exact local commands, Vercel deployment commands, direct HTTP checks, rollback instructions, sanitized proof shapes, and no secrets.
+- Preserve the existing repo style. ASCII only.
+- Do not introduce native JSON serialization guidance such as JSON.stringify; document Effect Schema JSON boundaries with `Schema.fromJsonString(...)` and `Schema.UnknownFromJsonString`.
+
+Verification to run before handing back:
+- `bun run check`
+- `bun run verification`
+
+Final response: list changed files, summarize important doc additions, and include verification results. Do not commit or push.
