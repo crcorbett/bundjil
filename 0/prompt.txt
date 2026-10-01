@@ -1,0 +1,1 @@
+Are there any caveats with chatSdkChannel? Why didn’t we originally use this + sendblue adapter?
