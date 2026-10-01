@@ -1,0 +1,1 @@
+Return the exact sanitized Vercel HTTP 400 error code/message/details from the failed updateProjectProtectionBypass call, plus the current number of automation bypass records and their notes/scopes only. Do not mutate anything and do not expose any secret/key.
