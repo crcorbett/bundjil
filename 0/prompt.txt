@@ -1,0 +1,71 @@
+Work in /Users/cooper/Projects/bundjil. You are the sequential implementation worker for task 2 of the active Vercel production promotion. You are not alone in the codebase; do not revert others' edits and accommodate live-state inspection.
+
+Read:
+- .agents/skills/prd-implementer/SKILL.md
+- AGENTS.md
+- docs/product-specs/vercel-production-promotion.md
+- docs/product-specs/vercel-production-promotion.tasks.json
+- docs/exec-plans/active/vercel-production-promotion.md
+- docs/architecture/effect-patterns.md
+- docs/architecture/repo-structure.md
+- docs/architecture/eve-agent.md
+- docs/architecture/testing-and-quality.md
+- installed/local Eve auth docs
+
+Task:
+{
+  "id": "implement-production-preflight-and-eve-auth",
+  "title": "Implement read-only Production preflight and explicit Eve auth",
+  "status": "pending",
+  "dependsOn": [
+    "revalidate-clean-codex-preview-baseline"
+  ],
+  "description": "Add a schema-backed, read-only Production preflight and explicit deployed Eve authentication before any Production mutation.",
+  "implementationNotes": [
+    "Set the app-owned Eve policy to eveChannel({ auth: [vercelOidc(), localDev()] }) and test Vercel OIDC acceptance, deployed anonymous rejection, and localhost-only localDev behavior.",
+    "Keep deployment preflight at the app/CLI boundary. Reuse AgentModelProviderConfig, CodexProxyConfig, CodexOAuthSubject, and package errors rather than defining Vercel/profile DTO mirrors.",
+    "Fail closed on wrong Vercel project/scope, missing target variable name/binding, Preview/branch/ad hoc proxy host, mock/local mode, missing route protection, shared derived namespace identity, or missing accepted rollback references.",
+    "Decode only the Vercel metadata fields needed for a sanitized go/no-go result; the command cannot deploy, alias, set variables, provision storage, or write profiles."
+  ],
+  "mandatoryVerification": [
+    "Verify flat meaningful Effect.gen/Effect.fn flow; expected typed errors are handled in .pipe(...) with catchTag, catchTags, or mapError; contracts are canonical Effect Schema-derived; no unsafe casts, DTO mirrors, manual readers/mappers, raw JSON helpers, or trivial wrapper/helper sprawl.",
+    "Tests prove positive personal-scope preflight and every wrong-target, shared-namespace, stale-host, missing-auth, wrong-mode, and read-only rejection.",
+    "Direct HTTP tests prove Eve auth behavior and proxy health/private route policy; run focused checks and the global verification gate."
+  ],
+  "completionCriteria": [
+    "A documented command returns only Schema-encoded sanitized go/no-go evidence.",
+    "The explicit Eve auth policy and route matrix are accepted with three parent audit passes."
+  ],
+  "implementationImprovementAudit": {
+    "requiredPasses": 3,
+    "completedPasses": 0,
+    "evidence": []
+  },
+  "commitAfterPassing": true
+}
+
+Ownership/write scope:
+- apps/agent/agent/channels/eve.ts
+- app-owned tests for explicit Eve auth
+- app-owned Production preflight schemas/services/scripts/tests in apps/agent or apps/codex-proxy according to actual boundary ownership
+- relevant package.json scripts/exports and minimal docs
+- docs/product-specs/vercel-production-promotion.tasks.json and docs/exec-plans/active/vercel-production-promotion.md for sanitized worker evidence
+Do not mutate Production or commit/push. Parent reviews, audits, accepts, and commits.
+
+Implement a read-only preflight that can verify both linked projects' personal scope, stable production domains, target-scoped variable names/types, live mode requirement, explicit Eve auth presence, Deployment Protection, disjoint Preview/Production namespace/key-id identities without printing values, and rollback reference availability. It must have no mutation capabilities. Prefer input via a mode-0600 untracked Vercel metadata snapshot or command adapter at the CLI edge if live API auth is not an app concern. Decode only minimal canonical Schema contracts and emit Schema-encoded sanitized go/no-go evidence. Do not create a broad Vercel SDK wrapper or local DTO mirror.
+
+Add explicit:
+import { localDev, vercelOidc } from "eve/channels/auth";
+import { eveChannel } from "eve/channels/eve";
+export default eveChannel({ auth: [vercelOidc(), localDev()] });
+Test the authored channel/build behavior and direct route matrix as practical without duplicating Eve internals.
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when code is fallible, async, runtime-owned, collection-heavy, or crosses a package, RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded identifiers from the owning package. Do not define standalone DTO mirrors or duplicate fields such as id: string, slug: string, status, or post metadata outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers, mappers, transformers, switch/case branches, instanceof checks, unsafe casts, or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit primitive or owning service contract should carry the behavior.
+
+For UI work, use primitive -> composite -> layout -> route and leaf ownership rules; no UI is expected here.
+
+Run targeted tests/check-types/build and bun run verification. Do not mark task complete or increment parent audit counters. Report changed files and evidence.
