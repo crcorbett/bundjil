@@ -1,0 +1,60 @@
+Implement exactly one task from the Bundjil task ledger: `define-codex-direct-provider-contract`.
+
+You are not alone in the codebase. Do not revert edits made by others. Work with the current clean main branch and keep changes narrowly scoped.
+
+Mandatory implementation prompt block:
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,
+HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit,
+Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
+code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
+RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded
+identifiers from the owning package. Do not define standalone DTO mirrors or
+duplicate fields such as id: string, slug: string, status, or post metadata
+outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers,
+mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
+or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit
+primitive or owning service contract should carry the behavior.
+
+For UI work, compose stable visible structure as high as practical, usually in
+the route or nearest page-level parent. Use the primitive -> composite ->
+layout -> route chain for visible structure. Let leaves own the data,
+search/page params, commands, atoms, skeletons, and fallbacks for the exact
+fragment or action they render. Do not add nested feature wrappers merely to
+shorten route JSX, and do not prop-drill query results, selected ids, loading
+flags, command callbacks, or derived option lists when a leaf can own the
+narrow value.
+
+For reusable URL state, use schema-backed field URL atoms for search params and
+read-only page-param atoms for route identity. Keep TanStack Router as the app
+URL writer, and do not import app route files, `routeTree.gen`,
+`Route.useSearch()`, or `Route.useParams()` into reusable packages.
+
+Task object:
+- id: define-codex-direct-provider-contract
+- title: Define direct Codex provider and private proxy services
+- description: Create the package contract for mapping OpenAI-compatible requests to Codex Responses and exposing a private proxy without wiring Eve's default model yet.
+- implementation notes: use package layout additions for codex-direct-provider.service.ts, codex-request-mapper.ts, codex-stream-mapper.ts, openai-compatible-proxy.service.ts, and src/index.ts; model auth strategies explicitly: subscription profile, test/mock, future BYOK fallback only after a separate spec update; subscription mode must ignore OPENAI_API_KEY and CODEX_API_KEY unless separately proven; keep HTTP proxy private/internal and do not change apps/agent.
+- mandatory verification: flat meaningful Effect.gen programs for proxy handling, Codex HTTP calls, request mapping, stream mapping, and token resolution; typed errors handled in .pipe with catchTag/catchTags/mapError; canonical Effect Schema contracts from @bundjil/codex-oauth; no unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers; tests cover OpenAI-compatible request decode, Codex Responses payload encode, streaming chunk mapping, proxy auth failure, HTTP status failure mapping, safe error redaction; run `bun run --filter @bundjil/codex-oauth test`, `bun run --filter @bundjil/codex-oauth build`, and `bun run check-types`.
+
+Relevant files:
+- `/Users/cooper/Projects/bundjil/docs/product-specs/codex-oauth-eve-model-provider.md`
+- `/Users/cooper/Projects/bundjil/docs/product-specs/codex-oauth-eve-model-provider.tasks.json`
+- `/Users/cooper/Projects/bundjil/docs/exec-plans/active/codex-oauth-eve-model-provider.md`
+- `/Users/cooper/Projects/bundjil/packages/codex-oauth/src/**`
+- `/Users/cooper/Projects/bundjil/packages/codex-oauth/test/**`
+- `/Users/cooper/Projects/bundjil/packages/codex-oauth/README.md`
+- architecture docs in `/Users/cooper/Projects/bundjil/docs/architecture/*.md`
+
+Scope:
+- Only modify `packages/codex-oauth`, package README/docs/task ledger/active plan if needed.
+- Do not create `apps/codex-proxy` and do not touch `apps/agent`.
+- Build a package-level contract and deterministic mock tests; no live network calls in tests.
+- You may use the existing `CodexHttpClient`, `CodexResponsesProof`, `CodexOAuthService`, and profile services from the previous task.
+- Keep the proxy endpoint contract private/internal; represent internal auth with schemas and service errors, not a deployed server.
+
+Run verification gates you can reasonably run and report changed files plus evidence.
