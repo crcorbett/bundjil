@@ -1,0 +1,69 @@
+Implement exactly task enable-refresh-capable-live-proxy from docs/product-specs/codex-hosted-live-oauth-storage.tasks.json, against docs/product-specs/codex-hosted-live-oauth-storage.md, the active execution plan, and repo architecture docs. Do not implement or run the later hosted preview proof, do not deploy, and do not touch production.
+
+You own the coherent implementation across packages/codex-oauth and apps/codex-proxy, focused tests, and task-specific sanitized notes in the active plan. Do NOT mark the task completed, add parent audit evidence, or commit; parent owns acceptance and commit. You are not alone in the codebase: preserve existing edits and do not revert unrelated work.
+
+Required behavior:
+- canonical atomic credential result containing access token, account id, and revision;
+- valid bypass; proactive refresh within skew under distributed lock; re-read winner under lock; refresh transport; validate new access token and JWT expiry; preserve current refresh token/account id only when optional response fields permit; reject cross-account metadata;
+- fenced CAS commit for every refreshed generation; stale lease/write cannot overwrite;
+- classify transient network/timeout/rate-limit/5xx without profile mutation;
+- classify permanent credential failure and fenced mark reauthentication required;
+- revision-aware recoverAfterUnauthorized: use newer winner if present, otherwise one forced refresh of the exact rejected revision, permit exactly one replay, stop on second 401 and do not replay unrelated failures;
+- reject legacy access-import profiles from refresh-capable live mode;
+- compose Upstash fenced commit + refresh lock + OAuth HTTP refresh + encrypted store into private live proxy mode;
+- explicit live readiness and stable app errors: 502 codex_reauthentication_required, 503 codex_auth_temporarily_unavailable, sanitized provider 502; no OAuth browser routes, API-key fallback, mock fallback, or retry loop;
+- preserve mock/local behavior and current private auth/SSE contracts.
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,
+HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit,
+Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
+code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
+RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded
+identifiers from the owning package. Do not define standalone DTO mirrors or
+duplicate fields such as id: string, slug: string, status, or post metadata
+outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers,
+mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
+or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit
+primitive or owning service contract should carry the behavior.
+
+For UI work, compose stable visible structure as high as practical, usually in
+the route or nearest page-level parent. Use the primitive -> composite ->
+layout -> route chain for visible structure. Let leaves own the data,
+search/page params, commands, atoms, skeletons, and fallbacks for the exact
+fragment or action they render. Do not add nested feature wrappers merely to
+shorten route JSX, and do not prop-drill query results, selected ids, loading
+flags, command callbacks, or derived option lists when a leaf can own the
+narrow value.
+
+For reusable URL state, use schema-backed field URL atoms for search params and
+read-only page-param atoms for route identity. Keep TanStack Router as the app
+URL writer, and do not import app route files, routeTree.gen,
+Route.useSearch(), or Route.useParams() into reusable packages.
+
+Implementation quality:
+- flat named Effect.gen/Effect.fn primary operations and typed .pipe error handling;
+- canonical Schema-derived types and tagged errors;
+- explicit Context services/Layers and Effect Config/Redacted boundaries;
+- Schema JSON codecs only, no JSON.parse/stringify;
+- no raw fetch, raw process.env package reads, unsafe casts, DTO mirrors, manual object readers, stringly tag switches, or helper sprawl;
+- mock provider layers for all automated tests.
+
+Mandatory tests cover every item in the task ledger, including valid bypass, skew refresh, lock winner, rotated/omitted token fields, malformed expiry, stale commit, concurrent login, transient/permanent/cross-account mutation behavior, revision-aware forced refresh and one replay, second 401 stop, unrelated no-replay, legacy refusal, missing config, mock/local preservation, stable HTTP errors/readiness, and leak safety.
+
+Verification:
+- bun run --filter @bundjil/codex-oauth check-types
+- bun run --filter @bundjil/codex-oauth test
+- bun run --filter @bundjil/codex-oauth build
+- bun run --filter @bundjil/codex-proxy check-types
+- bun run --filter @bundjil/codex-proxy test
+- bun run --filter @bundjil/codex-proxy build
+- bun run --filter @bundjil/codex-proxy smoke-test
+- bun run verification
+- git diff --check
+- stale/leak scans.
+
+Report changed files, exact test counts, call graph, and remaining gaps. No live browser, network, Vercel mutation, deployment, production, or Eve wiring.
