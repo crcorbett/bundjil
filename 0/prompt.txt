@@ -1,0 +1,5 @@
+2. Is this Vercel workflows? Why are they needed 
+
+3. Yes, handle with Effect retry / failure mechanism 
+
+4. Sensible values in constants.ts where relevant
