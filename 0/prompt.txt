@@ -1,0 +1,1 @@
+Are you sure? I'm pretty sure personal executor Vercel connection is set up to use my personal Vercel, which is what we need here. Are you certain Vercel does not allow project tokens? If that is the case, then yes, let's update the spec as you suggest.
