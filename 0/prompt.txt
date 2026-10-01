@@ -1,0 +1,1 @@
+Before returning, fix the three trailing-whitespace failures reported by git diff --check. Finish remaining repo-structure/testing/skill path updates, then return.
