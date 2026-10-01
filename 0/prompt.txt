@@ -1,0 +1,10 @@
+# Files mentioned by the user:
+
+## Screenshot 2026-07-07 at 10.39.14 pm.png: /Users/cooper/Library/CloudStorage/GoogleDrive-coopercorbett@gmail.com/My Drive/Screenshots/Screenshot 2026-07-07 at 10.39.14 pm.png
+
+## My request for Codex:
+Then when I signed in it went to a localhost address. I dont know if this was you or not?
+
+<image name=[Image #1] path="/Users/cooper/Library/CloudStorage/GoogleDrive-coopercorbett@gmail.com/My Drive/Screenshots/Screenshot 2026-07-07 at 10.39.14 pm.png">
+
+</image>
