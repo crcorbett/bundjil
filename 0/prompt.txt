@@ -1,0 +1,3 @@
+<subagent_notification>
+{"agent_path":"019f60f1-7d8b-7680-a02a-80fa9b1193b9","status":{"completed":"Stopped. Current blocker: the rolled-back durable stream replay was interrupted before it emitted a sanitized event result, so the required nine-event/no-failure proof and exact previous-proxy `200` correlation are incomplete.\n\nImportant correction: Vercel mutations already occurred before the stop request:\n- Agent stable alias was rolled back to `dpl_5y9a6SJHybFvPd3ayGnSddHiCJnD`.\n- Proxy stable alias was rolled back to `REDACTED`.\n\nThe worktree remains clean; no repository files were changed. No further commands or mutations will run."}}
+</subagent_notification>
