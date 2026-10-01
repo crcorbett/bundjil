@@ -1,0 +1,18 @@
+You are the single sequential implementation worker for task deploy-and-prove-production-agent in /Users/cooper/Projects/bundjil. You are not alone in the codebase; do not revert other edits. Start from clean pushed main 9a34a34.
+
+Read AGENTS.md, .agents/skills/prd-implementer/SKILL.md, docs/product-specs/vercel-production-promotion.md, the exact task in docs/product-specs/vercel-production-promotion.tasks.json, docs/exec-plans/active/vercel-production-promotion.md, docs/architecture/effect-patterns.md, docs/architecture/eve-agent.md, docs/architecture/testing-and-quality.md, and apps/agent/README.md.
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when code is fallible, async, runtime-owned, collection-heavy, or crosses a package, command, config, or service boundary. Reuse canonical schemas, types, service contracts, errors, and branded identifiers. Do not define DTO mirrors. Keep one-off Effect logic inline. Do not add tiny wrappers, manual mappers/readers, switch/case, instanceof, unsafe casts, raw JSON helpers, or duplicate fields when Effect Schema/Match/Result/Exit or the owning service should carry behavior.
+
+Do exactly this task:
+1. Confirm clean 9a34a34. Accepted proxy: current REDACTED, previous REDACTED, stable https://bundjil-codex-proxy.vercel.app/v1, source e53e7a48270db4bb571d90c771186f92a0282922.
+2. Configure ONLY bundjil-agent Production vars in personal team REDACTED/project REDACTED: REDACTED; BUNDJIL_AGENT_MODEL=gpt-5.5; BUNDJIL_CODEX_PROXY_BASE_URL=https://bundjil-codex-proxy.vercel.app/v1; BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN matching concealed password in personal-vault item Bundjil Production, type sensitive; BUNDJIL_CODEX_PROXY_CONTEXT_WINDOW_TOKENS=200000. Do not print secrets. Do not add OAuth/profile/Upstash/Sendblue vars.
+3. Build sanitized mode-0600 snapshot and run proxy-accepted-agent-configured with pure JSON stdout. Prove exact personal scope, accepted proxy URL/deployment/source, variable types, independent bearer identity, SSO protection, explicit Eve Vercel OIDC, no deployed local/anonymous fallback.
+4. Deploy two post-config immutable READY Production agent deployments from same clean 9a34a34 source/config via source deploy only: no prebuilt, inline runtime env, or build env. First is previous rollback; second current stable alias.
+5. Prove Deployment Protection and Eve OIDC: anonymous deployed access rejected; fresh OIDC accepts /eve/v1/info; create minimal non-sensitive session; replay from startIndex=0 through session.waiting; expect nine events including message.completed, turn.completed, session.waiting and no failure; correlate exactly one proxy POST 200 on accepted current proxy deployment and Codex subscription provider path.
+6. Query agent/proxy Production logs/errors; prove no Gateway/mock/Preview fallback and no prompt/output/header/token/profile/ciphertext/PII/bypass leak. Record only sanitized metadata.
+7. Revoke only any task-created temporary bypass. Preserve pre-existing Preview Sendblue automation bypass.
+8. Edit ONLY docs/exec-plans/active/vercel-production-promotion.md with sanitized worker evidence. Do not mark task/audits or edit ledger. Do not commit/push.
+9. Run agent focused typecheck/test/build, bun run verification, jq empty, git diff --check.
+
+If 1Password CLI blocks on interactive auth, stop and report exact sanitized blocker within two minutes; do not create mismatched bearer. Report changed files and evidence.
