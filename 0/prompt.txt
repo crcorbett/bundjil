@@ -1,0 +1,29 @@
+Repository: /Users/cooper/Projects/bundjil. Implement exactly Task 2, "migrate-codex-oauth-to-effect-persistence", from docs/product-specs/effect-persistence.tasks.json and governing SPEC docs/product-specs/effect-persistence.md. Read AGENTS.md and /Users/cooper/Projects/bundjil/.agents/skills/prd-implementer/SKILL.md first. Task 1 is committed at 803be1e.
+
+You own this Task 2 write scope:
+- packages/codex-oauth/** (source, tests, scripts, package metadata)
+- apps/codex-proxy/** only where composition/tests/docs must change for this migration
+- bun.lock
+Do not edit the SPEC, task ledger, active execution plan, apps/agent, root lint/format/TS configs, or the Task 1 persistence package unless a concrete contract defect blocks the migration; report such a defect before touching Task 1.
+
+You are not alone in the codebase. Do not revert others' edits; work with current main at 803be1e plus parent-owned uncommitted plan/ledger status edits. Do not commit; parent reviews and commits.
+
+Required outcomes:
+- Replace Codex-owned generic Upstash adapter, SDK clients, scans, Redis construction, Lua/provider command ownership, and old provider subpath with @bundjil/effect-persistence native KeyValueStore plus AtomicKeyValueStore.
+- Preserve Codex-owned env names/aliases/default namespace/config errors, storage keys, encrypted profile encoding, profile versions, revision semantics, lock policy, observer behavior, scripts, hosted proxy behavior, filesystem mode, and Vercel bindings.
+- Express initial write, legacy replacement, revision-fenced replacement/refresh/reauthentication, refresh-lock acquire, and owner-only release via AtomicKeyValueStore.transact. Map generic persistence errors to existing safe Codex errors.
+- Preserve exact physical keys and stored encrypted values. Domain services pass existing logical keys; shared adapter applies configured prefix once.
+- For legacy replacement, retain encrypted profile read/decrypt/canonical comparison, then atomically require Equals(profile encoded) plus Absent(revision) before writing profile+revision.
+- Acquire lock with Absent(lock)+Set(owner, TTL); release with Equals(lock,owner)+Remove(lock), preserving expired-lease checks/reasons.
+- Compose one shared Upstash Layer per hosted/script composition so native and atomic services share one client. Never build Layers inside operations.
+- Remove @upstash/redis from @bundjil/codex-oauth once imports are gone. Remove old adapter subpath exports and stale compatibility aliases/interfaces/tests after callers migrate.
+- Flat named linear Effects; outer typed error mapping; canonical Schemas/Schema JSON codecs/Effect Config/Match/Effect collections. No raw JSON, unsafe casts, async domain ops, floating Promises, local Effect execution, suppressions, raw _tag branching, switch protocol logic, helper/common/util/repository sprawl, or one-call wrappers.
+- No React/TSX/routes/UI.
+
+Verification:
+- Adapt/add tests proving encrypted round trip, exact key/value compatibility, initial/legacy/revision behavior, stale rejection, concurrent winner, lock TTL/ownership/release, shared ordinary/atomic state, safe errors/observers.
+- All trusted-local scripts and apps/codex-proxy compile without old imports.
+- Run bun run fix; effect-persistence test; codex-oauth check-types/test/build; codex-proxy check-types/test/build/smoke-test; root check and knip. Use ignored .local/secrets/executor-production.env only if required; never print values.
+- Inspect actual diff for helper admission and forbidden patterns before reporting.
+
+Report changed files, preserved behavior, command/test counts, and unresolved concerns.
