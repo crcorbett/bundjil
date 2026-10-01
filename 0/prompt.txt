@@ -1,0 +1,12 @@
+Continue task 1. Add packages/effect-persistence/test/upstash-atomic-key-value-store.test.ts.
+
+Required tests:
+1. Directly test serializeUpstashAtomicCommand with a canonical transaction containing Absent a, Equals b, Set a with TTL, Remove b, and persistent Set c. Assert one unique physical prefixed key per logical key in deterministic order and exact args:
+conditions count + a/index + e/index/value + mutation count + s/index/value/ttlMillis + r/index + s/index/value/emptyTTL.
+2. Through makeUpstashPersistenceLayer, prove eval is called exactly once with the static script and exact keys/args; response 1 -> applied, 0 -> conflict.
+3. Duplicate condition/mutation and 33-entry transactions fail before eval; eval call count stays zero and no provider state changes.
+4. Malformed eval response and rejected eval Promise map to safe AtomicKeyValueStoreError containing only operation/message; Schema.UnknownFromJsonString rendering excludes private key/value/provider/response markers and cause.
+5. Add a concise stateful mocked eval client that interprets the internal positional protocol (no JSON) and compare a meaningful sequence of applied/conflict/multi-key/stale-owner/remove outcomes and native readback with PersistenceMemory. This proves memory/mock-Upstash parity and all-or-nothing behavior.
+6. Prefix applied exactly once, Set without TTL has empty TTL arg, TTL is whole milliseconds.
+Use @effect/vitest, Effect Array/HashMap/Match/Schema where practical. Test-only provider simulation may use minimal mutable state but no unsafe casts, suppressions, JSON.parse/stringify, or production exports.
+Run bun run fix, package check-types/test/build, bun run check. Do not edit consumers/ledger/plan or commit. Report total test count and remaining diagnostics.
