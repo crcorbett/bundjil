@@ -1,0 +1,39 @@
+Work in /Users/cooper/Projects/bundjil. Implement exactly Task 3, "type-eve-sendblue-and-proxy-boundaries", from:
+- docs/product-specs/effect-schema-string-contracts.md
+- docs/product-specs/effect-schema-string-contracts.tasks.json
+- docs/exec-plans/active/effect-schema-string-contracts.md
+Read AGENTS.md and docs/architecture/effect-patterns.md first. Baseline commit is 315da74.
+
+You own only:
+- packages/eve-effect/**
+- apps/agent/**
+- apps/codex-proxy/**
+- directly necessary tests in those owners
+Do not edit packages/effect-persistence, packages/codex-oauth, SPEC/task/plan/docs, deployment configuration, environment files, or commit.
+
+You are not alone in the codebase. Do not revert edits made by others; accommodate the existing uncommitted task-status docs changes.
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the code is fallible, async, runtime-owned, collection-heavy, or crosses a package, RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded identifiers from the owning package. Do not define standalone DTO mirrors or duplicate fields such as id: string, slug: string, status, or post metadata outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers, mappers, transformers, switch/case branches, instanceof checks, unsafe casts, or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit primitive or owning service contract should carry the behavior.
+
+For UI work, use the primitive -> composite -> layout -> route chain. Let leaves own the data, commands, loading, empty, error, retry, skeleton, and fallback behavior for the exact fragment they render. Do not add nested feature wrappers merely to shorten route JSX, and do not prop-drill query results, selected ids, loading flags, command callbacks, or derived option lists when a leaf can own the narrow value.
+
+For reusable URL state, use schema-owned search and route-identity contracts. Keep the app router as the URL writer, and do not import app route modules into reusable packages.
+
+Specific requirements:
+- Preserve all routes, payloads, HTTP statuses, Sendblue behavior, Eve behavior, model/provider selection, Executor behavior, config names, and encoded replay data.
+- Define and materially use a canonical literal for message.completed and the installed Eve finish-reason vocabulary: content-filter, error, length, other, stop, tool-calls. Do not mirror the full Eve protocol.
+- The Eve event map remains framework dispatch. Use the canonical literal value for its key if type-safe.
+- Brand open semantic values crossing boundaries: Eve session/turn coordinates, model IDs, app/proxy filesystem/config identities, Sendblue provider IDs/status/group/media values and prefixes where semantically appropriate.
+- Use owner-named checked content Schemas for prompts/messages/summaries rather than meaningless content brands.
+- Consolidate Sendblue service/status/result/ignored-reason literals and named redacted secret/transport Schemas.
+- Change deliverCompletedMessage to accept unknown or the Schema-encoded boundary shape as appropriate, decode the complete projected event once, then use Match for finish reason, replay outcome, provider response, and response-error reason. Avoid raw string discriminant checks and as const where canonical contextual Schemas preserve literals.
+- packages/eve-effect should own reusable operation string contracts; do not move app-only Eve channel IDs there without actual reuse.
+- apps/codex-proxy must reuse newly exported Codex principal/account/token/model Schemas and own only app mode/path/health/error contracts.
+- Tagged error messages, provider error descriptions, production-preflight diagnostic evidence strings, parser-local header/URL fragments, and human content are not mechanically branded. Classify them.
+- No unsafe cast, decodeSync brand constructor in production, lint suppression, DTO mirror, generic schema helper, switch, raw JSON, new helper/common/utils module, TSX/route/provider/deployment change.
+- Run focused check-types/tests/builds for all three owners, root check-types/check/knip if practical, and git diff --check. Use .local/secrets/executor-production.env only if needed for agent Eve build; never print values.
+- Report exact changed files, verification, remaining classified exceptions, and blockers.
