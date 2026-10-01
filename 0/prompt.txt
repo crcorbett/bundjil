@@ -1,0 +1,1 @@
+Please send a concise progress update now. If blocked by an Effect API or design question, name it; otherwise complete the bounded task and report verification without waiting for more work.
