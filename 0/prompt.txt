@@ -1,0 +1,1 @@
+Based on the 3 threads spin up a new codex project thread who’s goal is to review those 3 threads suggestions, draft an improvement spec and implement the suggestions (ensuring no issues and docs are updated too). It has my approval / authority to make changes, deployments, secrets etc ensure it uses Sol + High for its work
