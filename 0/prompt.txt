@@ -1,0 +1,1 @@
+Conclude PASS 2 now from the evidence already gathered. Stop further broad scans. Return only actionable findings with exact file:line, mechanism/remediation, or exactly 'PASS 2: zero findings' plus concise evidence. Do not edit or mutate anything.
