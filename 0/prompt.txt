@@ -1,0 +1,38 @@
+Create a new thread in this project, with the responsibility of drafting a new SPEC [$prd-writer](/Users/cooper/Projects/bundjil/.agents/skills/prd-writer/SKILL.md) for this:
+
+Update bundjil model to use GPT 5.6 Terra (High)
+
+The correct values are:
+
+```toml
+model = "gpt-5.6-terra"
+model_reasoning_effort = "high"
+```
+
+For a Responses API request, the equivalent is:
+
+```json
+{
+  "model": "gpt-5.6-terra",
+  "reasoning": {
+    "effort": "high"
+  }
+}
+```
+
+For Bundjil specifically:
+
+```env
+BUNDJIL_CODEX_PROXY_MODEL=gpt-5.6-terra
+BUNDJIL_CODEX_PROXY_CONTEXT_WINDOW_TOKENS=1050000
+```
+
+But reasoning effort is **not currently configurable**. Bundjil hardcodes `reasoning.effort` to `low` in [request-mapper.ts](/Users/cooper/Projects/bundjil/packages/codex/src/provider/request-mapper.ts:103). We must add an Effect-configured proxy setting before Terra High will actually work.
+
+Once implemented, Eve should report:
+
+```text
+bundjil-codex-proxy/gpt-5.6-terra
+```
+
+A live Preview call through the subscription proxy is still required to prove the subscription endpoint accepts Terra, rather than merely the public OpenAI API and local Codex client supporting it.
