@@ -1,0 +1,1 @@
+Stop further exploration and return the terminal pass-2 report now from evidence already inspected. State CLEAN only if no actionable finding exists; otherwise list the finding(s) with exact file/line and minimal correction/proof. Do not run more commands or mutate anything.
