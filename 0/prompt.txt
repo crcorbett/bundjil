@@ -1,0 +1,5 @@
+<environment_context>
+  <current_date>2026-09-01</current_date>
+  <timezone>Australia/Melbourne</timezone>
+  <filesystem><workspace_roots><root>/Users/cooper/.codex/worktrees/8a9e/bundjil</root><root>/Users/cooper/.codex/visualizations/2026/08/31/01a057e7-41d4-7582-a388-5acd4feeb742</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
