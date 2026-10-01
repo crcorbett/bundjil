@@ -1,0 +1,6 @@
+Fix the current broken memory file first, then finish the test corrections. The correct Effect.fn shape is:
+const get = Effect.fn("PersistenceMemory.get")(function* (key: string) { ... });
+const transact = Effect.fn("AtomicKeyValueStore.transact")(function* (transaction: AtomicKeyValueStoreTransaction) { ... });
+There is an extra closing '});' after get and malformed indentation/braces in transact. Do not pipe the function itself.
+
+Then apply the exact test changes from my previous message (unique 32 through atomic.transact, 33 through atomic.transact with no mutation, successful Remove, stale overwrite conflict, negative TTL, Effect Array.map, safe error leak rendering). Run bun run fix and package check-types/test/build. Do not stop before these commands complete. Do not touch Upstash/ledger/plan/consumers or commit.
