@@ -3,7 +3,7 @@ document_type: architecture-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-quality-owner
-last_reviewed: 2026-09-09
+last_reviewed: 2026-10-01
 review_trigger: verification, lint, test, CI, proof, documentation, or skill-control change
 ---
 
@@ -119,6 +119,58 @@ fixtures also prove occurrence-count staleness. Root-config probes additionally
 prove both anti-slop plugins load and the TypeScript-only redeclaration policy
 does not weaken JavaScript. A clean repository lint alone is not sufficient
 rule proof, and a visitor-only test does not prove installed plugin behavior.
+
+## AI work history
+
+Entire records local Codex and Claude Code chats using
+[shared settings](../../.entire/settings.json),
+[Codex hooks](../../.codex/hooks.json), and
+[Claude Code hooks](../../.claude/settings.json). Install Entire CLI on each
+machine and run `entire enable --agent codex --telemetry=false --absolute-git-hook-path`
+then `entire agent add claude-code` from that clone. `entire doctor` checks the
+installed hooks; approve Codex hooks using `/hooks` if it reports missing
+approval records. Start fresh chats after installing hooks.
+
+The shared settings turn off Entire's anonymous usage reporting and link
+commits to chats automatically. A shared custom redaction rule removes
+standalone 32-character hexadecimal values, including the old credential
+format found inside quoted password-manager exports. This also masks benign
+identifiers with that shape. Built-in scanning alone did not catch those
+quoted credentials; verify redaction before publishing historical chats. Local Git hooks contain the installed binary's
+absolute path; that path is machine-specific and is not committed. Only
+`.codex/hooks.json` is tracked under `.codex`; Entire's local settings, logs,
+working transcripts and metadata stay ignored. Original agent transcripts
+remain in their owning local stores.
+
+The hosted repository is [Bundjil on Entire](https://entire.io/gh/crcorbett/bundjil).
+This clone keeps its direct GitHub `origin` and uses a separate `entire` remote
+on `aws-ap-southeast-2.entire.io`. The ignored local setting
+`strategy_options.checkpoint_push_remote` selects `entire`. To connect another
+clone, use `entire repo remote add entire /gh/crcorbett/bundjil --cluster aws-ap-southeast-2.entire.io`,
+then `entire enable --agent codex --telemetry=false --absolute-git-hook-path --checkpoint-push-remote entire`.
+This adds a remote without replacing an existing one. A normal commit
+and `git push entire HEAD` upload the chat checkpoints and send source changes
+through to GitHub. A push only to `origin`, or ending a chat, does not prove
+checkpoint publication. Verify hosted transcripts and the exact GitHub commit
+separately from `entire status`.
+
+The native Codex and Claude Code importers support `--dry-run`, `--path` and
+`--session`. Preview before importing; repeat previews after import to check
+that existing turns are skipped. Codex's default importer matches the current
+working folder and the last 30 days of file modification times. Older worktree
+and compressed history needs temporary, decompressed copies selected by the
+original repository identity; only the temporary initial working-folder field
+is adjusted to this checkout. Preserve originals, session IDs and timestamps.
+Imported chats are read-only and cannot be resumed. Ordinary Claude web and
+desktop chats have no native importer in Entire CLI 0.11.3.
+
+`entire disable` stops local recording without removing existing checkpoints.
+Reverting the shared settings and hook files restores the source configuration;
+remove only the added `entire` remote and its local checkpoint selection when
+undoing this clone's connection. Neither action removes already published
+history. Hosted deletion is a separate operation requiring fresh authority.
+The [dated setup receipt](../documentation-audit/ENTIRE-setup-2026-10-01.md)
+records this setup's checks and limits; it is not standing provider state.
 
 ## Oxlint change impact ledger
 

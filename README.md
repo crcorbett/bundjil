@@ -52,6 +52,19 @@ credentials, and production state are intentionally absent here. External
 systems are authoritative for their current state; dated repository evidence
 proves only the observation it records.
 
+## AI work history
+
+This repository is set up to record AI work history with
+[Entire](https://entire.io/gh/crcorbett/bundjil). The
+[Entire settings](./.entire/settings.json) have telemetry off. Codex recording
+is installed through [`.codex/hooks.json`](./.codex/hooks.json), and Claude Code
+recording is installed through [`.claude/settings.json`](./.claude/settings.json).
+
+Commits link automatically. The GitHub `origin` remote stays direct, and the
+separate `entire` remote publishes checkpoints through Sydney. See the
+[AI work history guide](./docs/architecture/testing-and-quality.md#ai-work-history)
+for setup, publication and backfill commands.
+
 ## Getting started
 
 ```bash
