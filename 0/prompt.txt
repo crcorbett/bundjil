@@ -1,0 +1,3 @@
+CAn we merge tje SPEC thread now? Or start the implementation in a clean thread?
+
+And the Eve runtime integration, how can we get this merge ready
