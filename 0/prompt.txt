@@ -1,0 +1,7 @@
+Read-only terminal audit pass 1 (architecture-boundaries) of the current uncommitted candidate in /Users/cooper/.codex/worktrees/d4b4e069-1303-427d-957e-756d18e049a9/bundjil.
+
+Follow AGENTS.md, the repository-local docs-maintainer and effect-client-wrapper guidance, /Users/cooper/.agents/skills/strict-effect-ts/SKILL.md, the active Effect runtime SPEC/task ledger/plan, and the terminal audit procedure. Inspect the actual diff and relevant callers. Use only Effect v4 guidance matching installed effect@4.0.0-beta.101; consult the local Effect clone at revision 1caab3cc30f626efbf15e59d74f539a487e5c85c where API semantics matter.
+
+Scope only pass 1: Effect contracts, Schema boundaries and brands, errors, Config, Layers, provider adapters, hostile ingress/egress, secret-negative diagnostics, streaming/proof boundaries, and supported exports. Look specifically for plausible false greens and recurrence gaps after ENP-FND-011 through ENP-FND-014. Do not edit files, run provider mutations, create credentials, deploy, commit, push, or change docs.
+
+Return findings first, ordered by severity, with exact absolute file:line references, a concrete failure scenario, earliest durable owner, and direct recurrence oracle. State explicitly if there are zero unresolved findings. Distinguish repository proof from live/provider proof.
