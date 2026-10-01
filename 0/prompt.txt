@@ -1,0 +1,3 @@
+A fresh direct MCP session again reached user_approval_required, but Executor’s authenticated Personal approval page discarded the controls after hydration and reported the execution unavailable. No GitHub write occurred. This matches [Executor PR #1317](https://github.com/UsefulSoftwareCo/executor/pull/1317).
+
+Help me understand what the problem is here, ELI5. Can we use a different tool call approval mode e.g. model approval?
