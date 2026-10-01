@@ -1,0 +1,16 @@
+Continue task 4 from updated parent state. Parent safely transferred the four 1Password values through the unlocked desktop app into Preview-only encrypted Vercel vars and remapped connected KV values into BUNDJIL_SENDBLUE_REPLAY_STORE_URL/TOKEN without output. All 12 required Sendblue vars now exist Preview-only; Production count is 0. Accepted commits were pushed.
+
+A clean Git deployment of exact commit 5061a86 (deployment REDACTED) failed in buildStep:
+- Vercel cloned commit 5061a86 and ran its Turbo optimized build scoped to @bundjil/agent.
+- eve build could not resolve @bundjil/eve-effect imported by agent/tools/workspace_status.ts because upstream workspace dist was not built.
+- Vercel also warned all Sendblue/KV env names are absent from turbo.json.
+- project settings: rootDirectory apps/agent, sourceFilesOutsideRootDirectory true, buildCommand null, framework null.
+
+Own the narrow source/provider correction required by task 4:
+1. Investigate the repo's existing Vercel/Turbo patterns and make the minimal durable fix so a clean Git deployment builds upstream @bundjil/eve-effect/@bundjil/core before the agent. Prefer proper Turbo/project build semantics over app-local manual build chains.
+2. Add all build-time Sendblue env names required by the accepted channel to the @bundjil/agent#build env allowlist in turbo.json. Include only vars actually needed; account for connected KV names only if the build consumes them directly.
+3. Verify from a clean workspace/no dist condition with the closest command to Vercel's optimized build. Run full verification.
+4. If a Vercel project buildCommand/framework setting is required, use executor-personal and report any approval execution id; do not mutate Production.
+5. Update no task status and do not commit. Return changed files, reasoning, and exact verification.
+
+Do not deploy yet; parent will review, audit, commit/push, and trigger the clean redeploy.
