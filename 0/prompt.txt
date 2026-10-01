@@ -1,0 +1,7 @@
+Apply these exact native compile fixes and rerun package check-types/build plus bun run fix:
+1. In upstash.layer.ts import the options type as UpstashPersistenceOptionsType and use that in the function signature, so public re-export names do not conflict. Keep imports before exports.
+2. In UpstashPersistenceClient use mutable Array<string> for eval keys/args (and del rest if required) so Redis structurally satisfies the interface.
+3. After Schema.decodeUnknownEffect(UpstashGetResponse), map null to undefined before returning get.
+4. Name the nested clear Effect.gen and use an explicit Effect.void/return branch acceptable to formatter.
+5. Replace the test's Effect Array.filter count with Array.reduce if the root rule still flags the method.
+Do only these fixes. Do not touch atomic placeholder, consumers, ledger/plan, or commit. Report command results.
