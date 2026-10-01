@@ -1,0 +1,1 @@
+Status check. If you have not started editing, report that immediately. If you have a patch, finish the narrow package-only slice and summarize changed files plus verification. Do not expand into apps/agent or apps/codex-proxy.
