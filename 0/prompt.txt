@@ -1,0 +1,12 @@
+Continue task 1. Implement only the atomic half of the internal Upstash adapter now.
+
+Requirements:
+- Add one static Lua transaction program in the internal module. Never generate source or expose it through package exports; a relative internal export for direct tests is allowed.
+- Add a named Effect.fn provider-serialization operation (directly testable via relative internal import) that accepts the already canonical-decoded transaction plus prefix and returns a Schema-derived internal command with physical keys and arguments.
+- Use Effect Array.dedupe/appendAll/map/flatMap or Effect.forEach, HashMap, Match, Option, Tuple as appropriate. No native Map/Set, native array map/flatMap/forEach, raw _tag, switch, unsafe lookup/casts, manual JSON, or helper chains.
+- The command has one deterministic KEYS entry per unique logical key across conditions+mutations. Build a logical-key -> 1-based index map without unsafe fallback. A small getKeyIndex Effect helper is admitted only because it is used for both condition and mutation serialization and owns the impossible-invariant error.
+- Prefix each physical key exactly once. Encode Absent/Equals and Set/Remove deterministically; Set without TTL uses an empty TTL argument and the static Lua SET clears prior expiry; TTL uses Duration.toMillis.
+- transact first calls decodeAtomicKeyValueStoreTransaction, then command serialization, then exactly one client.eval in Effect.tryPromise, then exactly one Schema decode of Schema.Literals([0, 1]), then Match to applied/conflict. One outer pipe maps any internal/provider/Schema error to safe AtomicKeyValueStoreError and adds the span. No key/cause/value/response retained.
+- Keep the internal client/factory and one-client Layer composition.
+- Run bun run fix, package check-types/test/build, and bun run check. Do not add provider tests yet, edit consumers/ledger/plan, or commit.
+Report changed symbols and all command results.
