@@ -1,0 +1,1 @@
+I want model mode, so that this can work in chat UI like email / iMessage etc which dont support native MCP elicitation. This is fine security-wise until the browser approach is working
