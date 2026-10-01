@@ -1,0 +1,1 @@
+The second 5-minute callback window is nearly expired and no callback has arrived. If it expires, restart once with BUNDJIL_CODEX_LOGIN_CALLBACK_TIMEOUT=30 minutes, keep the same private temp env and browser flow, and wait. Do not rotate again or open repeated windows after that. Report immediately if browser launch itself failed.
