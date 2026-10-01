@@ -1,0 +1,6 @@
+Fix the atomic/native adapter candidate based on the parent run:
+- Ultracite flags data-first Effect Array/Effect.forEach calls as native thisArg usage. Use pipe(collection, Array.map(...)), pipe(collection, Effect.forEach(...)), and pipe(logicalKeys, Array.map(...)) data-last forms throughout serialization.
+- Make clear's non-empty Effect.forEach branch return void with Effect.asVoid so it exactly satisfies KeyValueStore clear.
+- Replace result === 1 ternary with Match.value(result) and exhaustive literal branches.
+- Keep getKeyIndex as the admitted two-call serialization invariant helper.
+- Run bun run fix, package check-types/test/build, and bun run check. Do not add tests yet or change any other scope. Do not stop until commands complete; report exact outputs/findings.
