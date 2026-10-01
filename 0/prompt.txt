@@ -1,0 +1,16 @@
+Parent review found required fixes. Keep the same write scope and do not commit/push or touch Vercel/task audit fields.
+
+1. Later checkpoint schemas currently spread baseSnapshotFields and therefore require inventory.productionAgentActivation/proxyActivation === "absent" even after provisioning/acceptance. Split immutable common facts from stage-specific Production state/inventory. Model truthful stage-specific states (before: both absent; proxy-provisioned: proxy provisioned and agent absent; proxy-accepted-agent-configured: proxy accepted and agent configured; rollback-ready/final: both accepted), or equivalently use exact stage-specific inventory schemas. Tests must catch contradictory state.
+2. Add the exact personal Vercel account/team ID to both project contracts: REDACTED. Scope string alone is insufficient.
+3. Tighten ProductionProxyUrl: https only; expected hostname/path; no port, username, password, query, or fragment. Add rejection tests.
+4. Correlate immutable evidence in preflightProductionPromotion:
+   - acceptedProxy.sourceSha must equal source.pushedSha.
+   - acceptedAgent.sourceSha must equal source.pushedSha.
+   - rollback.proxy.current deployment/config must equal acceptedProxy deployment/config.
+   - rollback.agent.current deployment/config must equal acceptedAgent deployment/config.
+   Keep previous deployment distinct but do not require a different config fingerprint because a no-op rollback-candidate deployment may share config.
+5. README says bearer is write-only sensitive, but expectedProxyVariables currently permits encrypted. Require Vercel sensitive for both agent and proxy internal bearers. Add plain/encrypted downgrade tests.
+6. Tests must cover mismatched source, mismatched current rollback deployment/config, wrong account ID, contradictory stage state, http/userinfo/query/fragment URL rejection, in addition to existing cases.
+7. Rerun focused checks, direct CLI fixture, full verification, jq, diff check. Update worker evidence counts if tests increase.
+
+Preserve flat Effect flow, Schema JSON, and no helper sprawl.
