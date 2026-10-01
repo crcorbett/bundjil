@@ -1,0 +1,1 @@
+Retry the parity test against the actual file. Open the current import block and end of file first, then append rather than relying on assumed context. Add imports exactly where formatter currently expects. Do not report until the parity test exists and package test/check-types complete.
