@@ -1,0 +1,3 @@
+<subagent_notification>
+{"agent_path":"019f6295-0244-7ff0-bcf2-90bad8ba53fa","status":{"completed":"Updated only [executor-mcp-connection.md](/Users/cooper/Projects/bundjil/docs/exec-plans/active/executor-mcp-connection.md:55).\n\nIt now records sanitized current Eve/Executor contract evidence, the GitHub PR-triage candidate inventory, explicit policy classifications, task-2 module/helper budget, and the exact delegation prompt. Executor core authority-management operations are explicitly excluded.\n\nVerification passed: `jq empty`, `bun run check`, `git diff --check`, whitespace scan, and scoped secret/protected-URL scan. No browser approval page or state-changing operation was run. Parent audits and ledger status remain unchanged.\n\n"}}
+</subagent_notification>
