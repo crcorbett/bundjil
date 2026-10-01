@@ -1,0 +1,6 @@
+Additional parent consistency pass found stale tense only in docs/exec-plans/active/sendblue-eve-channel.md. Please correct:
+- Provider Discovery: “No receive... is currently configured” must say “At discovery time...” because one receive webhook now exists.
+- Provider Discovery first bypass bullet must be historical, stating it was treated as unknown and later replaced before registration, not “will be replaced”.
+- Preview Build Log final bullet must be historical (“was used”) rather than “will be used”.
+- Audit Log implement-sendblue-eve-channel phrase “bounded claim release” should be “owner-fenced claim release”.
+Do not alter task completion or existing three passes. Run bun run check and git diff --check. Parent will record this as an additional fourth consistency pass.
