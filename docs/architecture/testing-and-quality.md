@@ -132,7 +132,11 @@ installed hooks; approve Codex hooks using `/hooks` if it reports missing
 approval records. Start fresh chats after installing hooks.
 
 The shared settings turn off Entire's anonymous usage reporting and link
-commits to chats automatically. Local Git hooks contain the installed binary's
+commits to chats automatically. A shared custom redaction rule removes
+standalone 32-character hexadecimal values, including the old credential
+format found inside quoted password-manager exports. This also masks benign
+identifiers with that shape. Built-in scanning alone did not catch those
+quoted credentials; verify redaction before publishing historical chats. Local Git hooks contain the installed binary's
 absolute path; that path is machine-specific and is not committed. Only
 `.codex/hooks.json` is tracked under `.codex`; Entire's local settings, logs,
 working transcripts and metadata stay ignored. Original agent transcripts
@@ -141,7 +145,10 @@ remain in their owning local stores.
 The hosted repository is [Bundjil on Entire](https://entire.io/gh/crcorbett/bundjil).
 This clone keeps its direct GitHub `origin` and uses a separate `entire` remote
 on `aws-ap-southeast-2.entire.io`. The ignored local setting
-`strategy_options.checkpoint_push_remote` selects `entire`. A normal commit
+`strategy_options.checkpoint_push_remote` selects `entire`. To connect another
+clone, use `entire repo remote add entire /gh/crcorbett/bundjil --cluster aws-ap-southeast-2.entire.io`,
+then `entire enable --agent codex --telemetry=false --absolute-git-hook-path --checkpoint-push-remote entire`.
+This adds a remote without replacing an existing one. A normal commit
 and `git push entire HEAD` upload the chat checkpoints and send source changes
 through to GitHub. A push only to `origin`, or ending a chat, does not prove
 checkpoint publication. Verify hosted transcripts and the exact GitHub commit

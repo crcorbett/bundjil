@@ -7,5 +7,10 @@
       "type": "git-refs"
     }
   },
-  "commit_linking": "always"
+  "commit_linking": "always",
+  "redaction": {
+    "custom_redactions": {
+      "legacy_32_hex_credential": "(?i)\\b[0-9a-f]{32}\\b"
+    }
+  }
 }

@@ -64,8 +64,46 @@ before the successful repeat. Earlier Codex attempts with `gpt-6.1-sol` and
 `gpt-5.4` were rejected by the CLI login and are not recording/publication proof;
 the accepted fresh session used `gpt-5.5`.
 
-Final import counts, hosted links and exact publication identities are recorded
-below after hosted verification.
+## Hosted publication and redaction correction
+
+The first normal commit is `2b7aa8f27ae73c1e1be91406980304529bf24fdd`,
+linked automatically to checkpoint `01M3TQPZ0SEWF94B3SQD6XDZEE` containing
+the two fresh sessions. A normal push through Sydney published that checkpoint
+and the source branch. Independent GitHub readback matched the exact SHA.
+Hosted session pages display the actual prompts, replies and tool calls:
+
+- [Fresh Codex session](https://entire.io/gh/crcorbett/bundjil/session/01a0f577-1693-7a63-bf0d-093373441474)
+- [Fresh Claude Code session](https://entire.io/gh/crcorbett/bundjil/session/6c8144af-30f4-4905-b205-6db5625e0c50)
+
+The native import wrote 1,291 turns from 119 scanned transcripts. Of these,
+115 have importable user turns; four contain none. A normal second push
+uploaded all 1,291 imported checkpoint refs. A repeat native preview reported zero new turns and all 1,291 already imported. The imported working copy was verified against each original:
+all 119 transcript bodies matched their original snapshots, with only the
+temporary initial working folder changed; one original had newer appended
+messages. Those newer messages were not part of this snapshot.
+
+Hosted inspection then found two old credential values inside a quoted
+password-manager export. Entire's default scanner missed their nested field
+shape. No credential value is reproduced in this receipt. The backfill cannot
+be accepted as safe publication at that point. A shared custom redaction rule
+now removes all standalone 32-character hexadecimal values, and temporary
+copies are explicitly scrubbed before a replacement import. Originals remain
+untouched. This masks benign identifiers with the same shape as well.
+
+Removing the task-created hosted imports was rejected by automatic approval
+review because that broad remote deletion needed explicit user approval. The
+local imported refs were removed; the fresh-session checkpoint and source
+branch were preserved. Hosted replacement is held pending that exact approval.
+The old credentials' current validity is unknown. Any provider credential
+rotation is a separate action requiring its own approval.
+
+The corrected temporary snapshot masks 4,579 standalone 32-character
+hexadecimal values across 47 transcripts; all 119 copies pass the absence
+check. A separate local native-import fixture confirms Entire removes a fake
+nested credential using the shared rule. That fixture was never published.
+The full `bun run verification` and `entire doctor` pass on the corrected
+configuration. Hosted replacement remains held for the exact deletion
+approval; it must not be described as complete or safely redacted yet.
 
 ## Rollback and non-claims
 
