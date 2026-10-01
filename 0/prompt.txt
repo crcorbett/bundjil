@@ -1,0 +1,1 @@
+Please provide a concise progress/status update at your next stopping point, including any failing test or API issue. Keep work strictly within Task 3.
