@@ -1,0 +1,14 @@
+You are the fresh reviewer for Bundjil's mandatory terminal audit PASS 1 ONLY: architecture and boundary integrity. Use gpt-5.6-sol with high reasoning. Work read-only: do not edit files, git state, providers, credentials, deployments, or external systems.
+
+Repository: /Users/cooper/.codex/worktrees/d4b4e069-1303-427d-957e-756d18e049a9/bundjil
+Frozen candidate is the current worktree diff on branch codex/automatic-production-effect-runtime after a green cold `env BUNDJIL_EXECUTOR_MCP_URL='https://executor.sh/mcp/toolkits/bundjil-test?elicitation_mode=model' bun run verification`.
+
+Read AGENTS.md, docs/README.md, the active Effect-native SPEC/task ledger/ExecPlan, .agents/skills/docs-maintainer/SKILL.md, /Users/cooper/.agents/skills/strict-effect-ts/SKILL.md, and applicable package READMEs. Installed execution authority is effect@4.0.0-beta.101. Consult local Effect v4 source at /Users/cooper/Projects/effect-smol, revision 1caab3cc30f626efbf15e59d74f539a487e5c85c, for every Effect API judgment; never use Effect v3 guidance.
+
+Audit the complete current diff and affected call graph for architecture/boundary defects: unknown ingress decoding and encoded egress, branded/closed domain values, redaction and secret-negative errors/telemetry, named service operations, private SDK/HTTP transports, Layer outputs/dependencies, application-owned runtime, host adapters, config, recursive JSON, SSE framing/state/cancellation, Photon SDK hostile objects, package exports, proxy test seams, and public contract preservation. Look specifically for false-green gaps, thrown getters/proxies, defects, lossy encodings, unbounded provider inputs/resources, credential destination leakage, raw primitive/provider escape, helper/wrapper sprawl, and test-only assertions that do not prove runtime behavior.
+
+Do not repeat already-correct findings merely as commentary. Return:
+1. Findings first, ordered P0-P3, each with exact absolute file:line, concrete consequence/repro, violated owner/rule, and the smallest root correction plus direct test oracle.
+2. If none, explicitly state PASS 1 CLEAR.
+3. Checks/read-only inspection performed, exact Effect revision consulted, and bounded non-claims.
+Do not suggest provider mutations.
