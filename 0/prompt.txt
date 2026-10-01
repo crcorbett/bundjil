@@ -1,0 +1,15 @@
+Parent review rejects the current parity test because eval only returns scripted outcomes; it does not interpret the command, mutate state, or prove native readback.
+
+Replace that parity mock with a real test-owned positional-protocol interpreter:
+- parse condition count/types/key indexes/expected values from args;
+- evaluate against test-owned state;
+- on conflict return 0 with no mutations;
+- parse mutation count and apply Set/Remove to a copied state, then commit and return 1;
+- TTL may be parsed/ignored for this non-expiry sequence, but consume its arg correctly;
+- no JSON, unsafe casts, non-null assertions, or production exports. Test-owned Map/loops are acceptable for provider simulation if all indexed values are decoded with Effect Schema rather than asserted.
+- client get/set/del must use the same state.
+Then compare the sequence outcomes with PersistenceMemory and assert final native readback for owner, second, and side are all absent; assert every script is the static script using data-last Effect Array.every.
+
+Also change the 33-entry invalid test to call atomic.transact directly with the 33-entry typed transaction (as the memory test does), not only Schema.decodeUnknownEffect, and keep evalCalls zero.
+
+Run bun run fix, package check-types/test/build, bun run check. Do not report until these commands complete.
