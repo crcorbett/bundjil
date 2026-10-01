@@ -1,0 +1,1 @@
+Report your exact current status immediately. Production proxy variables now read back with the expected names/types. If trusted-local OAuth browser action is needed, provide the safe action now; otherwise continue remaining profile/proof/preflight/verification steps. Do not expose values.
