@@ -1,0 +1,1 @@
+C continue the diagnosis task thread. It has permission to use [@Computer Use](plugin://computer-use@openai-bundled/) to control messages
