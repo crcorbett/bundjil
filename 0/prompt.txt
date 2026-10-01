@@ -1,0 +1,61 @@
+Implement exactly one task from the Bundjil task ledger: `prove-codex-auth-runtime-path`.
+
+You are not alone in the codebase. Do not revert edits made by others. Work with the current files and keep your changes narrowly scoped.
+
+Mandatory implementation prompt block:
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,
+HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit,
+Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
+code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
+RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded
+identifiers from the owning package. Do not define standalone DTO mirrors or
+duplicate fields such as id: string, slug: string, status, or post metadata
+outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers,
+mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
+or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit
+primitive or owning service contract should carry the behavior.
+
+For UI work, compose stable visible structure as high as practical, usually in
+the route or nearest page-level parent. Use the primitive -> composite ->
+layout -> route chain for visible structure. Let leaves own the data,
+search/page params, commands, atoms, skeletons, and fallbacks for the exact
+fragment or action they render. Do not add nested feature wrappers merely to
+shorten route JSX, and do not prop-drill query results, selected ids, loading
+flags, command callbacks, or derived option lists when a leaf can own the
+narrow value.
+
+For reusable URL state, use schema-backed field URL atoms for search params and
+read-only page-param atoms for route identity. Keep TanStack Router as the app
+URL writer, and do not import app route files, `routeTree.gen`,
+`Route.useSearch()`, or `Route.useParams()` into reusable packages.
+
+Task object:
+- id: prove-codex-auth-runtime-path
+- title: Prove the direct Codex Responses subscription path
+- description: Run an opt-in local proof that Codex subscription auth can produce a model result through the direct Codex Responses backend and a private Bundjil proxy without exposing secrets.
+- mandatory verification: flat meaningful Effect.gen programs; tagged errors handled with catchTag/catchTags/mapError; canonical schemas from @bundjil/codex-oauth; no unsafe casts/DTO mirrors/manual object readers/trivial wrappers; OAuth refresh, Codex Responses request mapping, stream mapping, private proxy auth, no API-key fallback, and failure mapping tested without network where possible; live proof logs contain no tokens/codes/raw OAuth/private prompts/full bodies; provider errors mapped to safe tagged errors; `bun run --filter @bundjil/codex-oauth test`; `bun run check-types`.
+- completion criteria: a sanitized live proof records the direct Codex Responses runtime path OR an explicit safe blocker is recorded; spec and package README updated with result; failure to prove support blocks Eve replacement rather than adding a fallback fake.
+
+Relevant files:
+- `/Users/cooper/Projects/bundjil/docs/product-specs/codex-oauth-eve-model-provider.md`
+- `/Users/cooper/Projects/bundjil/docs/product-specs/codex-oauth-eve-model-provider.tasks.json`
+- `/Users/cooper/Projects/bundjil/docs/exec-plans/active/codex-oauth-eve-model-provider.md`
+- `/Users/cooper/Projects/bundjil/packages/codex-oauth/src/**`
+- `/Users/cooper/Projects/bundjil/packages/codex-oauth/test/**`
+- `/Users/cooper/Projects/bundjil/packages/codex-oauth/README.md`
+- architecture docs in `/Users/cooper/Projects/bundjil/docs/architecture/*.md`
+
+Scope:
+- Implement safe, opt-in proof scaffolding in `packages/codex-oauth`; do not touch `apps/agent` or create `apps/codex-proxy` in this task.
+- It is acceptable to add schemas/service tags for Codex Responses request/stream proof if needed, but keep full proxy/provider implementation for later tasks.
+- Add tests with mocked network/fetch behavior. Do not require live credentials for tests.
+- Add an opt-in proof command/script if practical, but it must redact output and skip cleanly when credentials are missing.
+- Do not read or use `OPENAI_API_KEY` for subscription mode.
+- Do not print or commit token values.
+
+Run verification gates you can reasonably run, including `bun run --filter @bundjil/codex-oauth test` and `bun run check-types`. Report changed files and evidence. If a live Codex proof cannot be performed without user-controlled OAuth/token input, implement the opt-in proof path and record a safe blocker instead of faking success.
