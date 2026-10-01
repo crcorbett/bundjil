@@ -1,0 +1,1 @@
+Do we have Alchemy properly set up to handle the production environment with Verselle? Are we using Alchemy correctly according to the Alchemy docs and how we've set up alchemy in the ~/projects/site repo.
