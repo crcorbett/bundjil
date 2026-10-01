@@ -1,0 +1,1 @@
+Stop work immediately and do not make further edits. The parent agent is taking over the task because this agent has not returned. Provide a final status only if possible.
