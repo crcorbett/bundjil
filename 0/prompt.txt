@@ -1,0 +1,8 @@
+Early parent security review findings to address before completion:
+1. Do not implement constant-time secret equality in JavaScript. Use the platform primitive (Node/Vercel timingSafeEqual) after explicit length equality, and remove the non-null assertion.
+2. Use Effect Encoding.encodeHex for digest bytes rather than Array.from/manual padStart. Keep keyed digest only if it remains a genuine reused crypto boundary; do not expose a generic utility surface.
+3. SendblueReplayClaimResult must be a discriminated Schema union: claimed requires claim; duplicate forbids it. The current optional-claim struct permits invalid states.
+4. Replay transitions must not silently succeed on stale/missing/wrong-owner claims. Memory and Upstash must map CAS result 0 to a typed safe failure or explicit canonical conflict result, consistently.
+5. Claim IDs must be deterministic/testable through an Effect Crypto (or equally injectable) service, not globalThis.crypto.randomUUID directly.
+6. Keep tests proving these exact properties, including stale transition failure and no leaked Redis/request values.
+Continue working and run gates after corrections.
