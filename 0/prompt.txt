@@ -1,0 +1,1 @@
+tools.vercel_api.user.personalvercelapi - this is fine, if you look at getTeams and getProjects they're only my personal account projects. My Vercel account is linked to both coopercorbett@gmail.com and cooper.corbett@tilt.legal (with tilt legal as the primary contact address) but the actual access is only to my personal vercel
