@@ -1,0 +1,1 @@
+[$development-workflows:improve-codebase-architecture](/Users/cooper/.codex/plugins/cache/commonplace/development-workflows/0.4.0/skills/improve-codebase-architecture/SKILL.md)
