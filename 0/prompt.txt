@@ -1,0 +1,54 @@
+Implement exactly task implement-sendblue-security-identity-replay from /Users/cooper/Projects/bundjil/docs/product-specs/sendblue-eve-channel.tasks.json.
+
+You own only:
+- /Users/cooper/Projects/bundjil/apps/agent/agent/lib/sendblue/**
+- /Users/cooper/Projects/bundjil/apps/agent/test/sendblue-security-*.test.ts
+- /Users/cooper/Projects/bundjil/apps/agent/test/sendblue-replay-*.test.ts
+- /Users/cooper/Projects/bundjil/apps/agent/package.json and /Users/cooper/Projects/bundjil/bun.lock only if a dependency is genuinely required
+
+Do not edit specs, ledgers, execution plans, READMEs, Vercel state, Sendblue account, or 1Password. You are not alone in the codebase; do not revert other changes and preserve the accepted task-1 implementation.
+
+Read:
+- /Users/cooper/Projects/bundjil/AGENTS.md
+- /Users/cooper/Projects/bundjil/docs/product-specs/sendblue-eve-channel.md
+- /Users/cooper/Projects/bundjil/docs/product-specs/sendblue-eve-channel.tasks.json
+- /Users/cooper/Projects/bundjil/docs/architecture/effect-patterns.md
+- /Users/cooper/Projects/bundjil/docs/architecture/repo-structure.md
+- /Users/cooper/Projects/bundjil/docs/architecture/testing-and-quality.md
+- existing task-1 Sendblue modules
+- /Users/cooper/Projects/bundjil/packages/codex-oauth/src/upstash-key-value-store.layer.ts as a reference only; do not create a shared abstraction or import package-private behavior.
+
+Implement:
+- SendblueWebhookVerifier as a named Effect service using redacted configured secret and constant-time byte comparison of sb-signing-secret before any body decode.
+- SendblueIdentityDirectory mapping decoded E.164 senders to stable non-phone principals from canonical Config.
+- SendblueSessionRouter deriving deterministic opaque keyed digests from sender + configured line without exposing raw numbers.
+- SendblueReplayStore with canonical Schema contracts for atomic claim/complete/retryable/uncertain behavior, deterministic concurrency-correct memory Layer, and Upstash live Layer using one atomic SET key value NX EX claim operation (not get-then-set).
+- Inbound handle and outbound Eve-coordinate key contracts with opaque values/status metadata only.
+- Focused verifier, identity/routing, concurrency/transition, and Upstash command-shape/leak tests. No real credentials or provider calls.
+
+Mandatory implementation rules:
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the code is fallible, async, runtime-owned, collection-heavy, or crosses a package, RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded identifiers from the owning package. Do not define standalone DTO mirrors or duplicate fields such as id: string, slug: string, status, or post metadata outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers, mappers, transformers, switch/case branches, instanceof checks, unsafe casts, or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit primitive or owning service contract should carry the behavior.
+
+For UI work, use the primitive -> composite -> layout -> route chain. Let leaves own the data, commands, loading, empty, error, retry, skeleton, and fallback behavior for the exact fragment they render. Do not add nested feature wrappers merely to shorten route JSX, and do not prop-drill query results, selected ids, loading flags, command callbacks, or derived option lists when a leaf can own the narrow value.
+
+For reusable URL state, use schema-owned search and route-identity contracts. Keep the app router as the URL writer, and do not import app route modules into reusable packages.
+
+Security and quality:
+- No raw causes in errors if they may retain headers, secret values, phone numbers, content, or Redis bodies.
+- No process-local Map/Set replay implementation; memory tests must model atomic semantics with Effect synchronization primitives and Clock.
+- No structural assertions, manual JSON.parse/stringify, direct process.env, raw fetch, or generic helpers.
+- Keep primary operations flat and named; typed error translation belongs in .pipe(...).
+
+Verification:
+- focused new tests
+- bun run --filter @bundjil/agent check-types
+- bun run --filter @bundjil/agent test
+- bun run --filter @bundjil/agent build
+- bun run verification
+- git diff --check
+
+Edit files directly. Report changed files and command evidence. Do not commit.
