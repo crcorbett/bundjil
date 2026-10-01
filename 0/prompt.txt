@@ -1,0 +1,67 @@
+Implement exactly Task 5, `reconcile-persistence-documentation-and-final-audit`, from /Users/cooper/Projects/bundjil/docs/product-specs/effect-persistence.tasks.json against /Users/cooper/Projects/bundjil/docs/product-specs/effect-persistence.md. You own documentation reconciliation and task/plan status files for this task. Edit files directly in /Users/cooper/Projects/bundjil. You are not alone in the codebase: do not revert others' work; accommodate current main, which includes committed Task 4 evidence at 444e82f. Do not commit or push. Do not mutate Vercel, Sendblue, Executor, OAuth, storage, or any provider. No TSX/React/route/hook/visible-text implementation changes are allowed.
+
+Read first:
+- docs/product-specs/effect-persistence.md
+- docs/product-specs/effect-persistence.tasks.json
+- docs/exec-plans/active/effect-persistence.md
+- AGENTS.md
+- ARCHITECTURE.md
+- README.md
+- docs/architecture/effect-patterns.md
+- docs/architecture/repo-structure.md
+- docs/architecture/testing-and-quality.md
+- docs/architecture/eve-agent.md
+- docs/architecture/frontend-composition.md
+- packages/effect-persistence/README.md
+- packages/codex-oauth/README.md
+- apps/codex-proxy/README.md
+- apps/agent/README.md
+
+Task requirements:
+- reconcile root README/ARCHITECTURE, Effect/repo/testing guides, package/app READMEs, Eve architecture, SPEC/task ledger, and active execution plan wherever current ownership claims are stale
+- preserve historical evidence and mark superseded claims rather than rewriting history
+- document native KeyValueStore versus AtomicKeyValueStore, config ownership, provider subpaths, physical-key compatibility, replay versus conversation storage, privacy, monitoring, deployment proof, and rollback
+- run a symbol-level helper-admission ledger over every new non-test abstraction from this SPEC; remove/inline only if a concrete unresolved implementation defect is found and first record it in the plan. Documentation-only correction is preferred.
+- stale scans: old Codex-owned Upstash paths, direct agent SDK ownership, KeyValueStore.modify coordination, old dependency locations, pending rollout language
+- mark SPEC implemented/complete, Task 5 completed, active plan completed, and fill three audit evidence slots as subagent review input only. Parent will perform and record acceptance after review.
+- archive/move the active plan only if existing repo convention clearly requires it; otherwise leave it completed for parent handling.
+- run task JSON parse, focused docs checks, bun run fix, bun run check, bun run knip, bun run verification with mode-0600 .local/secrets/executor-production.env loaded, bun run build with the same env, git diff --check, and report deliberately skipped checks.
+- report every changed file and concrete verification evidence. Do not commit.
+
+Mandatory implementation rules:
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,
+HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit,
+Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
+code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
+RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded
+identifiers from the owning package. Do not define standalone DTO mirrors or
+duplicate fields such as id: string, slug: string, status, or post metadata
+outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers,
+mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
+or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit
+primitive or owning service contract should carry the behavior.
+
+For UI work, use the primitive -> composite -> layout -> route chain. Let
+leaves own the data, commands, loading, empty, error, retry, skeleton, and
+fallback behavior for the exact fragment they render. Do not add nested
+feature wrappers merely to shorten route JSX, and do not prop-drill query
+results, selected ids, loading flags, command callbacks, or derived option
+lists when a leaf can own the narrow value.
+
+For reusable URL state, use schema-owned search and route-identity contracts.
+Keep the app router as the URL writer, and do not import app route modules into
+reusable packages.
+
+Final review bar:
+- no helper sprawl
+- flat meaningful Effect.gen/Effect.fn operation flows
+- canonical Schema/types/tagged errors/Config.Redacted/Layers
+- no unsafe casts, DTO mirrors, manual readers, raw JSON/direct env, suppressions, generic helper modules, hidden expected failures
+- no Object.values/entries or switch where Effect primitives fit
+- no frontend file changes; Browser screenshots are not applicable only if this invariant holds
+- Effect language-service hints clean
+- three final audit passes: ownership/call graph; implementation quality/helper admission; verification/docs/rollback coverage. A found gap requires correction and another pass.
