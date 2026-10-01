@@ -1,0 +1,3 @@
+<subagent_notification>
+{"agent_path":"019f607d-1139-7b93-99b6-913b9bf7152c","status":{"completed":"Stopped. No Production deployment was created.\n\nExact blocker: the staged-gate command was invoked with Bun’s `--silent` in the wrong position:\n\n```sh\nBUNDJIL_PRODUCTION_PREFLIGHT_SNAPSHOT=\"$snapshot\" \\\nbun run --cwd apps/agent preflight:production --silent | jq ...\n```\n\nIt emitted the Bun script banner:\n\n```text\n$ bun scripts/production-preflight.ts --silent\n```\n\nbefore the JSON expected by `jq`, causing the gate pipeline to fail before `vercel --prod` ran. No 1Password authentication blocker occurred; the existing authenticated `op` session was used without printing secrets."}}
+</subagent_notification>
