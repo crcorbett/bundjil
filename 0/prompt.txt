@@ -1,0 +1,1 @@
+Retry against the actual current formatted file. Open it first. Append the two tests at the end instead of patching imports by assumed context; add any imports based on the actual first lines. Implement exactly the invalid-no-eval test and rejected-eval-safe-error extension from the previous message. Run package test/check-types.
