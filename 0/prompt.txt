@@ -1,0 +1,1 @@
+Please report current progress, remaining blockers, and verification status. If implementation is complete, stop and return changed files and evidence now.
