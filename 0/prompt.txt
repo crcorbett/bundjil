@@ -1,0 +1,63 @@
+Continue the SAME task implement-local-subscription-login-broker. You own the task's package login-broker implementation and may edit all files already touched plus the canonical fenced-commit files/tests needed for correctness. You are not alone in the codebase: preserve all existing/user/parent edits and do not revert unrelated changes.
+
+Parent audit found unresolved blockers. Fix all before reporting:
+
+1. Legacy -> subscription fenced replacement bug. Current login calls initialWrite for an existing access-token-import profile, which necessarily conflicts. Add a canonical CodexOAuthProfileCommit.replaceLegacy (or equally explicit named operation) with atomic semantics:
+- only succeeds when encrypted profile exists as legacy/access-token-import and no revision is installed;
+- first concurrent migration wins and installs the new subscription revision;
+- delayed/concurrent migration cannot overwrite the winner.
+Implement across canonical schemas/operation literals/input, service interface/accessor/unsupported layer, memory layer, Upstash Lua/adapter, exports as needed. Add memory and mocked Upstash tests plus login integration tests proving legacy -> subscription success and concurrent winner preservation. Do not weaken initialWrite or generic replace fencing.
+
+2. Effect Platform callback server. Replace raw Bun.serve in loopback-callback.service.ts. The spec mandates Effect Platform HTTP ownership. Use @effect/platform-bun BunHttpServer.make (scoped) and effect/unstable/http HttpServer.serveEffect with HttpServerRequest and HttpServerResponse. Bind only 127.0.0.1, preserve first-party port fallback 1455 then 1457, do not enable request logger, and ensure release on success, denial, timeout, interruption, state mismatch, exchange failure, and browser failure. Map only bind/listen conflicts to portConflict; don't swallow unrelated defects. Keep Deferred completion and focused finalizer tests. Inspect .local/references/effect-v4/packages/platform-bun/src/BunHttpServer.ts and effect HttpServer APIs.
+
+3. Expiry validity. After deriving access-JWT expiry, reject a token whose expiresAtEpochMillis is <= current Clock time rather than returning sanitized "valid". Add focused expired-token test. Keep no expires_in assumption.
+
+4. Narrow OAuth error responses. The spec requires successful AND error responses use narrow Effect Schemas. Add an owning provider error response schema and decode non-2xx bodies without logging or surfacing provider payload values. Map to stable sanitized CodexSubscriptionAuthError classification/message. Test malformed and schema-valid non-2xx error responses for exchange and/or refresh. Do not use raw JSON.parse/stringify.
+
+5. CLI type safety. packages/codex-oauth/tsconfig.json must include scripts/**/*.ts so check-types actually compiles login-subscription.ts. Build may remain source-only via build config. Fix any revealed errors.
+
+6. Tighten Redacted types to canonical schema-derived types where available (state, authorization URL, ID token, etc.), avoiding unparameterized Redacted.Redacted in public contracts.
+
+7. Re-audit callback port selection so only expected bind conflicts fall through to the next approved port. Do not Effect.option arbitrary failures.
+
+8. Preserve existing protocol-authority fields exactly and ensure ID token is not persisted or emitted. Automated verification remains mock-only; do not launch the real browser.
+
+Mandatory implementation block:
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,
+HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit,
+Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
+code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
+RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded
+identifiers from the owning package. Do not define standalone DTO mirrors or
+duplicate fields such as id: string, slug: string, status, or post metadata
+outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers,
+mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
+or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit
+primitive or owning service contract should carry the behavior.
+
+For UI work, compose stable visible structure as high as practical, usually in
+the route or nearest page-level parent. Use the primitive -> composite ->
+layout -> route chain for visible structure. Let leaves own the data,
+search/page params, commands, atoms, skeletons, and fallbacks for the exact
+fragment or action they render. Do not add nested feature wrappers merely to
+shorten route JSX, and do not prop-drill query results, selected ids, loading
+flags, command callbacks, or derived option lists when a leaf can own the
+narrow value.
+
+For reusable URL state, use schema-backed field URL atoms for search params and
+read-only page-param atoms for route identity. Keep TanStack Router as the app
+URL writer, and do not import app route files, routeTree.gen,
+Route.useSearch(), or Route.useParams() into reusable packages.
+
+Verification gates:
+- bun run --filter @bundjil/codex-oauth check-types
+- bun run --filter @bundjil/codex-oauth test
+- bun run --filter @bundjil/codex-oauth build
+- bun run verification
+- git diff --check
+- stale scans for Bun.serve in loopback, JSON.parse/stringify, process.env in package src/scripts, unsafe casts.
+Report exact files changed, test counts, and sanitized evidence. Do not modify task status/audit evidence; parent owns acceptance.
