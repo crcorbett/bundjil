@@ -1,0 +1,1 @@
+Report current exact blocker immediately. If the preflight snapshot/gate has passed, state that and proceed directly to bearer rotation and `vercel deploy --prod` from the repo root with the proxy project linkage. If it has not passed, give the sanitized failing command/output. No secret values.
