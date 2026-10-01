@@ -1,0 +1,9 @@
+Add the final required atomic test: stateful mocked-Upstash parity with PersistenceMemory. Build a test-owned client that synchronously interprets the documented positional eval protocol against test-owned state (no JSON, no unsafe casts). Run the same sequence through a memory Layer and mocked Upstash Layer and compare outcome arrays plus native readback:
+- absent owner -> set current applied
+- duplicate absent -> side mutation conflict and side absent
+- equals current -> set newer plus second key applied
+- stale equals current -> overwrite conflict
+- stale equals current -> remove conflict
+- equals newer -> remove plus remove second key applied
+- final owner/second keys absent.
+Also assert the mock observed only the one static script. Use Effect Schema/Array/Match where practical. Run bun run fix, package test/check-types/build, bun run check. Do not change production unless parity exposes a defect.
