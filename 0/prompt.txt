@@ -1,0 +1,7 @@
+You are the sole sequential implementation subagent for Task 4: implement-live-oauth-client-and-proxy-routes in docs/product-specs/codex-hosted-live-oauth-storage.tasks.json. You are not alone in the codebase; do not revert any changes.
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun/Platform Command, and ManagedRuntime at real runtime boundaries. Reuse package-owned schemas, errors, identifiers, services, and layers. Do not create standalone DTOs, unsafe casts, manual codecs, or trivial helpers.
+
+Task 1 concluded the current CLI ChatGPT account flow uses a localhost callback and does not establish a registered Vercel redirect. The parent has just rechecked current local CLI status/version and official OpenAI developer sources; no supported hosted grant was found.
+
+Your exact task is a documentation-only revalidation. Inspect current local CLI/source and official OpenAI docs if useful. Do not implement or modify OAuth routes, clients, proxy routes, Vercel settings, apps, encryption, or storage. If you cannot prove a supported hosted account-link grant with a Vercel redirect, update only the spec/task ledger/active plan with sanitized current evidence and mark Task 4 explicitly blocked/deferred. Run jq validation, git diff --check, and bun run verification when practical. Do not commit. Report the evidence and precise unblock condition.
