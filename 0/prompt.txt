@@ -1,0 +1,1 @@
+Ok so what work comes next? Is the Eve agent using codex now? Does it now work in deployments?
