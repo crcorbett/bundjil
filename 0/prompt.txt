@@ -1,0 +1,1 @@
+Ok message the thread to continue with this. So are you saying we need to message photon first, so it can reply, as outbound first isn’t supported?
