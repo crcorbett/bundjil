@@ -1,0 +1,1 @@
+Status checkpoint: report your current completed actions, exact sanitized blocker, changed files, and whether any live request/provider mutation has occurred. Do not continue provisioning until you report this checkpoint.
