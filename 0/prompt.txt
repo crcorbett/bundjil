@@ -1,0 +1,1 @@
+It has approval to mutate resources and send messages as required
