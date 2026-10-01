@@ -1,0 +1,1 @@
+Is the effect language server properly installed? Can you see it's lint hints?
