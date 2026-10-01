@@ -1,0 +1,38 @@
+# AGENTS.md instructions for /Users/cooper/Projects/bundjil
+
+<INSTRUCTIONS>
+# Repo Atlas
+
+Start here for repo conventions.
+
+## Current Shape
+
+- `package.json` owns Bun workspaces, dependency catalogs, and root scripts.
+- `turbo.json` owns workspace task orchestration.
+- `tsconfig.base.json` owns strict TypeScript and Effect language-service
+  settings.
+- `packages/core` owns Bundjil domain primitives and Effect programs.
+- `packages/effect-start` owns reusable TanStack Start middleware glue for
+  running Effect HTTP programs.
+- `apps` is intentionally empty until the first app is chosen.
+
+## Working Agreements
+
+- Use Bun from the repo root.
+- Prefer workspace packages over app-local shared logic.
+- Use Effect for fallible, async, stateful, boundary-crossing, or
+  dependency-injected code.
+- Keep app code out of packages unless the package explicitly owns that
+  framework boundary.
+- Run the smallest useful check during iteration, then `bun run verification`
+  before handing work back.
+
+</INSTRUCTIONS>
+
+<environment_context>
+  <cwd>/Users/cooper/Projects/bundjil</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-07-06</current_date>
+  <timezone>Europe/London</timezone>
+  <filesystem><workspace_roots><root>/Users/cooper/Projects/bundjil</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+</environment_context>
