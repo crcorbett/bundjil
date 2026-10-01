@@ -1,0 +1,1 @@
+Ok draft an improvement SPEC. Please try and keep naming agnostic to Sendblue. [$prd-writer](/Users/cooper/Projects/bundjil/.agents/skills/prd-writer/SKILL.md)
