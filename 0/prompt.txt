@@ -1,0 +1,14 @@
+Read-only research review for /Users/cooper/Projects/bundjil. Do not edit files.
+
+Review:
+- docs/product-specs/codex-hosted-live-oauth-storage.md
+- docs/product-specs/codex-hosted-live-oauth-storage.tasks.json
+- packages/codex-oauth/src/oauth-client.service.ts
+- packages/codex-oauth/src/oauth.service.ts
+- packages/codex-oauth/src/schemas.ts
+- .local/references/opencode-openai-codex-auth/lib/auth/auth.ts
+- .local/references/opencode-openai-codex-auth/lib/auth/server.ts
+- .local/references/opencode-openai-codex-auth/index.ts
+- .local/references/opencode-openai-codex-auth/lib/request/fetch-helpers.ts
+
+The previous spec incorrectly required a Vercel-hosted OAuth redirect. Evaluate a revised architecture where a trusted local Bundjil command runs the official Codex-compatible loopback PKCE login, exchanges the code locally, derives only necessary account metadata, encrypts access+rotating refresh credentials into personal Upstash, and the private Vercel proxy refreshes under the existing distributed lock. Identify exact protocol requirements, unsupported assumptions, security constraints, token/profile fields, refresh/401 behavior, single-user/personal-use scope, and task sequencing. Distinguish official OpenAI evidence from community precedent. Return concise findings and concrete corrections the spec must make.
