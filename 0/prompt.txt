@@ -1,0 +1,1 @@
+Create a new thread in this project (with Terra) to investigate Eve on Vercel, vs Eve on Cloudflare Durable Objects vs other Agent framework (like Pi or something else suggested by Sam Goodwin from Alchemy) on Cloudflare)
