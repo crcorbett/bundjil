@@ -1,0 +1,1 @@
+The parent accepted the Vercel consent gate and the Preview-only Upstash connection returned HTTP 201. Continue the existing prove-sendblue-preview task from the new provider state. Do not send a live message to counterpart 7386 until parent confirms ownership; complete all other provisioning and proof steps.
