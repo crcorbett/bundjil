@@ -1,0 +1,9 @@
+Continue the same Task 4. Add the final sanitized handset evidence to docs/exec-plans/active/effect-persistence.md, but leave task/audit status unchanged pending parent audit commands:
+- bounded window after accepted Production promotion
+- Sendblue provider: exactly one inbound, exactly one outbound, outbound delivered-or-sent count one, pending zero, error zero
+- configured receive inventory: exactly one route; expected /eve/v1/sendblue/webhook path on stable Production host, zero Preview host, no fragment; do not retain query or URL
+- Production proxy: exactly one additional /v1/chat/completions 200 during the handset window, zero error/fatal/leak matches
+- Production agent Workflow: one successful flow request in the bounded window, zero error/fatal/leak matches
+- Preview Sendblue ingress query: zero
+- Combined with prior isolated duplicate/replay proof, this establishes no duplicate dispatch/send without injecting a synthetic personal replay.
+Correctly state old stored replay/profile compatibility was exercised by the successful Production turn. Do not retain message content, phone, timestamps, IDs, provider payloads, or protected URLs. Run git diff --check and report. Do not commit.
