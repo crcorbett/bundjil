@@ -1,0 +1,6 @@
+The parent accepted both pauses. The six Preview-only variables were created with failedCount 0, and the dedicated automation bypass is configured (HTTP 200). Continue task 4:
+- verify the six variables by name/target only;
+- determine a safe way to persist the bypass secret in 1Password once CLI auth succeeds; if the generated value is no longer retrievable, plan owner-controlled regeneration using a locally generated secret after op auth rather than leaving an unknown credential;
+- complete any deployment-readiness checks independent of the four 1Password secrets;
+- do not deploy, register webhook, or send messages yet.
+Return the exact remaining blockers and sanitized provider state. No commit.
