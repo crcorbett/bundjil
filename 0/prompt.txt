@@ -1,0 +1,1 @@
+Ok the thread keeps getting blocked. Can we accept the limitation, document it, update the SPEC so it’s non blocking, and continue on with a fresh goal. I don’t want to overcook it, I want the spec implemented even if we have to record issues and move on
