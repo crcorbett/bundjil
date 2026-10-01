@@ -1,0 +1,1 @@
+Provide an immediate sanitized progress report: deployment status/URL, proof commands completed, current blocker, changed files, and whether any temporary state/remote mutation has occurred. Do not continue any potentially blocking log stream. If proof cannot proceed due a live 401/credential condition, report exact nonsecret status and stop for parent review.
