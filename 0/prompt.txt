@@ -1,0 +1,1 @@
+Status check: no login process or shared edits are visible yet. Continue the task, but report immediately if preview env retrieval or browser launch is blocked. Do not wait silently on an interactive command without telling the parent.
