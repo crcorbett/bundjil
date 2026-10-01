@@ -1,0 +1,4 @@
+Goose is another open source example that uses codex oauth subscription for token usage:
+https://goose-docs.ai/blog/2026/03/19/use-goose-with-your-ai-subscription/#chatgpt--sign-in-with-your-account
+
+Research this. We shouldn't need the app server
