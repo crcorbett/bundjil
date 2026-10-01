@@ -1,0 +1,51 @@
+You are the single sequential Terra Medium worker for Task 4 of the active Bundjil Executor MCP rollout.
+
+Repository: /Users/cooper/Projects/bundjil
+SPEC: docs/product-specs/executor-mcp-connection.md
+Task ledger: docs/product-specs/executor-mcp-connection.tasks.json
+Active plan: docs/exec-plans/active/executor-mcp-connection.md
+Architecture: AGENTS.md, docs/architecture/effect-patterns.md, docs/architecture/repo-structure.md, docs/architecture/eve-agent.md, docs/architecture/testing-and-quality.md, docs/architecture/frontend-composition.md
+Accepted prior commit: 4d02933
+Exact task object:
+{"id":"prove-preview-eve-executor-and-browser-resume","title":"Prove the deployed Preview Eve, Executor, browser approval, and Sendblue path","status":"pending","dependsOn":["provision-isolated-preview-toolkit-and-credentials"],"description":"Deploy a clean Preview and prove connection discovery, read execution, human browser approval/decline, safe resume, owner-channel delivery, policy restoration, observability, and leak safety end to end.","implementationNotes":["Deploy from a clean pushed SHA using only target-scoped encrypted/sensitive variables. Record the immutable Preview deployment and source SHA.","Use an authenticated Eve principal to call connection_search, confirm the exact remote skills/execute/resume surface, and run one selected read-only execute operation. Correlate Eve Agent Run, Vercel request, and Executor execution evidence.","Temporarily mark a harmless proof operation require_approval. Prove paused output returns an executionId and approval URL, but resume exposes no action/content input.","Open the approval URL as the authenticated owner and separately prove approve and decline. Call resume with executionId only and verify the corresponding completed/denied outcome.","Send an allowlisted Sendblue request requiring the same connection. Prove the approval URL reaches only the owner and the final agent reply follows the recorded browser decision.","Restore the intended Preview policy after proof and read it back. Never leave a temporarily loosened or gated proof policy undocumented.","Retain sanitized counts/statuses/correlation ids only; do not retain prompts, message text, generated code, provider records, raw MCP/results, or full approval/toolkit URLs."],"mandatoryVerification":["The immutable Preview deployment is Ready, source-correlated, authenticated, and built without secret output.","Authenticated Eve proof shows connection_search -> exact skills/execute/resume surface -> skills -> execute read-only success with no broad root catalog exposure.","Preview proof records sanitized bearer/auth failure plus malformed and unavailable remote MCP failures, confirms they fail closed without a direct-provider fallback, and proves browser-paused resume accepts executionId only after an authenticated human decision.","Approval proof shows browser mode, authenticated human decision, executionId-only resume, successful approve, successful decline, settled-link replay prevention, and no model self-approval path.","Sendblue proof shows only the allowlisted owner receives the approval URL and final delivery follows the Executor decision without treating message text as approval.","Policy readback after proof matches the accepted intended Preview policy.","Review any changed code for one named flat sequential Effect.fn/Effect.gen success path, tagged errors in Effect.fn transforms or the outer Effect.gen .pipe(...), exactly one named span, canonical Schema-derived contracts, adapter-edge runtime execution, and no nested helper chains, unsafe/structural casts, non-null assertions, any, DTO mirrors, manual readers/mappers, raw JSON, process.env, raw production fetch, raw _tag checks, or trivial wrapper/helper sprawl.","Record and accept a helper-admission inventory for every new helper/mapper/wrapper/script/service/layer/factory/module; remove anything without current call sites, boundary ownership, or a materially complex directly tested policy.","No lint/type/Knip/Turbo/test configuration or ignore list changes; type-aware lint, Knip, strict typecheck, and Effect language-service diagnostics report no unresolved findings.","Focused checks, full bun run verification, direct HTTP evidence, Browser evidence, Agent Run/log/Executor/Sendblue correlation, replay checks, diff/JSON checks, language-service review, and comprehensive leak scans pass."],"browserVerification":["Unauthenticated approval URL requires Executor sign-in and does not expose the pending action.","Authenticated approval page identifies the sanitized pending operation and exposes distinct approve, decline, and cancel controls without credentials or raw provider data.","Approve and decline each produce the expected execution outcome; refresh/reuse cannot settle the execution twice.","The approval URL delivered over Sendblue opens the same authenticated decision surface.","Evidence redacts full URL, execution id, account data, provider payload, message content, and credentials."],"completionCriteria":["Preview has complete local-to-live proof for discovery, read execution, browser-gated resume, Sendblue delivery, observability, policy restoration, and rollback inputs.","The model cannot submit or infer an approval action through the resume tool.","The helper-admission inventory is accepted and all three audit passes are recorded."],"implementationImprovementAudit":{"requiredPasses":3,"completedPasses":0,"evidence":[]},"commitAfterPassing":true}
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,
+HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit,
+Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
+code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
+RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded
+identifiers from the owning package. Do not define standalone DTO mirrors or
+duplicate fields such as id: string, slug: string, status, or post metadata
+outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers,
+mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
+or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit
+primitive or owning service contract should carry the behavior.
+
+For UI work, use the primitive -> composite -> layout -> route chain. Let
+leaves own the data, commands, loading, empty, error, retry, skeleton, and
+fallback behavior for the exact fragment they render. Do not add nested
+feature wrappers merely to shorten route JSX, and do not prop-drill query
+results, selected ids, loading flags, command callbacks, or derived option
+lists when a leaf can own the narrow value.
+
+For reusable URL state, use schema-owned search and route-identity contracts.
+Keep the app router as the URL writer, and do not import app route modules into
+reusable packages.
+
+Ownership and execution rules:
+- You own only Task 4 provider/runtime proof and its evidence section in docs/exec-plans/active/executor-mcp-connection.md. Do not alter prior accepted evidence, task-ledger status/audit counters, parent audit evidence, commits, pushes, Production, or Task 5.
+- You are not alone in the codebase. Work with current changes; do not revert or overwrite others.
+- Use the existing personal Executor org at https://executor.sh/personal-3548, never Tilt Legal. The accepted Preview toolkit/key and Vercel variables already exist.
+- Do not spawn subagents.
+- Do not expose secrets, protected toolkit/approval URLs, execution IDs, account data, message text, prompts, generated code, provider payload/results, or raw MCP responses in files, output, or final report. Use mode-0600 ephemeral material and delete it.
+- No code is expected unless live proof reveals a genuine SPEC-required gap. If code must change, keep it app-owned, follow the exact Effect/helper rules above, add direct tests, and run focused and full verification.
+- Deploy a clean immutable Preview from the accepted source state using only Preview variables. Do not touch Production.
+- Prove the exact task gates end to end: authenticated Eve discovery, exact skills/execute/resume surface, one read-only GitHub operation, bearer/malformed/unavailable fail-closed behavior, browser-mode approval and decline with executionId-only resume and replay prevention, owner-only Sendblue delivery, correlation/observability, policy restoration, rollback inputs, and comprehensive leak safety.
+- Browser interactions that create state must follow current confirmation policy; prior user intent authorizes this rollout, but never self-approve a model action. The human browser page owns decisions.
+- Record sanitized evidence only in the active plan. Include a helper admission inventory even if None.
+- Run focused checks and BUNDJIL_EXECUTOR_MCP_URL=<valid synthetic executor.sh browser toolkit fixture> bun run verification. Report every command and sanitized outcome.
+- Do not self-approve the three parent audits, do not mark the task completed, and do not commit or push. Leave Task 4 status in progress and report changed files plus remaining blockers precisely.
