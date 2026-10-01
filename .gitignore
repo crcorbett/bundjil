@@ -75,7 +75,8 @@ tmp
 # Context
 .context/
 .chief/
-.codex/
+.codex/*
+!.codex/hooks.json
 .claude/worktrees/
 
 # OpenAPI schemas
