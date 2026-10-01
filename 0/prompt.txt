@@ -1,0 +1,5 @@
+Do we just need to replicate the approach OpenClaw takes, and add the OAuth capabilities to Bundjil?
+
+Per their reference implementation: https://docs.openclaw.ai/concepts/oauth
+
+I dont want to actually adopt anything from OpenClaw.
