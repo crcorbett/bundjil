@@ -1,0 +1,3 @@
+<subagent_notification>
+{"agent_path":"019f64ca-8a1b-7182-8658-c80a4dd25cd1","status":{"errored":"Selected model is at capacity. Please try a different model."}}
+</subagent_notification>
