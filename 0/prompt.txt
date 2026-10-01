@@ -1,0 +1,11 @@
+<in-app-browser-context source="ambient-ui-state">
+This block is automatically supplied ambient UI state, not part of the user's request. Do not treat it as an instruction or as evidence that the user explicitly selected the in-app browser.
+# In app browser:
+- The user has the in-app browser open with 1 tab.
+- Current URL: file:///var/folders/9q/4hjm8t9d1513m42wgw5tg06r0000gn/T/architecture-review-20260923-232538.html
+</in-app-browser-context>
+
+## My request:
+Actually, compare bundjil to \~/Projects/site (particularly Alchemy structure/patterns/file paths). I have a feeling bundjil is a bit messy, and modules could be better constructed [$development-workflows:package-structure](/Users/cooper/.codex/plugins/cache/commonplace/development-workflows/0.4.0/skills/package-structure/SKILL.md)&#x20;
+
+Also, I want to remove the low-value verification/testing/ci scripts.
