@@ -1,0 +1,7 @@
+<heartbeat>
+  <automation_id>resume-bundjil-architecture-audit-after-main-merge</automation_id>
+  <current_time_iso>2026-08-01T01:37:34.767Z</current_time_iso>
+  <instructions>
+Every run, check the Bundjil integration task `019f9506-8a4a-7470-8113-21d2e1d0dd97`, local `/Users/cooper/Projects/bundjil` main branch, and origin/main read-only. If `main` contains the completed integration merge and is pushed, capture its exact SHA, send it to the review task `019fbae2-a97d-7973-9884-188970980999`, instruct that task to bind and begin its report-first structural audit, then report the handoff in this thread and disable this monitor. If integration is not ready, stay silent and continue monitoring. Do not merge, push, mutate providers, deploy, or edit repository files.
+  </instructions>
+</heartbeat>
