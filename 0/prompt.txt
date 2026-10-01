@@ -1,0 +1,1 @@
+Finish the documentation-only amendment now. Run jq empty on both ledgers, git diff --check, and stale scans, then send the concise final report. Do not mutate providers or commit.
