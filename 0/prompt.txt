@@ -1,0 +1,3 @@
+<subagent_notification>
+{"agent_path":"019f5bb7-8330-71a2-b6d8-3fd26989f546","status":{"completed":"Documentation reconciliation is complete. It updates the hosted refresh-capable preview state, marks access-token-only import superseded/deprecated, preserves historical workaround evidence, and distinguishes separate agent-adapter versus proxy proof.\n\nUpdated root/app/package docs, architecture guides, all three relevant SPECs, active plans, and both repo-local PRD skills. `git diff --check` passes. Root verification was not run per instruction.\n\n"}}
+</subagent_notification>
