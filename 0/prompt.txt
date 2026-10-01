@@ -1,0 +1,1 @@
+Send a concise progress update now: staged gate result, soak evidence status, current blocker if any, and whether any rollback mutation has occurred. Continue after the update.
