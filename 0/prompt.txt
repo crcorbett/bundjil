@@ -1,0 +1,1 @@
+One additional correction landed during your read-only review: postResponses proof now consumes response.stream incrementally, counts bytes in Ref, and feeds the shared bounded SSE framer instead of materialising response.text. Please include the current file state in your conclusion.
