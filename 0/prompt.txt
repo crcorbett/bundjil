@@ -1,0 +1,8 @@
+<environment_context>
+  <current_date>2026-07-16</current_date>
+  <timezone>Europe/London</timezone>
+  <filesystem><workspace_roots><root>/Users/cooper/Projects/bundjil</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+  <subagents>
+    - 019f6698-026f-7ea2-adfd-d3abfbbed6d9
+  </subagents>
+</environment_context>
