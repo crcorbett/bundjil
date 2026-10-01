@@ -1,0 +1,6 @@
+One final Task 4 parent audit finding:
+
+- docs/architecture/effect-patterns.md still contains an executable Schema.encodeUnknownSync example and then says smoke scripts/proof output follow it. Operator scripts must remain Effectful, so replace this with an Effectful Schema.encodeEffect example for Schema.UnknownFromJsonString (or the precise Effect v4 equivalent) and clarify that test-only sync fixture construction is the sole permitted sync-codec exception.
+- tooling/skill-policy-audit.ts currently catches Schema.decodeSync/encodeSync but misses decodeUnknownSync/encodeUnknownSync. Broaden the contradictory pattern so all four sync families are rejected in the canonical instruction surface.
+- Search the target instruction/docs surfaces for all Schema *Sync examples and ensure none remain except prose explicitly describing the test-only rule.
+- Rerun check:skills, check:boundaries, check, knip, check-types, and diff check. Do not commit or edit parent bookkeeping.
