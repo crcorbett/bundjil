@@ -1,0 +1,1 @@
+Ok I need you to copy over the skills from ~/Projects/site from .agents and ensure this is symlinked into .claude correctly too
