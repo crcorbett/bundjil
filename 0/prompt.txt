@@ -1,0 +1,1 @@
+Please send a concise progress update now, including any auth prompt/blocker and whether the two Production deployments have been created. Continue working after the update.
