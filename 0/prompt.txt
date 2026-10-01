@@ -1,0 +1,5 @@
+Continue SAME task. Parent isolated the macOS issue safely: both `open URL` and `open -a Google Chrome URL` are ignored by the existing normal Chrome process, even for a benign test URL. A parameterized AppleScript command succeeded:
+osascript -e 'on run argv' -e 'tell application "Google Chrome" to open location (item 1 of argv)' -e 'end run' <url>
+The benign test tab was closed.
+
+Replace the macOS launcher command with Effect ChildProcess.make("osascript", [...static -e script args..., url]). The redacted authorization URL must be only the final argv item, never interpolated into AppleScript text, logs, errors, tests, or snapshots. Update the command-construction test to assert command/static args/count without asserting or printing the final URL value. Keep Windows/Linux unchanged. Run focused typecheck/tests, then restart the real login once with the existing 0600 temp preview env and 30-minute timeout. Notify parent when auth.openai.com host is present, checking host only and never path/query. Do not rotate keys or namespace again.
