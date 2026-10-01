@@ -1,0 +1,26 @@
+You are implementing Task 4 only from /Users/cooper/Projects/bundjil/docs/product-specs/effect-schema-string-contracts.tasks.json under the prd-implementer workflow.
+
+Work in /Users/cooper/Projects/bundjil on the existing shared worktree. You are not alone in the codebase. Do not revert edits by others; accommodate them. The source implementation for Tasks 1-3 is already committed. Your ownership is documentation and audit artifacts only:
+- docs/product-specs/effect-schema-string-contracts.md
+- docs/product-specs/effect-schema-string-contracts.tasks.json
+- docs/exec-plans/active/effect-schema-string-contracts.md
+- docs/architecture/*.md where string-contract guidance belongs
+- package/app README files only where public contract documentation changed
+
+Do not edit production/test source, package manifests, lockfiles, environment/provider/deployment state, frontend, routes, or Vercel configuration. Do not commit.
+
+Required work:
+1. Re-run the repository string-contract inventory from actual exported Schema declarations and persisted/service fields. Reconcile the final state against the six categories: brand, literal, content, secret, transport, diagnostic.
+2. Add a concise but concrete final audit table to the active plan covering every scoped owner and every remaining anonymous Schema.String/Schema.NonEmptyString exception, with owner/category/reason. Do not claim every prose/local string is branded.
+3. Update relevant package/app READMEs and architecture docs so they explain canonical brands, named literals, boundary decode/encode, and Match use. Forbid helper/common/utils schema sprawl, unsafe brand constructors/assertions, production decodeSync, and raw discriminant branching when a decoded union exists.
+4. Preserve accurate status: leave Task 4 and the overall SPEC/ledger in progress/planned. The parent will mark them complete after its three audit passes and final gate. Do not edit Task 3 evidence.
+5. Run documentation-relevant checks: bun run fix, bun run check, bun run knip, jq empty on task JSON, git diff --check, plus any focused checks needed.
+6. Report exact files changed, inventory findings, intentional exceptions, and command results.
+
+Effect rules:
+- Open semantic values crossing boundaries use owner-named checked brands.
+- Closed vocabularies use named Schema.Literal/Literals and Match.
+- Human/generated content, transport strings, secrets, and diagnostics use owner-named checked Schemas where exported/cross-boundary, not mechanical brands.
+- Complete structures decode once at boundaries and encode outward.
+- No generic branded-string factory, common schema package, DTO mirrors, helper sprawl, unsafe casts, or assertions.
+- Keep documentation accurate to actual code; do not invent future behavior.
