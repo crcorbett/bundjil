@@ -1,0 +1,95 @@
+Implement exactly one task from /Users/cooper/Projects/bundjil: `add-vercel-kv-adapter` in docs/product-specs/codex-oauth-eve-model-provider.tasks.json. Do not start later tasks. Edit files directly in your workspace. Do not commit or push. You are not alone in the codebase: do not revert unrelated edits, and accommodate existing changes.
+
+Mandatory PRD implementer prompt block:
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,
+HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit,
+Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
+code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
+RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded
+identifiers from the owning package. Do not define standalone DTO mirrors or
+duplicate fields such as id: string, slug: string, status, or post metadata
+outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers,
+mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
+or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit
+primitive or owning service contract should carry the behavior.
+
+For UI work, compose stable visible structure as high as practical, usually in
+the route or nearest page-level parent. Use the primitive -> composite ->
+layout -> route chain for visible structure. Let leaves own the data,
+search/page params, commands, atoms, skeletons, and fallbacks for the exact
+fragment or action they render. Do not add nested feature wrappers merely to
+shorten route JSX, and do not prop-drill query results, selected ids, loading
+flags, command callbacks, or derived option lists when a leaf can own the
+narrow value.
+
+For reusable URL state, use schema-backed field URL atoms for search params and
+read-only page-param atoms for route identity. Keep TanStack Router as the app
+URL writer, and do not import app route files, `routeTree.gen`,
+`Route.useSearch()`, or `Route.useParams()` into reusable packages.
+
+Task object:
+{
+  "id": "add-vercel-kv-adapter",
+  "title": "Add a Vercel-compatible KeyValueStore adapter",
+  "status": "pending",
+  "description": "Add an adapter for a Vercel Marketplace KV provider, expected to be Upstash Redis, behind Effect KeyValueStore.",
+  "implementationNotes": [
+    "Do not use @vercel/kv; Vercel KV is sunset for new work.",
+    "Prefer Upstash Redis through Vercel Marketplace so env vars are provisioned through the linked project.",
+    "Keep the adapter behind KeyValueStore so @bundjil/codex-oauth does not depend on app code.",
+    "Decide and document token encryption before storing refresh tokens in hosted KV."
+  ],
+  "mandatoryVerification": [
+    "Flat meaningful Effect.gen programs for adapter operations.",
+    "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError.",
+    "Canonical Effect Schema contracts and schema-derived types from @bundjil/codex-oauth.",
+    "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers.",
+    "Tests use a mock or memory adapter by default; live Upstash tests are opt-in.",
+    "bun run --filter @bundjil/codex-oauth test",
+    "bun run --filter @bundjil/codex-oauth build",
+    "bun run check-types"
+  ],
+  "completionCriteria": [
+    "A KeyValueStore-compatible adapter exists for the chosen Vercel KV provider.",
+    "Env vars are parsed with Effect Config and secrets use Config.redacted.",
+    "Docs describe provisioning through Vercel Marketplace and local env pull."
+  ],
+  "implementationImprovementAudit": {"requiredPasses": 3, "completedPasses": 0, "evidence": []},
+  "commitAfterPassing": true
+}
+
+Relevant files/docs to inspect before editing:
+- docs/product-specs/codex-oauth-eve-model-provider.md
+- docs/product-specs/codex-oauth-eve-model-provider.tasks.json
+- docs/exec-plans/active/codex-oauth-eve-model-provider.md
+- docs/architecture/effect-patterns.md
+- docs/architecture/repo-structure.md
+- docs/architecture/testing-and-quality.md
+- packages/codex-oauth/src/profile-store.service.ts
+- packages/codex-oauth/src/live.layer.ts
+- packages/codex-oauth/src/mock.layer.ts
+- packages/codex-oauth/src/schemas.ts
+- packages/codex-oauth/src/errors.ts
+- packages/codex-oauth/README.md
+
+Expected implementation direction:
+- Add a package-owned Upstash/Vercel Marketplace KV adapter behind Effect v4 KeyValueStore, likely in packages/codex-oauth/src/upstash-key-value-store.layer.ts or a clearly named package-owned layer file.
+- Use Effect Config for env parsing, including redacted secrets. Do not read process.env directly in package logic.
+- Do not store refresh/access tokens in hosted KV until the docs define the encryption-at-rest/operator-access constraint. The adapter can provide the storage primitive/layer and document that using it for token profiles is blocked until encryption is implemented, or make encryption config required if you implement encryption in this task.
+- Avoid @vercel/kv. Prefer @upstash/redis if adding a dependency is necessary.
+- Do not use JSON stringify/parse or any raw native JSON serialization in committed app/package/docs source; use Effect Schema JSON encoders if JSON is needed.
+- Add focused tests that do not require live Upstash credentials by using a mocked Redis-like client or memory behavior. Live Upstash tests must remain opt-in and not part of default tests.
+- Update package exports and README/docs as needed. Update task ledger/active plan only with implementation notes if you are confident, but leave final parent audit evidence for the parent if unsure.
+
+Run at least:
+- bun install --frozen-lockfile if package dependencies change
+- bun run --filter @bundjil/codex-oauth test
+- bun run --filter @bundjil/codex-oauth build
+- bun run check-types
+
+Final response: summarize changed files, verification commands/results, remaining risks, and any docs/task ledger edits. Do not commit or push.
