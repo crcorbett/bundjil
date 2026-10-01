@@ -1,0 +1,3 @@
+<subagent_notification>
+{"agent_path":"019f566a-11ad-7cf2-90f2-d9e9764acf26","status":{"completed":"Paused. The implementation subagent was stopped with exit code 130. No process is still editing.\n\nCurrent state:\n\n- `check-types` passes with one non-failing Effect lint hint.\n- Package tests fail: 5 failed, 41 passed.\n- No build or root verification has been accepted.\n- The implementation remains incomplete and uncommitted.\n- Task ledger and active execution plan were not edited."}}
+</subagent_notification>
