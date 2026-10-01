@@ -1,0 +1,5 @@
+ELI5 this, and your suggestions:
+
+        Next decision: use the device owning the Preview identity, reconfigure Preview, or obtain a Photon-supported cross-project arrangement.
+
+2. Archive this now
