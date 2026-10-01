@@ -1,0 +1,1 @@
+Ok so how do we test your implementation then? Do you need to generate tokens etc?
