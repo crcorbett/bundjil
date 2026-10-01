@@ -1,0 +1,1 @@
+Stop now and report the exact current command/blocker. No Production mutation is visible. Include the preflight result if available.
