@@ -1,0 +1,49 @@
+Continue the existing Bundjil corrective implementation as the same sequential worker. You are using gpt-5.6-terra at medium reasoning; do not change models.
+
+New authoritative parent evidence:
+- Local and deployed Production endpoint classification is bundjil-production, not bundjil-preview.
+- Authenticated Executor API readback in organization personal-3548 shows both toolkits are user-owned.
+- bundjil-production has 17 connection patterns (all configured personal integrations plus executor.*); bundjil-preview has only github.user.personalgithub.*.
+- Both toolkits currently share the same five ordered policies: four GitHub rules followed by "* -> block".
+- Direct bundjil-production MCP enumeration therefore returns only the four GitHub operations. The final wildcard block, not a Preview URL binding, hides every other Production connection.
+- The user clarified that bundjil-production is intended to expose its full configured tool catalog, while Preview remains GitHub-only.
+
+Your write scope is documentation/ledger only:
+- docs/product-specs/executor-mcp-connection.md
+- docs/product-specs/executor-mcp-connection.tasks.json
+- docs/exec-plans/active/executor-mcp-connection.md
+- docs/product-specs/sendblue-eve-channel.md
+- docs/product-specs/sendblue-eve-channel.tasks.json
+- docs/exec-plans/active/sendblue-eve-channel.md
+- any already-modified README/architecture files only where the current false four-GitHub Production claim exists.
+
+Amend the existing specs/tasks before provider mutation. State the actual diagnosis and intended correction: Preview remains GitHub-only with its catch-all block; Production retains its independent URL/key and full configured connections, removes the accidental final catch-all block, and relies on connection selection plus tool-declared default approval behavior and any explicit reviewed overrides. Preserve the invariant that Bundjil cannot use Executor toolkit/policy/key administration to enlarge its authority; if the executor.* connection makes that impossible, document that it must be removed or explicitly blocked while other Production integrations become visible. Do not invent protected values, retain full URLs, or mutate Executor/Vercel/Sendblue. Correct the Sendblue task's false acceptance requirement of exactly four Production GitHub operations and record the newly discovered blocker. Keep the Sendblue task in_progress and audit pass 3 open until policy correction plus fresh handset proof.
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,
+HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit,
+Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
+code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
+RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded
+identifiers from the owning package. Do not define standalone DTO mirrors or
+duplicate fields such as id: string, slug: string, status, or post metadata
+outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers,
+mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
+or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit
+primitive or owning service contract should carry the behavior.
+
+For UI work, use the primitive -> composite -> layout -> route chain. Let
+leaves own the data, commands, loading, empty, error, retry, skeleton, and
+fallback behavior for the exact fragment they render. Do not add nested
+feature wrappers merely to shorten route JSX, and do not prop-drill query
+results, selected ids, loading flags, command callbacks, or derived option
+lists when a leaf can own the narrow value.
+
+For reusable URL state, use schema-owned search and route-identity contracts.
+Keep the app router as the URL writer, and do not import app route modules into
+reusable packages.
+
+Run jq empty on both task ledgers, git diff --check, and focused stale-claim scans. Report changed files and exact sanitized wording/evidence. Do not commit or push.
