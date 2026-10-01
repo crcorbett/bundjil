@@ -1,0 +1,10 @@
+Deploy to production (shouldn’t this be automatic on push to main?). Send iMessage to photon + sendblue asking for long response, so that typing indicators have a chance to appear with [@Computer](plugin://computer-use@openai-bundled/) 
+
+Then consider how we can safely determine: “    Photon’s strict candidate-specific duplicate/replay oracle remains incomplete.”
+
+
+I’m also interested in why we couldn’t use ChatSDK and had to create entirely custom channels here. Ensure this is well documented. I suspect it’s because our behaviour is too custom, but I don’t want to veer too far from ChatSDK / Eve native semantics.
+
+I also want a separate thread to do a complete code call graph audit, and ensure our file structures / folder structures are as good as possible per [$repo-structure](/Users/cooper/.agents/skills/repo-structure/SKILL.md) [$package-structure](/Users/cooper/Projects/bundjil/.agents/skills/package-structure/SKILL.md) [$docs-maintainer](/Users/cooper/Projects/bundjil/.agents/skills/docs-maintainer/SKILL.md) 
+
+Handoff all the above to subthreads in this codex project
