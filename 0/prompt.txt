@@ -1,0 +1,1 @@
+Stop and report the exact current blocker immediately. Agent Production has no variables and no deployments, and the tracked worktree is clean. Do not print secrets.
