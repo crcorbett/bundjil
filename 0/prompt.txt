@@ -1,0 +1,1 @@
+Quick audit reminder before final verification: tsconfig.json still currently excludes ./scripts/**/*.ts in the shared diff. Ensure include contains src, test, AND scripts so login-subscription.ts is compiled by check-types. Continue your current work; no need to respond until all gates finish.
