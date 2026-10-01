@@ -1,0 +1,8 @@
+Continue the same task and address these parent audit findings:
+
+1. retryable semantics differ: memory permits immediate re-claim because it inspects status, while Upstash keeps the key for one second and SET NX returns duplicate. Implement retryable as an owner-fenced compare-and-delete release in both memory and Upstash (or an equally atomic design with identical immediate-retry semantics). A stale/wrong owner must still fail.
+2. Add a stateful Upstash mock test proving successful owner-fenced complete/uncertain transitions and retryable release/reclaim, including key/TTL/argument shape and stale owner result 0.
+3. Expand concurrency coverage to race identical outbound coordinates as well as inbound; prove one winner for each and independence for different coordinates/handles.
+4. Add an equal-byte-length wrong sb-signing-secret case so the timingSafeEqual comparison path is tested, in addition to missing/length mismatch/match.
+5. Re-audit retained helpers/services. Keep the claim-ID service only as the justified secure randomness injection boundary; do not add more wrappers.
+6. Run focused tests, agent check-types/test/build, root verification, and diff check. No docs edits or commit.
