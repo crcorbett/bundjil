@@ -1,0 +1,20 @@
+Run terminal audit pass 4 of 5 for the active Bundjil Effect-native runtime specification. Passes 1–3 are CLEAN after ENP-FND-050. This is report-only: do not edit, generate outputs, commit, push, deploy, use credentials, or mutate providers.
+
+Worktree: /Users/cooper/.codex/worktrees/d4b4e069-1303-427d-957e-756d18e049a9/bundjil
+Base: 763199f
+Installed Effect 4.0.0-beta.101; source revision 1caab3cc30f626efbf15e59d74f539a487e5c85c.
+
+Read AGENTS.md, docs/README.md, .agents/skills/docs-maintainer/SKILL.md and repository profile, the two active SPEC/task ledgers/plans, docs architecture owners, affected READMEs, authority/automation/control registers, verification routes and dated evidence added by this branch.
+
+Pass 4 scope is docs and proof consistency only:
+- code/SPEC/tasks/plan/index/README claims agree;
+- ENP-FND-043 through ENP-FND-050 findings, reopened evidence and completion state are coherent;
+- terminal task remains pending until this ordered audit finishes;
+- operational hosted tasks are honestly deferred at the personal-only Vercel identity boundary;
+- evidence/receipt lifecycle, exact Git identity, owner routes and non-claims are consistent;
+- no duplicated policy, stale current pointer, premature implemented/completed/archive state, or docs-inventory mismatch;
+- docs-maintainer impact ledger decisions match the actual diff.
+
+Use read-only inspection and existing green check:docs/check:skills/check:authority/check:controls/check:verification/eval evidence; do not rerun broad verification.
+
+Return CLEAN with exact inspected owners and residual non-claims, or actionable findings with file/line, invariant, consequence and minimal correction/proof.
