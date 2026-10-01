@@ -1,0 +1,5 @@
+Fresh terminal audit PASS 1 of 5 after ENP-FND-043. REPORT ONLY, no mutation, credentials, providers, deployments, git operations. Inspect exact candidate at /Users/cooper/.codex/worktrees/d4b4e069-1303-427d-957e-756d18e049a9/bundjil.
+
+Scope only architecture-boundaries: Schemas/brands/decode-encode, errors, Config/redaction, service/Layer topology, host/provider adapters, secrets, canonical JSON, credential refresh boundaries. Include current diff and affected call graph. Prior lifecycle receipt is explicitly invalidated; do not accept it. Verify Effect APIs against installed 4.0.0-beta.101 and immutable source revision 1caab3cc30f626efbf15e59d74f539a487e5c85c via git show. Read AGENTS, strict Effect and effect-client-wrapper instructions.
+
+Findings first with severity, exact file:line, mechanism/remediation. No preferences. If none state exactly 'PASS 1: zero findings' with concise evidence and external non-claims.
