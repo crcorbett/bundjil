@@ -1,0 +1,3 @@
+Ok add this to the SPEC [$prd-writer](/Users/cooper/Projects/bundjil/.agents/skills/prd-writer/SKILL.md) 
+
+Including deployment via Vercel, and all verficiation checks
