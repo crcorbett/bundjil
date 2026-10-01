@@ -1,0 +1,21 @@
+Run terminal audit pass 3 of 5 for the active Bundjil Effect-native runtime specification. Passes 1 and 2 are CLEAN after ENP-FND-050. This is report-only: do not edit files, generate outputs, commit, push, deploy, use credentials, or mutate providers.
+
+Worktree: /Users/cooper/.codex/worktrees/d4b4e069-1303-427d-957e-756d18e049a9/bundjil
+Base: 763199f
+Candidate has already passed:
+- full public-synthetic-Executor bun run verification;
+- 136 boundary tests, 17 lint tests, Knip, nine package typechecks, 15 workspace tasks;
+- 156 Codex, 43 proxy, 80 agent, 45 Photon tests.
+Installed Effect is 4.0.0-beta.101; reviewed source revision is 1caab3cc30f626efbf15e59d74f539a487e5c85c.
+
+Read governing instructions, active SPEC/tasks/plan, testing-and-quality, relevant tests and executable policy. Do not rerun the full repository suite. Use existing output as evidence and run only a narrowly necessary read-only/focused check if a suspected defect requires it.
+
+Pass 3 scope:
+- behavioral semantics and failure-path coverage;
+- retries, replay/idempotency, uncertain writes, rollback and fail-closed paths where changed;
+- Effect Clock/TestClock, timeout ordering, interruption and finalizers;
+- schema/property negative oracles, AST lint fixtures, typecheck/build/source-resolution gates;
+- direct observables versus false-green assertions;
+- ENP-FND-043 through ENP-FND-050 recurrence proof, especially 401 lazy consumption, Layer defects/interruption, empty chunks, response cancellation, unclaimed expiry, header ordering and exactly-once body claims.
+
+Return CLEAN with exact evidence inspected and residual non-claims, or actionable findings with file/line, invariant/requirement, failure mode and minimal correction/proof. Do not report style preferences or provider non-claims as defects.
