@@ -1,0 +1,1 @@
+How hard would it be to add the typing indicator with sendblue when the model response starts streaming in? Also are we using the ChatSDK with Eve to handle the channels for chats?
