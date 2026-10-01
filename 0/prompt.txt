@@ -1,0 +1,1 @@
+Stop now and return exact current status: changed files, last command/output, unresolved compile/test failures, and remaining mandatory task items. Do not continue editing.
