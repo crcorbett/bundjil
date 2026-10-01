@@ -1,0 +1,25 @@
+Workspace: /Users/cooper/Projects/bundjil, main at clean pushed commit e53e7a4. Implement only serial task "deploy-and-accept-production-proxy" via /Users/cooper/Projects/bundjil/.agents/skills/prd-implementer/SKILL.md and the active Production SPEC/ledger/plan.
+
+Ownership:
+- Personal Vercel proxy project REDACTED, REDACTED.
+- Production proxy deployments/proof/rollback references.
+- Sanitized evidence only in docs/exec-plans/active/vercel-production-promotion.md.
+- Do not edit task status/audit counters, agent Production vars/deployments, Sendblue, commit, or push.
+
+Requirements:
+1. Confirm HEAD/origin/main clean e53e7a4, exact personal project, SSO Deployment Protection, Production variable names/types, live mode, stored profile readiness, and the accepted proxy-provisioned gate before deployment. Use documented disjoint fingerprints and fresh live metadata; never invent values.
+2. Generate a fresh independent internal bearer in a mode-0600 temporary boundary, upsert proxy BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN as write-only sensitive, and preserve the matching bearer securely in 1Password Private vault in a dedicated "Bundjil Production" item/field (create/update without printing). Remove local bearer material after proof. Never emit values.
+3. Deploy from the clean pushed source with ordinary Vercel Production build only. No --env/--build-env, shell-injected deploy secret, prebuilt output, or tracked pulled env.
+4. Establish two accepted immutable READY Production proxy deployments from the same accepted SHA/config so one is current and one is a genuine previous accepted rollback reference. Verify the stable alias resolves to current. Do not treat old failed deployments as accepted rollback.
+5. For both accepted deployments as appropriate, prove protected/private boundary:
+   - health 200, live, ready;
+   - missing and invalid internal bearer 401;
+   - valid bearer authenticated SSE 200, text/event-stream, complete [DONE], no token/raw payload leak;
+   - stable alias mapping and source SHA;
+   - stored encrypted profile readiness and existing refresh/fence proof continuity;
+   - sanitized Vercel runtime/build logs with no prompts/outputs/tokens/profile/ciphertext/PII/bypass URLs.
+Use fresh Vercel OIDC/temporary automation bypass if needed for Deployment Protection; revoke temporary bypass afterward.
+6. Record current/previous deployment IDs and config fingerprint only as sanitized evidence.
+7. Run focused proxy/OAuth checks, smoke, bun run verification, jq empty, git diff --check.
+8. Preserve newest fenced profile generation. No OAuth route or profile rollback.
+You are not alone in the codebase; do not revert others' changes.
