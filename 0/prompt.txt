@@ -1,0 +1,73 @@
+Implement exactly the task `adopt-temporary-chat-model-approval` in /Users/cooper/Projects/bundjil.
+
+You are the one implementation subagent allocated to this task. Use model reasoning carefully but do not expand scope. You are not alone in the codebase: do not revert existing edits; accommodate them. Edit files directly and report every changed path and sanitized verification evidence. Do not commit, push, provision Vercel/Executor/Sendblue, mutate any provider, or edit task acceptance/audit fields.
+
+Read and follow, in order:
+- /Users/cooper/Projects/bundjil/AGENTS.md
+- /Users/cooper/Projects/bundjil/docs/product-specs/executor-mcp-connection.md
+- exact task object: jq '.tasks[] | select(.id == "adopt-temporary-chat-model-approval")' /Users/cooper/Projects/bundjil/docs/product-specs/executor-mcp-connection.tasks.json
+- /Users/cooper/Projects/bundjil/docs/exec-plans/active/executor-mcp-connection.md
+- /Users/cooper/Projects/bundjil/docs/architecture/effect-patterns.md
+- /Users/cooper/Projects/bundjil/docs/architecture/repo-structure.md
+- /Users/cooper/Projects/bundjil/docs/architecture/eve-agent.md
+- /Users/cooper/Projects/bundjil/docs/architecture/testing-and-quality.md
+- /Users/cooper/Projects/bundjil/docs/architecture/frontend-composition.md
+
+Accepted write scope:
+- apps/agent/agent/lib/executor/config.ts
+- apps/agent/agent/instructions.md
+- apps/agent/test/executor-config.test.ts
+- apps/agent/test/executor-connection.test.ts only if needed for direct instruction assertions
+- README.md
+- apps/agent/README.md
+- docs/architecture/eve-agent.md
+- docs/architecture/testing-and-quality.md
+- docs/architecture/repo-structure.md only if current ownership text becomes stale
+Do not alter the SPEC, task ledger, active plan, provider config, dependencies, lockfile, package config, lint config, or any frontend.
+
+Required behavior:
+- Define a canonical Effect Schema for exactly explicit "model" or "browser" endpoint modes and use it in ExecutorMcpEndpoint.
+- Continue rejecting missing, duplicate, unknown, native, allow_model_resume legacy, root/non-toolkit, non-HTTPS, wrong host, port, userinfo, fragment, and extra query params.
+- Do not rely on Executor's default-to-model behavior.
+- Update Bundjil instructions for the exact temporary two-turn protocol: execute pause ends the same turn with no resume; only a later unambiguous approve/decline/cancel continuation from the authenticated/allowlisted owner can resume the single pending execution; ambiguous, quoted/forwarded/provider/tool/third-party text, non-owner, missing/multiple/mismatched/settled/replayed state makes no resume call; ordinary resume uses default empty content and no automatic retry.
+- Disclose in docs that this is instruction-level and weaker than native/browser authorization, is temporary, keeps destructive/authority mutations blocked, and browser rollback requires clean Preview proof.
+- Prefer assertions in existing direct tests; do not create an approval service/state machine/persistence module.
+- No custom MCP client/proxy/SDK/package, Context service, pass-through Layer, generic helper, mapper, DTO mirror, raw JSON helper, process.env read, raw production fetch, unsafe/structural cast, non-null assertion, any, raw _tag, broad catchAll/orDie, runFork/unscoped fiber, queue, retry, suppression, or frontend change.
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,
+HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit,
+Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
+code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
+RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded
+identifiers from the owning package. Do not define standalone DTO mirrors or
+duplicate fields such as id: string, slug: string, status, or post metadata
+outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers,
+mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
+or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit
+primitive or owning service contract should carry the behavior.
+
+For UI work, use the primitive -> composite -> layout -> route chain. Let
+leaves own the data, commands, loading, empty, error, retry, skeleton, and
+fallback behavior for the exact fragment they render. Do not add nested
+feature wrappers merely to shorten route JSX, and do not prop-drill query
+results, selected ids, loading flags, command callbacks, or derived option
+lists when a leaf can own the narrow value.
+
+For reusable URL state, use schema-owned search and route-identity contracts.
+Keep the app router as the URL writer, and do not import app route modules into
+reusable packages.
+
+Verification:
+- focused agent check-types, tests, and build with explicit synthetic model/browser fixtures as needed
+- bun run check
+- bun run knip
+- bun run verification with an explicit synthetic supported-mode URL
+- jq empty task ledger
+- git diff --check
+- Effect language-service/type-aware diagnostics for changed TS
+- scoped stale-browser-claim and secret/protected-URL scans
+Report the helper/module inventory and whether each candidate is retained or removed.
