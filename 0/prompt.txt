@@ -1,0 +1,53 @@
+Implement exactly task revalidate-personal-preview-configuration from docs/product-specs/codex-hosted-live-oauth-storage.tasks.json, against docs/product-specs/codex-hosted-live-oauth-storage.md and docs/exec-plans/active/codex-hosted-live-oauth-storage.md. This is a sanitized configuration/evidence task, not a deployment or production activation.
+
+You own edits needed to record sanitized preview revalidation evidence in the active execution plan and existing durable operational docs only if facts changed. Do NOT mark the task completed or add parent audit evidence in the task ledger; parent owns acceptance. Do not start the real owner login, do not deploy, and do not alter production.
+
+Use Executor Personal Vercel API (mcp__executor_personal__skills then mcp__executor_personal__execute with tools.vercel_api) as the primary remote evidence source, plus local Vercel CLI/read-only project metadata where useful. Verify without emitting values:
+- personal Vercel scope, exact project bundjil-codex-proxy, root directory apps/codex-proxy, framework/build/output/Node settings;
+- preview-only Bundjil environment-name presence/parity for mode, internal bearer, profile subject fields, cipher key/id, and Upstash aliases;
+- absence of Bundjil production activation: no production Bundjil mode/cipher/profile subject/profile/deployment enablement. Marketplace Upstash production binding alone is not activation;
+- Upstash integration/binding and safe namespace connectivity without reading or printing credential/profile values;
+- latest preview deployment metadata/readiness where available, but do not create a deployment;
+- personal scope only, never Tilt Legal.
+
+Sanitize IDs if they are sensitive; project/deployment identifiers and URLs may be recorded only if the existing docs treat them as safe. Never print or persist env values, tokens, profile ciphertext, account ids, credentials, or provider payloads. If Executor emits values, do not copy them to files or report them.
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,
+HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit,
+Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
+code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
+RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded
+identifiers from the owning package. Do not define standalone DTO mirrors or
+duplicate fields such as id: string, slug: string, status, or post metadata
+outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers,
+mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
+or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit
+primitive or owning service contract should carry the behavior.
+
+For UI work, compose stable visible structure as high as practical, usually in
+the route or nearest page-level parent. Use the primitive -> composite ->
+layout -> route chain for visible structure. Let leaves own the data,
+search/page params, commands, atoms, skeletons, and fallbacks for the exact
+fragment or action they render. Do not add nested feature wrappers merely to
+shorten route JSX, and do not prop-drill query results, selected ids, loading
+flags, command callbacks, or derived option lists when a leaf can own the
+narrow value.
+
+For reusable URL state, use schema-backed field URL atoms for search params and
+read-only page-param atoms for route identity. Keep TanStack Router as the app
+URL writer, and do not import app route files, routeTree.gen,
+Route.useSearch(), or Route.useParams() into reusable packages.
+
+Verification:
+- safe Upstash namespace connectivity check, no values
+- validate any edited JSON/Markdown
+- bun run check
+- git diff --check
+- report exact evidence categories, files changed, commands, and blockers
+- no live login, no deployment, no production changes.
+
+You are not alone in the codebase. Preserve all existing changes and do not revert unrelated work.
