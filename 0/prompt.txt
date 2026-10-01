@@ -1,0 +1,1 @@
+Cost control requirement: use Terra (Medium) only for any further subagent/delegated work. Do not use premium models. Continue the exact assigned preview-proof task; report progress and blockers with sanitized evidence only.
