@@ -1,0 +1,9 @@
+Work in /Users/cooper/Projects/bundjil. Execute exactly the final task "three-pass-effect-ts-audit-sweep" from docs/product-specs/codex-hosted-live-oauth-storage.tasks.json. This is a cross-cutting audit after all implementation and documentation tasks.
+
+You are not alone in the codebase. Do not revert current changes. Audit actual code, tests, docs, task ledgers, and active plans. Use Terra Medium rigor. Do not edit the task JSON or hosted plan; parent owns final acceptance records. You may edit source/docs only if you find a concrete unresolved defect, and must report it.
+
+Pass 1: package/app/trusted-local ownership and production/test/CLI/proof/rollback call graphs. Confirm apps import no browser/loopback login boundary and Vercel exposes no OAuth route.
+Pass 2: flat named Effects, Context services, explicit Layers, Effect Platform resource scope/Deferred, canonical Schema types and tagged errors, Config.redacted and Redacted access, encrypted KeyValueStore, fenced commits/locks, no unsafe casts/DTO mirrors/manual raw JSON/process.env/stringly tags/helper sprawl.
+Pass 3: verify the repository evidence covers local login, encrypted readback, hosted rotation/concurrency, bounded retry, SSE, readiness/errors, leak scans, docs, and rollback. Review the already-passing root verification evidence, but run targeted checks/scans as needed. Never access or print live secrets.
+
+Return pass-by-pass findings, any changes, exact commands, and whether unresolved gaps remain. Distinguish implemented opt-in Eve adapter, hosted proxy proof, and the still-unrecorded combined Eve -> hosted-live-proxy session. Production remains inactive and requires separate approval.
