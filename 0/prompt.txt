@@ -1,0 +1,76 @@
+You are the sole sequential implementation subagent for this exact task. You are not alone in the codebase. Do not revert any existing changes; preserve and work with them.
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,
+HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit,
+Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
+code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
+RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded
+identifiers from the owning package. Do not define standalone DTO mirrors or
+duplicate fields such as id: string, slug: string, status, or post metadata
+outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers,
+mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
+or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit
+primitive or owning service contract should carry the behavior.
+
+For UI work, compose stable visible structure as high as practical, usually in
+the route or nearest page-level parent. Use the primitive -> composite ->
+layout -> route chain for visible structure. Let leaves own the data,
+search/page params, commands, atoms, skeletons, and fallbacks for the exact
+fragment or action they render. Do not add nested feature wrappers merely to
+shorten route JSX, and do not prop-drill query results, selected ids, loading
+flags, command callbacks, or derived option lists when a leaf can own the
+narrow value.
+
+For reusable URL state, use schema-backed field URL atoms for search params and
+read-only page-param atoms for route identity. Keep TanStack Router as the app
+URL writer, and do not import app route files, `routeTree.gen`,
+`Route.useSearch()`, or `Route.useParams()` into reusable packages.
+
+Task object:
+{
+  "id": "revalidate-codex-oauth-surface-and-cli-login",
+  "title": "Revalidate Codex OAuth and local CLI login",
+  "status": "in_progress",
+  "description": "Resolve or explicitly bypass the local Codex duplicate-install/login issue, then confirm the current OAuth issuer, client, scopes, PKCE, redirect, and token response shape without recording secrets.",
+  "implementationNotes": [
+    "Inspect `which -a codex` and `codex --version` before relying on managed login behavior.",
+    "Record whether the active binary is the expected current Codex CLI or the app-bundled CLI.",
+    "Verify the localhost callback failure from 2026-07-07 is resolved or document why hosted OAuth can proceed without it.",
+    "Use current official docs, executor personal research, DeepWiki, or direct local inspection as needed, but record only sanitized findings.",
+    "Do not print, commit, or snapshot access tokens, refresh tokens, auth codes, raw OAuth responses, cookies, or account secrets."
+  ],
+  "mandatoryVerification": [
+    "Codex CLI binary paths and versions are recorded in sanitized form.",
+    "OAuth issuer, client id category, scopes, redirect behavior, PKCE behavior, and token response fields are confirmed or implementation is blocked.",
+    "The hosted redirect URI strategy is explicitly accepted, blocked, or deferred with evidence.",
+    "Flat meaningful Effect.gen programs are explicitly required for the implementation tasks that follow.",
+    "Typed errors handled in .pipe(...) with catchTag, catchTags, or mapError are explicitly required.",
+    "Canonical Effect Schema contracts and schema-derived types from owning packages are explicitly required.",
+    "No unsafe casts, local DTO mirrors, manual object readers/mappers, or trivial wrappers/helpers are approved by the revised implementation plan.",
+    "Implementation-improvement audit pass evidence is recorded before task acceptance."
+  ],
+  "completionCriteria": [
+    "The spec or a dated appendix contains current sanitized OAuth findings.",
+    "Implementation is either unblocked by current evidence or explicitly stopped before hosted OAuth code begins."
+  ],
+  "implementationImprovementAudit": {
+    "requiredPasses": 3,
+    "completedPasses": 0,
+    "evidence": []
+  },
+  "commitAfterPassing": true
+}
+
+Spec: docs/product-specs/codex-hosted-live-oauth-storage.md
+Task list: docs/product-specs/codex-hosted-live-oauth-storage.tasks.json
+Active plan: docs/exec-plans/active/codex-hosted-live-oauth-storage.md
+Architecture docs: ARCHITECTURE.md; docs/architecture/effect-patterns.md; docs/architecture/repo-structure.md; docs/architecture/testing-and-quality.md; docs/architecture/eve-agent.md.
+The skill-referenced docs/exec-plans/implementing-specs.md and docs/PLANS.md do not exist; record no substitute beyond the repo-local plan/architecture material.
+
+You own this tracer-bullet task's sanitized documentation updates only. Do not implement encryption, persistence, locks, OAuth routes, live proxy composition, deploy, or agent changes. Use official OpenAI sources if available, local current Codex CLI/source inspection, and any approved research tools. The parent already found the manual helper fails because the response lacks x-content-sha256; use the narrow official fallback rather than retrying it indefinitely. Do not run interactive login or print/inspect any raw credentials, codes, cookies, OAuth payloads, or auth cache values. You may inspect auth cache field names only.
+
+Edit the spec and/or add a dated research appendix, update the task ledger with sanitized evidence and completed status only if the completion criteria are genuinely met, and update the active plan task log. Run focused documentation checks, `jq empty docs/product-specs/codex-hosted-live-oauth-storage.tasks.json`, `git diff --check`, and `bun run verification` as the final gate when practical. Report changed files, research basis, verification evidence, unresolved uncertainty, and whether hosted OAuth code is unblocked or explicitly blocked/deferred. Do not commit; the parent will review/audit/commit.
