@@ -1,0 +1,1 @@
+We need both prod + preview to accept the same iMessage source as I only have one number
