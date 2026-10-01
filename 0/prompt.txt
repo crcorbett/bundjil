@@ -1,0 +1,2 @@
+1. How do we fix this? Is this something in the dashboard we need to set? Why wasn't this a problem earlier, we've been sending/receiving Photon messages fine?
+2. merge approved
