@@ -1,0 +1,1 @@
+I already had a personal Executor org set up. That’s what’s hooked up in codex MCP server config (the api key is there too). The personal org is present in the switcher, alongside the tilt legal org in the executor website.
