@@ -1,0 +1,12 @@
+Parent audit found task 3 is not yet acceptable. Continue in your existing workspace using Terra Medium context; do not commit. You are not alone in the codebase: preserve parent/user changes.
+
+Fix and verify these concrete gaps:
+1. Remove the duplicate Effect.provideService(SendblueWebhookVerifier, verifier) in SendblueChannelLive.
+2. Add Eve filesystem entrypoints to root knip.json so the root verification recognizes agent/channels/**/*.ts and the live layer. This is now explicitly within your write scope.
+3. Add direct Request/Response tests against the actual Eve channel route handler (channel.routes[0].handler or a boundary-level channel factory if needed). Cover missing/wrong secret 401, authenticated malformed 400, authenticated ignored/unknown 200, accepted 202 plus waitUntil and one send, duplicate 200/no second send, replay-store failure 503. Do not require real env or Upstash; use an injected ManagedRuntime/factory boundary, not process env mutation or unsafe casts.
+4. Expand outbound verification: stable coordinates elect exactly one concurrent send; duplicate event suppresses send; tool-call/null/blank messages ignored; over-18,996 content rejects before provider send and becomes retryable; known provider failure becomes retryable; uncertain remains duplicate/no auto-resend. Keep tests Effect-native.
+5. Treat provider direction explicitly as part of outbound/loop prevention rather than only is_outbound. Use the schema-owned provider value shape supported by current fixtures/spec; avoid stringly open-ended branching where a literal schema fits.
+6. Review inbound completion failure semantics. Once Eve send succeeds, a replay completion-store failure must not leave a claim that can expire and dispatch the same provider event again without an explicit quarantined/uncertain state. Implement the safest owner-fenced transition available and add a test. If both complete and quarantine fail, surface the replay error while remaining fail-closed.
+7. Re-run agent check-types/test/build, root bun run verification, git diff --check, and confirm Eve discovery has no diagnostics.
+
+Preserve flat linear Effect programs, no helper sprawl, no JSON.stringify/parse, no raw causes/secrets, no unsafe casts or DTO mirrors. Return changed files and exact evidence.
