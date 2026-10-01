@@ -1,0 +1,17 @@
+Parent accepts Task 5 after three distinct audits. Update status/evidence only; do not alter implementation/source and do not commit:
+- docs/product-specs/effect-persistence.tasks.json top status -> implemented; Task 5 -> completed; completedPasses -> 3; replace evidence [] with the three parent evidence entries below.
+- docs/product-specs/effect-persistence.md status -> Implemented.
+- docs/exec-plans/active/effect-persistence.md top status -> Complete; Ordered Task 5 -> completed; Task 5 section -> Completed. Preserve Subagent Review Input and ledger, then append three Parent Audit Pass sections with the evidence below.
+- Keep the completed plan in active/ because this repo has no completed-plan directory/index convention.
+- Run bun run check, task JSON parse, and git diff --check; no full suite rerun needed.
+
+Parent Audit Pass 1 - Ownership and call graph PASSED:
+Current docs and source were cross-checked. Shared package owns provider-neutral atomic contract, coherent native/atomic Layers, and the only SDK/provider protocol. Codex owns encrypted profile keys/codecs/refresh/Effect Config composition; proxy app owns runtime/private HTTP config and hosted composition; agent owns replay config/keys/records/TTL/delivery/channel runtime. Current-doc stale scans found no removed adapter path, Preview-only Production statement, pending handset claim, or nonexistent test path. Only effect-persistence imports/depends on @upstash/redis; no frontend/app route/provider mutation occurred.
+
+Parent Audit Pass 2 - implementation quality/helper admission PASSED:
+The expanded ledger was checked against actual declarations and corrected for Upstash client versus construction ownership and Sendblue live/memory locations. Every new non-test Schema/type/error/service/function/Layer/export/subpath/CLI proof/package/deployment config is covered by a named family and admitted for multiple use or a concrete Schema/provider/crypto/domain/CLI/packaging boundary. Modified Codex scripts only rewire Layers. Static scans found no raw JSON parse/stringify, direct process env, unsafe casts, suppression, switch, Object values/entries, instanceof, new Promise, raw tag branching, or local Effect runner outside explicit CLI exit boundaries in changed non-test implementation. No unresolved helper sprawl or stale compatibility export remains.
+
+Parent Audit Pass 3 - verification/docs/rollback PASSED:
+With mode-0600 .local/secrets/executor-production.env loaded, parent reran bun run fix, check, knip, verification, build, task JSON parse, and git diff --check successfully across all seven workspaces. Accepted suites: 23 persistence, 103 Codex OAuth, 24 proxy, 57 agent. Current-doc stale ownership scans, SDK/dependency ownership scan, coordination scan, config ownership scan, and no-frontend-change invariant passed. Task 4 already records accepted Preview/Production storage, stream/replay, handset, safe-log, clean-source, and rollback evidence. Browser/live provider checks were deliberately not repeated because Task 5 is docs/status only and provider mutation was prohibited.
+
+Use concise evidence-policy-safe wording. Do not add IDs, URLs, values, provider payloads, timestamps, or message content. Report changed status files and checks.
