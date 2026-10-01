@@ -1,0 +1,9 @@
+Continue the same task and address these parent audit findings. Keep the same write scope and do not edit docs/ledgers.
+
+1. The request test must assert the exact synthetic sb-api-key-id and sb-api-secret-key values and decoded content, number, and from_number. Synthetic fixtures are safe; this proves the correct fields rather than mere header presence.
+2. Add Config coverage for an explicit non-default allowed-services value and invalid BUNDJIL_SENDBLUE_FROM_NUMBER. Confirm the chosen Config encoding actually decodes under ConfigProvider.fromEnv.
+3. The documented Sendblue MessageResponse permits HTTP 2xx with status "ERROR". Add a minimal canonical provider wire Schema/union that distinguishes success from provider-rejected 2xx without retaining error_message/content/phone values. Map it to a safe SendblueResponseError reason such as providerRejected, and test it plus leak safety. Do not hand-write a DTO mapper.
+4. Re-run focused tests, agent check-types/build/test, git diff --check, and bun run verification.
+5. Recheck helper/module sprawl and keep the primary sendMessage flow flat and readable.
+
+Report the revised files and results.
