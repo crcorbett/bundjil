@@ -1,0 +1,4 @@
+The atomic suite still lacks two required cases. Add them now and do not report before they exist:
+1. 'rejects invalid transactions before provider I/O': use atomic.transact with duplicate condition keys, duplicate mutation keys, and 33 unique conditions. Each must fail; eval call count remains exactly zero; a paired native read/size proves no mutation.
+2. Extend safe eval errors with a second client whose eval returns Promise.reject(new Error(privateProviderMarker)); render the resulting AtomicKeyValueStoreError with Schema.UnknownFromJsonString and prove neither privateProviderMarker nor private key/value markers nor cause appear.
+Run bun run fix, package test/check-types. No parity test in this round, no other changes.
