@@ -1,0 +1,4 @@
+One final pass-2 polish correction:
+- apps/agent/README.md: reflow the paragraph beginning “Inbound handles...” so sentences wrap cleanly (the current complete./message.completed and before calling/Sendblue breaks are awkward) and keep lines within the repo's prose width.
+- docs/architecture/eve-agent.md: replace slash-heavy “operator/provider retry” with “operator-directed or provider retry” (or equally precise plain prose).
+Run bun run check and git diff --check. Leave task/audits in progress.
