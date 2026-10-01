@@ -1,0 +1,1 @@
+Please send a concise progress update now: session event count/terminal state, proxy correlation count, and any current blocker. Continue after the update.
