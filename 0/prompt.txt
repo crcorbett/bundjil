@@ -1,0 +1,3 @@
+Ok how can we begin improving the agent now?
+
+I want to provide it with the executor.sh MCP for example, https://start.1password.com/open/i?a=MIY7EWIONRD6FIPVGHATMOPW74&v=fsgvosp4rcmzfr3d5xjqycd4bu&i=erevcrueibyszi7tx6bznzwqli&h=my.1password.com has the API key
