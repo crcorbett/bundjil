@@ -1,0 +1,11 @@
+Task 1 remains unaccepted. Final correction round:
+
+1. Remove legacy-symbol-occurrence entirely. Convert every repository exception to exact stable occurrence fingerprints. No compatibility wildcard. Duplicate exact entries must fail as stale/duplicate. Keep owner/kind/contract/syntax/reason.
+2. Eliminate duplicate-prone recursive raw type reporting. Report the smallest semantic raw type node once (primitive/alias or Record/Map key), not every ancestor plus child. Add a fixture asserting exact diagnostic count for a nested exported signature.
+3. Expand inline exported Schema detection to actual supported exported Struct, TaggedStruct, and TaggedErrorClass field shapes. Add fixtures for all three.
+4. Strengthen outbound writes: a raw string variable passed to bodyText/persistence set must fail; a variable produced directly by yield* Schema.encodeEffect and a framework schemaBodyJson call must pass. Use TypeChecker/symbol declarations as needed and add exact fixtures. Keep target call patterns narrow.
+5. Make the CLI executable path Effectful: one flat named Effect operation, typed safe errors handled in its outer pipe, Effect Console/output, and run only at the executable edge. Compiler traversal may stay as the purposeful synchronous algorithm used by tests. Avoid helper sprawl.
+6. Ensure diagnostics don't claim unsupported non-null/assertion scope. Add exact-count assertions where multiple AST ancestors could duplicate findings.
+7. Run  check:boundaries, test:boundaries, tooling typecheck, check, knip if feasible, and git diff --check. Return only after legacy wildcard is gone and no known Task 1 acceptance limitation remains.
+
+Do not migrate Task 2/3 source or commit.
