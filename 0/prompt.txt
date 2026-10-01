@@ -1,0 +1,5 @@
+Can we use Effect Config + Schema + Config.fromProcess for this?
+
+  model: process.env["BUNDJIL_AGENT_MODEL"] ?? "google/gemini-2.5-flash",
+
+/Users/cooper/Projects/bundjil/apps/agent/agent/agent.ts
