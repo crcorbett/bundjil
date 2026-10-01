@@ -1,0 +1,8 @@
+<environment_context>
+  <current_date>2026-08-14</current_date>
+  <timezone>Australia/Melbourne</timezone>
+  <filesystem><workspace_roots><root>/Users/cooper/Projects/bundjil</root></workspace_roots><permission_profile type="disabled"><file_system type="unrestricted" /></permission_profile></filesystem>
+  <subagents>
+    - 019ffb6b-41da-7db3-a0d6-cfaaaa4b4c91: Hegel
+  </subagents>
+</environment_context>
