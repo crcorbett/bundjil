@@ -1,0 +1,13 @@
+Authoritative sanitized provider evidence is now available. Update only your existing documentation/ledger write scope; do not mutate providers or commit.
+
+Provider mutation and readback:
+- Guarded authenticated readback first proved Production 17 connections, exactly one executor.* connection, 5 policies, exactly one final * block; Preview 1 connection, 5 policies, one final * block.
+- Removed only Production executor.* connection, then only Production final * block.
+- Production after: 16 connection patterns, executor administration count 0, 4 policies, wildcard block count 0, four GitHub overrides retained.
+- Preview after: 1 connection, 5 policies, wildcard block count 1; unchanged.
+- No endpoint, key, Vercel variable, Sendblue state, deployment, or app code changed.
+- Direct Production MCP orchestration remains skills/execute/resume (asserted).
+- Inside execute, sanitized namespace counts were all positive for the 16 selected namespaces: cloudflare_api 3243, deepwiki_mcp 3, github 44, google_calendar 38, google_docs 3, google_drive 66, google_gmail 85, google_photos_library 12, google_sheets 17, linear_mcp 47, notion_mcp 20, parallel_mcp 2, parallel_task_mcp 4, sendblue_api 38, southleft_mcp 4, vercel_api 333. executor count 0.
+- No downstream provider operation was invoked; this was catalog discovery only.
+
+Update the Executor correction task operational evidence and plan/SPEC current-state wording. Keep the Executor task in_progress with completedPasses 0 until parent audits. Keep the Sendblue task in_progress/audit 2 until a fresh handset proof. Remove any text still saying no provider mutation has occurred. Run jq empty, git diff --check, and stale scans. Send final report.
