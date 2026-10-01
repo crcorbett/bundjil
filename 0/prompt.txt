@@ -1,0 +1,19 @@
+Continue task 1 with the native mocked-provider suite plus two production corrections.
+
+Production corrections:
+1. Convert the Upstash atomic transact member to the Effect-language-service recommended Effect.fn("AtomicKeyValueStore.transact")(generator, pipeTransformation) form, then pass the named function to AtomicKeyValueStore.of. Keep safe mapError and span in the Effect.fn transformation.
+2. In scanKeys, after decoding a page, reject the page as a provider failure if any returned key does not start with options.keyPrefix. Use Effect Array.every. This is required for namespace isolation even if Redis MATCH is violated.
+3. Add standard repository metadata to package.json matching sibling packages.
+
+Add test/upstash-key-value-store.test.ts using makeUpstashPersistenceLayer and a narrow mock:
+- exact prefixed get/set/remove operations and native get null->undefined;
+- one clientFactory call per Layer build;
+- complete multi-page cursor scan, duplicate-page key de-dup, size result, exact prefix match/count;
+- clear collects all pages before DEL, de-dupes keys, chunks >100 keys, and empty namespace makes no DEL;
+- malformed get, malformed scan page, out-of-prefix scan result, and rejected provider Promise map to safe KeyValueStoreError with method/message only and no key/cause/private marker in Schema.UnknownFromJsonString rendering;
+- prefix Schema accepts a normal prefix and rejects *, ?, [, ], and backslash;
+- no FLUSHDB/DBSIZE/unscoped command can be represented by the narrow client/calls.
+
+Use Effect/test patterns, Schema codecs, no JSON.parse/stringify, unsafe casts, suppressions, raw DTO mirror, or production test export. Test helpers may simulate provider state but keep them test-owned and concise.
+
+Run bun run fix, package check-types/test/build, bun run check. Do not add atomic provider tests yet, edit consumers/ledger/plan, or commit. Report exact test count and diagnostics.
