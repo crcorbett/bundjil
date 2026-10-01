@@ -1,0 +1,57 @@
+Work in /Users/cooper/Projects/bundjil. Implement exactly task document-and-audit-sendblue-channel from docs/product-specs/sendblue-eve-channel.tasks.json, following .agents/skills/prd-implementer/SKILL.md, AGENTS.md, and docs/exec-plans/active/sendblue-eve-channel.md.
+
+You own documentation reconciliation and task-5 audit preparation only. Primary write scope:
+- apps/agent/README.md
+- docs/architecture/eve-agent.md
+- docs/architecture/repo-structure.md only if needed
+- README.md
+- ARCHITECTURE.md
+- docs/product-specs/sendblue-eve-channel.md
+- docs/product-specs/sendblue-eve-channel.tasks.json
+- docs/exec-plans/active/sendblue-eve-channel.md
+- related docs indexes only when required.
+
+Do not change runtime code, tests, dependencies, provider state, Vercel, Sendblue, or 1Password. You are not alone in the codebase: preserve existing user/parent changes and do not revert work you did not make.
+
+The accepted live evidence is already sanitized in the active plan. Reconcile docs to actual current files and verified Preview behavior. Do not expose or reconstruct any credential, message text, full phone number, full protected webhook URL, provider body, replay payload, or ciphertext. Do not imply Production enablement. State that Sendblue uses the shared sb-signing-secret header rather than body HMAC, and Vercel bypass is independent platform auth.
+
+Required content includes config names, route/auth, supported/ignored event matrix, sender identity, opaque routing, inbound/outbound replay semantics, failure behavior, local test commands, Preview proof, observation, credential rotation, disabling/rollback, production/test/CLI call graphs, and current limitations. Keep Effect rules/patterns accurate and explicit: app-owned services, canonical Schema-derived contracts, Redacted Config, Context/Layer, named flat linear Effect.gen/Effect.fn operations, tagged errors handled in .pipe, claim before side effect, no unsafe casts/manual JSON/direct process.env/raw fetch/helper sprawl. Frontend composition rules are not applicable because no React/UI is touched; state that audit result rather than inventing frontend work.
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,
+HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit,
+Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
+code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
+RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded
+identifiers from the owning package. Do not define standalone DTO mirrors or
+duplicate fields such as id: string, slug: string, status, or post metadata
+outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers,
+mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
+or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit
+primitive or owning service contract should carry the behavior.
+
+For UI work, use the primitive -> composite -> layout -> route chain. Let
+leaves own the data, commands, loading, empty, error, retry, skeleton, and
+fallback behavior for the exact fragment they render. Do not add nested
+feature wrappers merely to shorten route JSX, and do not prop-drill query
+results, selected ids, loading flags, command callbacks, or derived option
+lists when a leaf can own the narrow value.
+
+For reusable URL state, use schema-owned search and route-identity contracts.
+Keep the app router as the URL writer, and do not import app route modules into
+reusable packages.
+
+Run and report:
+- helper-sprawl, unsafe-cast, manual-reader/mapper, raw JSON, process.env, raw fetch, Map/Set replay, lint-suppression, PII/secret marker, stale-status, and untracked-runtime-artifact scans
+- bun run --filter @bundjil/agent check-types
+- bun run --filter @bundjil/agent test
+- bun run check
+- bun run knip
+- bun run verification
+- jq task-ledger consistency checks
+- git diff --check
+
+Do not mark the task completed or fill its three parent implementationImprovementAudit passes; the parent owns those acceptance passes. Leave status in_progress and report changed files, scan findings, and command evidence.
