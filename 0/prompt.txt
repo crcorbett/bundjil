@@ -1,0 +1,1 @@
+Ok please do all of that. Remember to keep docs up to date, and before starting new implementations like apps/agent and integrations that we need SPECs via [$prd-writer](/Users/cooper/Projects/bundjil/.agents/skills/prd-writer/SKILL.md) and [$prd-implementer](/Users/cooper/Projects/bundjil/.agents/skills/prd-implementer/SKILL.md)
