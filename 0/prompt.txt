@@ -1,0 +1,1 @@
+During your final verification, fix the current trailing whitespace at docs/product-specs/sendblue-eve-channel.md:3. Please also run git diff --check after your edits and report any remaining findings.
