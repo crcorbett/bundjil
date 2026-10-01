@@ -1,0 +1,5 @@
+I thought Vercel Workflows were supposed to help with these issues, without needing the separate store?
+
+Sendblue could retry the same inbound webhook and Bundjil would answer the same text twice.
+Eve could replay a message.completed event after a function interruption and send the same reply twice.
+A Vercel function could complete the external side effect but fail before recording success, causing a retry.
