@@ -1,0 +1,7 @@
+You are terminal audit PASS 3 of 5 for Bundjil. Passes 1 and 2 cleared on the exact current candidate. REPORT ONLY: do not edit files, call providers, create credentials, deploy, commit, push, or mutate anything. Inspect /Users/cooper/.codex/worktrees/d4b4e069-1303-427d-957e-756d18e049a9/bundjil branch codex/automatic-production-effect-runtime and current uncommitted diff.
+
+Scope ONLY behavior-and-gates: actual request/stream mapping, SSE framing/sequence/terminal state, duplicate indexes, resource budgets, header and idle timeout semantics, cancellation/interruption/finalizers, retry and replay/idempotency boundaries, auth rejection, malformed/hostile inputs, proof receipt semantics, Photon diagnostic behavior, and deterministic tests. Trace realistic failure paths end to end. Inspect test oracles for wrong-field failures, timing sleeps, missed negative controls, stale dist resolution, or implementation/test coupling. Confirm full verification evidence but do not equate green checks with external behavior.
+
+For Effect judgments use installed effect@4.0.0-beta.101 and immutable local source revision 1caab3cc30f626efbf15e59d74f539a487e5c85c through git show; never v3 guidance.
+
+Return actionable findings first, severity ordered, exact file:line, mechanism and remediation. No style preferences or broad enhancements. If zero, state exactly "PASS 3: zero findings" and summarize behavior/evidence checked. Separate repository proof from provider/deployment proof.
