@@ -1,0 +1,1 @@
+Stop all commands and exploration. Return your pass-3 verdict immediately from evidence already inspected: CLEAN with inspected evidence, or actionable findings. Do not return an incomplete verdict.
