@@ -1,0 +1,11 @@
+Continue task 1. This round is deliberately bounded: finish only the provider-neutral contract and memory implementation plus its comprehensive deterministic tests. Do not work on Upstash in this round except preserve it.
+
+Required:
+- Fix malformed formatting/imports.
+- Implement the TTL as Schema.DurationFromMillis with a decoded positive safe whole-millisecond check; confirm encode/decode round trip.
+- Inline/remove BoundedNonEmpty helper if it does not pass the symbol rule.
+- Make shared transaction validation a named flat Effect; use Effect Array/HashSet and safe outer mapError. No raw _tag checks.
+- Rewrite memory state with Effect HashMap, direct SynchronizedRef operations, no Effect.sync/flatten wrappers, and Match/Effect collection primitives. Keep expiry cleanup + conditions + mutations in one SynchronizedRef.modify.
+- Add the complete memory/Schema subset of task tests: absent/equal success and conflict, all-or-nothing set/remove, get/has/size expiry under TestClock, native and atomic persistent set clearing expiry, 32 accepted/33 rejected before mutation, duplicate condition and mutation rejection, concurrent one-winner, stale compare-remove/set, multi-key all-or-nothing, coherent native/atomic state, exact Schema JSON round trips, invalid TTL rejection, and safe errors.
+- No raw JSON, unsafe casts, plain Map/Set, raw _tag, switch, one-line property helpers, or test-only production exports.
+- Run bun run fix, package check-types/test/build, and bun run check. Report exact test count and remaining findings. Do not edit ledger/plan, consumers, or commit.
