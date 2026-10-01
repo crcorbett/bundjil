@@ -1,0 +1,74 @@
+Implement exactly Task 3, "Migrate channel, proxy, config, and persistence boundaries end to end", in /Users/cooper/Projects/bundjil.
+
+Read first:
+- /Users/cooper/Projects/bundjil/docs/product-specs/effect-boundary-provenance-enforcement.md
+- /Users/cooper/Projects/bundjil/docs/product-specs/effect-boundary-provenance-enforcement.tasks.json
+- /Users/cooper/Projects/bundjil/docs/exec-plans/active/effect-boundary-provenance-enforcement.md
+- /Users/cooper/Projects/bundjil/AGENTS.md
+- relevant /Users/cooper/Projects/bundjil/docs/architecture docs, especially effect-patterns.md, repo-structure.md, testing-and-quality.md, eve-agent.md, frontend-composition.md
+- /Users/cooper/Projects/bundjil/.agents/skills/effect-client-wrapper/SKILL.md
+
+You are the sole Task 3 implementation worker. Edit files directly in the shared workspace. You are not alone in the codebase: preserve and work with edits made by others, never revert them. The working tree contains deliberate preparatory Task 4 changes in AGENTS.md, README/docs architecture files, skills, package.json, and tooling/skill-policy-audit.ts. Do not edit, stage, revert, or fold those preparatory files into Task 3. The parent owns task-ledger/active-plan audit bookkeeping and commits.
+
+Primary ownership/write scope:
+- apps/agent/agent/**, apps/agent/scripts/**, apps/agent/test/**
+- packages/eve-effect/**
+- packages/effect-persistence/**
+- apps/codex-proxy/** only for remaining Task 3 proxy boundaries not already completed in commit a4728c4
+- tooling/boundary-audit.ts, tooling/boundary-audit.test.ts, tooling/boundary-exceptions.ts only where Task 3 migration removes/adds exact findings or fixtures
+Do not introduce a generic helper/common/utils module.
+
+Requirements:
+- Confine Eve callback unknown/Promise primitives to exact framework adapters and retain Eve's typed event map as dispatch authority.
+- Use app/channel-owned Schemas for semantic config, preflight data, inbound/outbound content, coordinates, replay keys/values, sender identity, and safe diagnostics.
+- Use Config.schema for semantic values and keep secrets Redacted without unwrap/redecode cycles.
+- Keep Effect KeyValueStore and Upstash primitives private; decode external unknown once and encode domain records before every outward persistence write.
+- Use Effect HttpClient and canonical request/response/SSE codecs in any remaining proxy/channel HTTP path.
+- Preserve signed webhook verification, sender mapping, session routing, replay claims, outbound message.completed behavior, authorization/status/content-type/error/SSE wire contracts, persistent key prefixes/values/TTLs/atomic transactions, and Vercel fetch composition.
+- Remove resolved exact exception entries. Retain only unavoidable third-party/framework constraints with exact evidence.
+- No production/deployment/provider/credential/webhook/namespace mutation; automated mocks and direct local HTTP proof only.
+- No frontend change is expected. If visible UI is unexpectedly touched, stop and report because browser proof becomes mandatory.
+- Run focused typechecks/tests/builds and direct HTTP/persistence compatibility checks. Run bun run check:boundaries, bun run check:effect-setup, bun run check:skills, and bun --env-file=apps/agent/.env.preview.local run verification before reporting if practical.
+- Report changed files, call graphs, remaining exceptions, exact command results, and a downstream-impact ledger. Do not commit.
+
+Mandatory implementation policy:
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,
+HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit,
+Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
+code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
+RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded
+identifiers from the owning package. Do not define standalone DTO mirrors or
+duplicate fields such as id: string, slug: string, status, or post metadata
+outside their canonical schema/type owner.
+
+For every changed boundary, identify the canonical codec, its Type and Encoded
+sides, the exact inbound decode adapter, the exact outbound encode adapter, and
+any exact exception-registry entry. Decode unknown host/provider data once,
+use decodeEffect for statically encoded data, and encode decoded values before
+they leave the adapter. Domain services accept decoded owner types only.
+
+For provider/SDK work, follow .agents/skills/effect-client-wrapper. Expose only
+named operations, use schema-derived branded identifiers, load semantic config
+through Config.schema with redacted secrets, encode requests, immediately
+decode provider output, map failures to safe Schema tagged errors, and provide
+live and mock Layers. Reject raw client/callback escape hatches and unchecked
+provider DTOs.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers,
+mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
+or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit
+primitive or owning service contract should carry the behavior.
+
+For UI work, use the primitive -> composite -> layout -> route chain. Let
+leaves own the data, commands, loading, empty, error, retry, skeleton, and
+fallback behavior for the exact fragment they render. Do not add nested
+feature wrappers merely to shorten route JSX, and do not prop-drill query
+results, selected ids, loading flags, command callbacks, or derived option
+lists when a leaf can own the narrow value.
+
+For reusable URL state, use schema-owned search and route-identity contracts.
+Keep the app router as the URL writer, and do not import app route modules into
+reusable packages.
