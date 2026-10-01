@@ -1,0 +1,1 @@
+Continue the same task. Complete the mode-0600 sanitized sendblue-final-promotion checkpoint now. If it passes, proceed to the 1Password credential-read step exactly as assigned. If 1Password blocks, stop and report only after the gate has passed; do not mutate Production before usable credentials are available.
