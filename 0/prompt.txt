@@ -1,0 +1,17 @@
+Workspace: /Users/cooper/Projects/bundjil, main at 128584c with one uncommitted sanitized blocker note in docs/exec-plans/active/vercel-production-promotion.md from the previous worker. Act as prd-writer only. Read /Users/cooper/Projects/bundjil/.agents/skills/prd-writer/SKILL.md and revise the active Vercel Production promotion SPEC, task ledger, and active plan to remove the discovered circular preflight dependency.
+
+Current defect:
+- The single full preflight requires agent Production vars before task 3, but task 3 is prohibited from changing them and task 5 owns them.
+- It requires proxy Production vars before task 3, but task 3 owns creating them.
+- It requires accepted rollback deployment IDs before task 4, but task 4 owns creating the first accepted Production deployment.
+- The first read-only inventory correctly failed with only Marketplace Upstash Production aliases and no Bundjil Production vars; no state changed.
+
+Required design:
+- Keep fail-closed behavior and no weakened controls.
+- Define explicit staged checkpoints with the smallest check set that can truthfully pass at each point: before first mutation, after proxy credential/profile provisioning and before proxy deploy, after accepted proxy and agent vars before agent deploy, after accepted agent/rollback references, and final Sendblue promotion.
+- The before-first-mutation gate must verify granted approval, personal scope, exact projects/stable domains, Deployment Protection posture, clean source SHA, known/expected absence of Bundjil Production activation, no Preview identity reuse, and read-only inventory; it must not pretend future vars/deployments exist.
+- Later gates progressively require variable names/security types, live mode, stable proxy URL, disjoint opaque identities, accepted immutable deployment/rollback references, Eve OIDC, and Sendblue only last.
+- Add a new serial implementation task for staged preflight support before provisioning, rather than rewriting accepted history. Update dependencies accordingly.
+- Preserve all existing accepted evidence and the blocker note. Do not implement code, mutate Vercel, change task audit pass counts, commit, or push.
+- Maintain Effect rules, no helper sprawl, Schema contracts, tests for stage-specific forbidden/missing fields, and mandatory 3-pass audits.
+- You are not alone in the codebase. Do not revert others' edits. Report changed files and the revised task sequence.
