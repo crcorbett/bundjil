@@ -1,0 +1,26 @@
+Implement exactly task `implement-local-encrypted-filesystem-proof` from `docs/product-specs/codex-local-profile-import-workaround.tasks.json`. You are not alone in the codebase; do not revert edits made by others, and adjust to current changes.
+
+Ownership:
+- `package.json` only as necessary for Effect Bun platform catalog/dependency
+- `packages/codex-oauth/package.json`, exports, scripts, and any new/changed source or tests required for the explicit local filesystem KeyValueStore layer and separate filesystem importer command
+- `apps/codex-proxy/src/{schemas.ts,env.ts,server.ts,local.layer.ts,index.ts}` and proxy tests/readme as needed
+- You may update `packages/codex-oauth/README.md` and `apps/codex-proxy/README.md`, but do NOT edit the SPEC, task ledger, or active execution plan; the parent owns those.
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the code is fallible, async, runtime-owned, collection-heavy, or crosses a package, RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded identifiers from the owning package. Do not define standalone DTO mirrors or duplicate fields such as id: string, slug: string, status, or post metadata outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers, mappers, transformers, switch/case branches, instanceof checks, unsafe casts, or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit primitive or owning service contract should carry the behavior.
+
+Requirements:
+- Local is explicit and persistent: use `KeyValueStore.layerFileSystem(directory)` with `@effect/platform-bun/BunServices.layer`. It must share the existing encrypted `CodexProfileStoreEncryptedKeyValueLive`, AES-GCM cipher, canonical profile schema, direct provider, and no-refresh behaviour.
+- Add a separate filesystem importer command. Preserve the existing Upstash importer and preview path.
+- Add app-owned `local` proxy mode, composed in a dedicated `apps/codex-proxy/src/local.layer.ts`, using the memory refresh lock only because imported profiles are access-token-only and never refreshed. It must not use Upstash.
+- Configuration is through Effect Config only. `BUNDJIL_CODEX_LOCAL_PROFILE_STORE_DIR` is required for local mode/import. Decode Vercel’s standard runtime marker via Config and reject local mode in Vercel; do not use `process.env`.
+- `mock` remains default. `live` remains Upstash-only. Do not add a silent fallback.
+- Do not read a real cache, token, or provider response in tests or output. Do not call the real provider.
+- Tests must demonstrate persistence across fresh layer construction, ciphertext-only content with no fixture access/refresh/ID token strings, safe missing-directory/local-on-Vercel handling, protected local proxy streaming with mocked fetch, mock preservation, and no Upstash requirement.
+- Update focused READMEs with safe local commands and clear non-deployment warning.
+- Run all required focused checks and, if practical, `bun run verification`. Report commands/results and every changed file.
+
+Read `AGENTS.md`, the target spec/ledger, `docs/architecture/effect-patterns.md`, `docs/architecture/repo-structure.md`, and inspect existing layers before editing. Use `apply_patch` for edits.
