@@ -1,0 +1,1 @@
+Stop all commands and return the PASS 4 verdict immediately from inspected evidence. CLEAN only if every listed owner/date/route/inventory/non-claim check passed; otherwise give actionable findings. No incomplete verdict.
