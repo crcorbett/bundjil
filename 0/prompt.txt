@@ -1,0 +1,9 @@
+Run restarted terminal audit PASS 2 of 5 after ENP-FND-052. PASS 1 is CLEAN. Report-only; no edits, builds, generated output, commits, pushes, credentials, providers or deployment.
+
+Worktree: /Users/cooper/.codex/worktrees/d4b4e069-1303-427d-957e-756d18e049a9/bundjil
+Base: 803cd6a459be19a2babf5bf92d437d3946ed341a
+Current staged delta is 11 lifecycle/docs paths only; executable delta is zero. Full post-correction verification is green.
+
+Read exact staged diff and governing active SPEC/task/plan. PASS 2 scope: call graph/topology, Effect flatness/laziness/trace ownership, runtime/Layer lifetime, package/file placement, exports, helper sprawl, dead paths, state/collection semantics and duplicated contracts. Confirm the docs-only correction neither changes these nor makes a false claim about them. Reuse prior clean source evidence only after confirming zero executable delta. No tests or broad scans.
+
+Return CLEAN with exact evidence/non-claims, or actionable finding with file/line and minimal correction.
