@@ -1,0 +1,7 @@
+Parent audit pass 1 found unresolved documentation accuracy issues. Please correct these in the same task, rerun targeted scans and git diff --check, and report:
+1. docs/architecture/repo-structure.md: current app tree omits agent/channels/sendblue.ts and agent/lib/sendblue; line 89 still says future Sendblue. Update the durable app-owned boundary accurately.
+2. docs/architecture/eve-agent.md bottom Future Boundaries section still says Sendblue is not implemented and the preceding “Before starting new integrations such as Sendblue” is stale. Reconcile to current Preview-verified state while keeping Production gated.
+3. ARCHITECTURE.md near Runtime Principles still says “Future Sendblue...”; reconcile.
+4. README.md roadmap item 5 still says “Add the Sendblue...” although it exists. Replace with the actual next Sendblue step (keep Preview healthy / production promotion remains separately gated).
+5. apps/agent/README.md says a rejected dispatch “returns the claim to a bounded retryable state”. Actual dispatch failure calls retryable(), which owner-fenced compare-and-deletes/releases the claim. State that accurately. Review the similar SPEC phrase and preserve its allowed alternative only if it clearly reflects actual compare-and-delete behavior, not a persistent retryable state.
+Do not mark task complete or add parent audit evidence.
