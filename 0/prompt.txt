@@ -1,0 +1,8 @@
+No inbound has arrived in the last two hours. While waiting, complete every non-handset acceptance gate without causing any external message or provider delivery:
+- prove the ignored/loop 200 route path only if it cannot dispatch or deliver;
+- prove storage fail-closed 503 through the isolated local/synthetic fixture only;
+- run the sequential and concurrent replay-claim tests/fixtures locally without provider delivery;
+- inspect sanitized Production runtime logs for the accepted 401/401/400 probes and confirm no credentials, URL queries, content, numbers, handles, or raw bodies leaked;
+- validate exactly two Sendblue receive webhooks and five Vercel automation bypass records, with Preview preserved and the Production note present;
+- rerun focused agent tests/build and root verification if any evidence/docs change.
+Update only the same two active plans with sanitized in-progress evidence. Do not run an accepted synthetic inbound that could trigger Eve or Sendblue outbound. Do not commit, edit ledgers/audits, or remove the bundle.
