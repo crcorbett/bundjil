@@ -1,0 +1,1 @@
+Config belongs in a distinct config.ts file
