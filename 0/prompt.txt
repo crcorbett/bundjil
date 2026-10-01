@@ -1,0 +1,1 @@
+Correction: please do NOT change refresh serialization. The governing Bundjil SPEC and reviewed Codex reference explicitly require JSON for refresh and form encoding only for authorization-code exchange. Disregard my prior message entirely; leave the working tree unchanged. Please acknowledge no changes made.
