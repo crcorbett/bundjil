@@ -1,0 +1,1 @@
+Please finish this correction round now. Prioritize semantic alias detection, inline exported Schema fields, unsafe/non-null assertions, typed codec misuse, narrow outbound-write checks, exact occurrence exceptions, fixtures, and focused commands. Return any limitation honestly; parent will handle remaining corrections.
