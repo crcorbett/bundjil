@@ -1,0 +1,57 @@
+Implement exactly task run-real-local-login-tracer from docs/product-specs/codex-hosted-live-oauth-storage.tasks.json, using the accepted SPEC and active execution plan. This is the trusted owner-machine tracer. Do not implement hosted refresh or deploy anything.
+
+You own any narrowly required package proof command/tests/docs needed to make the real tracer safe and repeatable, plus sanitized evidence in the active execution plan. Do NOT mark the task completed or add parent audit evidence in the task ledger; parent owns acceptance. You are not alone in the codebase: preserve existing edits and do not revert unrelated work.
+
+Execution:
+1. Obtain the personal bundjil-codex-proxy PREVIEW environment into a restrictive temporary ignored file without printing values, using the same authenticated personal Vercel path already proven (Executor Personal Vercel API or bunx Vercel CLI). Never use Tilt Legal.
+2. Source it only within a private shell. Map the accepted proxy subject names to the local login command without printing:
+   BUNDJIL_CODEX_PROFILE_PRINCIPAL_ID from BUNDJIL_CODEX_SUBJECT_ID
+   BUNDJIL_CODEX_PROFILE_CONNECTOR_ID from BUNDJIL_CODEX_CONNECTOR_ID
+   BUNDJIL_CODEX_PROFILE_INSTALLATION_ID from BUNDJIL_CODEX_INSTALLATION_ID
+   BUNDJIL_CODEX_PROFILE_ID is shared.
+3. Run bun run --filter @bundjil/codex-oauth login:subscription. It should open the owner browser and return to localhost:1455 or 1457. Wait for the browser interaction and callback. Do not print the authorization URL, callback query, code, state, verifier, token, account id, ID token, provider response, prompt, or model output.
+4. If browser sign-in requires user action, keep the process alive and report that it is waiting rather than substituting cache access or manual token paste.
+5. After successful sanitized login output, prove the stored value is an encrypted V2 envelope and leak-free. If no safe durable verifier exists, add a package-owned trusted proof command/service using Effect Schema/Config/Redacted/KeyValueStore/cipher services. It may read/decrypt only inside the trusted process and emit a Schema-encoded sanitized result containing booleans/categories only: found, envelopeVersion2, ciphertextPresent, profileKindSubscription, refreshCapable, expiryValid, requiresReauthenticationFalse, and markerLeakFalse. It must not emit keys, subject hash, revisions, timestamps, ciphertext, env values, tokens, account id, claims, or raw payload. Use package services and schema codecs, no raw Redis/JSON/env.
+6. Delete all temporary env/proof files, and ensure shell history/docs/logs contain no values.
+7. Do not deploy, alter Vercel env, touch production, call the Codex model backend, or wire Eve.
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,
+HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit,
+Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
+code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
+RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded
+identifiers from the owning package. Do not define standalone DTO mirrors or
+duplicate fields such as id: string, slug: string, status, or post metadata
+outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers,
+mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
+or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit
+primitive or owning service contract should carry the behavior.
+
+For UI work, compose stable visible structure as high as practical, usually in
+the route or nearest page-level parent. Use the primitive -> composite ->
+layout -> route chain for visible structure. Let leaves own the data,
+search/page params, commands, atoms, skeletons, and fallbacks for the exact
+fragment or action they render. Do not add nested feature wrappers merely to
+shorten route JSX, and do not prop-drill query results, selected ids, loading
+flags, command callbacks, or derived option lists when a leaf can own the
+narrow value.
+
+For reusable URL state, use schema-backed field URL atoms for search params and
+read-only page-param atoms for route identity. Keep TanStack Router as the app
+URL writer, and do not import app route files, routeTree.gen,
+Route.useSearch(), or Route.useParams() into reusable packages.
+
+Mandatory verification:
+- real loopback login emits only sanitized Schema output
+- Upstash readback proves V2 encrypted envelope and subscription fields with sanitized booleans only
+- marker scans prove no credential/code/verifier/state/account/callback/JWT/ID-token markers in persisted encoded envelope or emitted output
+- package check-types, tests, build
+- bun run verification
+- git diff --check
+- temporary files removed
+- report exact changed files, sanitized output fields, and blockers.
+No production, no deployment, no model call.
