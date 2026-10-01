@@ -1,0 +1,1 @@
+Stop the current attempt and report the exact current status/blocker now. Include which command/tool is stalled and whether any temporary env file or process exists. Do not expose values.
