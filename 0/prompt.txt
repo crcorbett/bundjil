@@ -1,0 +1,1 @@
+Please stop further exploration and apply/finish the documentation patch now using the repo evidence already gathered. Do not run root verification. Return as soon as the coherent patch is written.
