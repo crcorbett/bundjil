@@ -1,0 +1,91 @@
+Implement exactly task "implement-local-subscription-login-broker" from docs/product-specs/codex-hosted-live-oauth-storage.tasks.json against docs/product-specs/codex-hosted-live-oauth-storage.md.
+
+You own:
+- packages/codex-oauth/src protocol/config/http-client/loopback/browser/login services, schemas, errors, layers, exports
+- packages/codex-oauth/scripts trusted-local login CLI
+- packages/codex-oauth/test focused login-broker tests and necessary existing package test migration
+- packages/codex-oauth/package.json and README for the new local command/contract
+Do not edit the task ledger or active execution plan. Do not commit. Do not edit apps/agent or add hosted/Vercel OAuth routes.
+
+You are not alone in the codebase. Preserve the committed fenced-profile work and any parent ledger status edit. Do not revert others.
+
+Read:
+- docs/product-specs/codex-hosted-live-oauth-storage.md
+- task object in docs/product-specs/codex-hosted-live-oauth-storage.tasks.json
+- docs/architecture/effect-patterns.md
+- docs/architecture/repo-structure.md
+- docs/architecture/testing-and-quality.md
+- current packages/codex-oauth code, especially profile/commit/cipher/Upstash contracts
+- current first-party source under .local/references/codex for exact auth protocol, ports, scopes, exchange, refresh, JWT expiry, account metadata, callback behavior
+- .local/references/effect-v4 for Effect v4 APIs when uncertain
+The pinned community repository is interoperability context only; do not copy its code or unsafe parsing/logging patterns.
+
+Required implementation:
+- CodexSubscriptionAuthProtocolConfigService with canonical first-party endpoints/client id/ports/scopes/parameters and explicit live/test layers. Public protocol constants are package config; secrets are not Config/process env.
+- Cryptographically random state and PKCE verifier/challenge S256, all state/verifier/code/tokens/ID token/auth URL Redacted and memory-only.
+- CodexOAuthHttpClient with separate form-url-encoded authorization-code exchange and JSON refresh transports, narrow response/error Schemas, Effect Platform HttpClient only, and no expires_in assumption.
+- Access JWT exp decoder and first-party canonical account metadata decoder using narrow Effect Schemas. Do not persist the ID token. Reject cross-account refresh metadata.
+- CodexLoopbackCallback with Bun live and memory test layers, 127.0.0.1, ports 1455 then 1457, exact GET /auth/callback validation, denial/missing code/state mismatch/timeout/port conflict errors, Deferred completion, request logging disabled, and Scope finalization on success/failure/timeout/interruption/browser failure/exchange failure.
+- CodexBrowserLauncher with Effect Platform Command live and memory test layers. Reveal auth URL only at command execution boundary.
+- CodexSubscriptionLogin with explicit live/mock composition: observe existing profile revision before browser flow; after exchange construct canonical CodexSubscriptionProfile; use initialWrite when absent or replace with observed revision; stale login gets typed conflict. Encrypt/persist via the existing Upstash commit composition.
+- Sanitized Schema-owned CLI result only: profile id, mode, expiry category, refresh-capable true, encrypted-store confirmation. No callback URL/query, code, state, verifier, token, account id, raw response, prompt, or model output.
+- Add package script login:subscription. Automated tests use mocks only; do not open a real browser or call OpenAI in this task.
+- Keep current CodexOAuthClient unsupported/live behavior coherent; if this new client supersedes or refines it, preserve existing consumers and explicit unsupported layers.
+
+Mandatory tests:
+- protocol authorization URL exact fields, ports 1455/1457, official scopes, state entropy and mismatch, PKCE challenge
+- callback method/path, denial, missing code, timeout, port conflict, browser failure
+- every Scope finalizer path (success, denial, timeout, interruption, state mismatch, exchange failure, browser failure)
+- code exchange form encoding and refresh JSON via mock HttpClient; response schemas without expires_in
+- access JWT exp, account metadata, malformed claims, cross-account refresh rejection
+- ID token not present in persisted profile or sanitized result
+- initial fenced save and observed-revision replacement; stale login conflict
+- encoded CLI result/output leak scan
+- no hosted OAuth routes/imports
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,
+HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit,
+Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
+code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
+RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded
+identifiers from the owning package. Do not define standalone DTO mirrors or
+duplicate fields such as id: string, slug: string, status, or post metadata
+outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers,
+mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
+or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit
+primitive or owning service contract should carry the behavior.
+
+For UI work, compose stable visible structure as high as practical, usually in
+the route or nearest page-level parent. Use the primitive -> composite ->
+layout -> route chain for visible structure. Let leaves own the data,
+search/page params, commands, atoms, skeletons, and fallbacks for the exact
+fragment or action they render. Do not add nested feature wrappers merely to
+shorten route JSX, and do not prop-drill query results, selected ids, loading
+flags, command callbacks, or derived option lists when a leaf can own the
+narrow value.
+
+For reusable URL state, use schema-backed field URL atoms for search params and
+read-only page-param atoms for route identity. Keep TanStack Router as the app
+URL writer, and do not import app route files, routeTree.gen,
+Route.useSearch(), or Route.useParams() into reusable packages.
+
+Quality constraints:
+- flat named Effect.gen/Effect.fn operations with tagged error handling in following .pipe chains
+- explicit Context services/Layers and Scope-safe resource ownership
+- Schema.fromJsonString / Schema.toCodecJson / URLSearchParams or Effect HTTP body APIs; no JSON.stringify/parse, raw fetch, unsafe casts, manual object readers, process.env package reads, switch, Object.values/entries, or helper sprawl
+- Redacted.value only at final browser-command, HTTP request-body/header, JWT decoding input, crypto input, or encrypted persistence boundaries
+- callback and HTTP errors must not capture query strings/provider bodies/secrets
+- no broad permanent/transient refresh policy work beyond the transport and metadata contract; that belongs to the later proxy task
+
+Run:
+bun run --filter @bundjil/codex-oauth check-types
+bun run --filter @bundjil/codex-oauth test
+bun run --filter @bundjil/codex-oauth build
+bun run verification
+git diff --check
+
+Return implementation summary, every changed file, exact test/build evidence, and unresolved concerns.
