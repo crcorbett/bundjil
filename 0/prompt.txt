@@ -1,0 +1,1 @@
+Should we be using a BetterAuth / WorkOS framework to help with this?
