@@ -1,0 +1,11 @@
+Task 3 parent audits found unresolved items. Correct within your existing ownership:
+1. Restore exact behavior in deliverCompletedMessage: outbound content must be completed.message.trim(), not the untrimmed message/null fallback.
+2. Do not use SendblueOutboundMessageContent (18,996 max) for inbound dispatch decisions. Add/reuse a separate named non-empty inbound dispatch content Schema with no outbound limit, preserving current inbound acceptance.
+3. Brand BundjilWorkspaceName and BundjilPackageName. Keep question/summary as named content Schemas.
+4. Complete agent model config: add canonical branded AgentModelId and use it in agent/model-provider.ts and agent/config.ts for gateway/proxy models/default. Reuse OpenAICompatibleProxyInternalToken instead of duplicating its redacted Schema. Add an app-owned named redacted Vercel protection-bypass Schema.
+5. Brand the broad forward-compatible SendblueInboundStatus and add a canonical SendblueReceivedStatus literal/value. Replace the raw status comparison against RECEIVED with Match over the decoded status.
+6. Replace SendblueEveAuth's anonymous Record<string,string> with its actual canonical attributes structure/literal if compatible with Eve.
+7. Replace remaining material raw string result/discriminant branches in Sendblue channel/client/replay code: inbound claimed duplicate, client response status, replay kind/status/result. Use Match and canonical literal/tagged types. Remove string as-const assertions where contextual result types or satisfies can preserve the canonical type without assertions.
+8. Keep proxy mode checks only if they are clearly decoded closed-literal control flow; do not add complexity merely to remove equality.
+9. Add tests that catch trimmed outbound content, no outbound-limit application to inbound dispatch, branded boundary decode failures, and message.completed finish-reason behavior where not already covered.
+10. Run focused checks/tests/builds plus root check/check-types/knip/verification/build with protected Executor env as needed, and static scans. No docs/commit/provider changes.
