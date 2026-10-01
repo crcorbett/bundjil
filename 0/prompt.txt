@@ -1,0 +1,18 @@
+Work in /Users/cooper/Projects/bundjil. Implement exactly one task from docs/product-specs/codex-hosted-live-oauth-storage.tasks.json: "document-and-supersede-access-only-workaround".
+
+Own documentation reconciliation only: README.md, ARCHITECTURE.md, docs/README.md, relevant docs/architecture/*.md, apps/agent/README.md, apps/codex-proxy/README.md, packages/codex-oauth/README.md, the three relevant product SPECs, relevant active exec plans, and repo-local .agents/skills/prd-writer/SKILL.md plus prd-implementer/SKILL.md if their paths are stale. Do NOT edit the tasks JSON or application/source code. You are not alone in the codebase; do not revert others' edits.
+
+Read the target SPEC/task, actual source, and recorded proof. Preserve dated historical evidence but label it historical/superseded.
+
+Truth to document:
+- Refresh-capable hosted proxy is implemented and proven on personal Vercel preview with encrypted Upstash persistence, trusted-local PKCE provisioning, refresh, fenced concurrency, SSE, safe logs.
+- Access-token-only import is a deprecated emergency/local diagnostic fallback.
+- apps/agent already has opt-in codex-proxy LanguageModel adapter via Effect Config; Gateway remains default.
+- Proxy and adapter are proven separately; do not claim recorded combined Eve -> hosted-live-proxy end-to-end proof unless evidence exists.
+- Proxy exposes no hosted browser OAuth callback/account-linking endpoint.
+- Update hosted SPEC status/revision/current call graphs; final cross-cutting audit remains for parent.
+- Mark workaround SPEC/plan superseded/completed without erasing history.
+- Correct stale future-work lists and skill routes to real Bundjil docs.
+Run stale-claim searches and relevant checks. Report changed files/evidence.
+
+Use Effect TS native approaches first. Reuse canonical schemas, services, tagged errors, and layers. Audit docs against actual Effect ownership and call graphs. Do not introduce source abstractions or DTO mirrors.
