@@ -1,0 +1,1 @@
+Please review the SPEC once again, and ensure it's as good as possible. That it includes proper Effect code, has well drafted patterns / rules, that helper sprawl is forbidden, lint rules, clean, composable linear effects, leaf-components / react compositional patterns etc.
