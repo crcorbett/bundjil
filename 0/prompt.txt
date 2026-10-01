@@ -1,0 +1,1 @@
+Help me understand, how does new chats work? Is everything a part of the same thread? Where are conversation histories stored? How can I create different ones? How does compaction work? Does Eve handle this?
