@@ -1,0 +1,63 @@
+You are implementing Task 2 only for /Users/cooper/Projects/bundjil.
+
+Use model context economically, but complete the task end to end. You are not alone in the codebase. Do not revert or overwrite edits made by others; work with the current main working tree. Edit files directly in the shared workspace. Do not commit. Report every changed file and exact verification evidence.
+
+Read first:
+- /Users/cooper/Projects/bundjil/docs/product-specs/effect-boundary-provenance-enforcement.md
+- /Users/cooper/Projects/bundjil/docs/product-specs/effect-boundary-provenance-enforcement.tasks.json
+- /Users/cooper/Projects/bundjil/docs/exec-plans/active/effect-boundary-provenance-enforcement.md
+- /Users/cooper/Projects/bundjil/AGENTS.md
+- /Users/cooper/Projects/bundjil/docs/architecture/effect-patterns.md
+- /Users/cooper/Projects/bundjil/docs/architecture/repo-structure.md
+- /Users/cooper/Projects/bundjil/docs/architecture/testing-and-quality.md
+
+Task 2: "Migrate Codex boundaries end to end"
+Apply provenance enforcement across Codex OAuth, profiles, persistence, filesystem, provider HTTP, SSE, proxy authorization, and operator scripts while preserving exact behavior.
+
+Implementation requirements:
+- Use existing Codex owner Schemas for profile IDs, revisions, redirect URIs, paths, tokens, accounts, model IDs, requests, events, and responses; add a Schema only for a real missing owner.
+- Use decodeUnknownEffect only at host/provider unknown boundaries, decodeEffect for typed encoded data, and encodeEffect for outbound and persisted data.
+- Keep SSE fragments parser-local, decode completed events before Match, and preserve frames byte for byte.
+- Move Effectful provider/proof HTTP calls to Effect HttpClient, remove sync codecs from src and scripts, and flatten the profile-cipher nested generator.
+- Remove Task 2 audit exceptions from tooling/boundary-exceptions.ts as each raw annotation or boundary is migrated; retain only exact, proven third-party/framework constraints.
+- Do not mutate credentials, provider accounts, deployments, or persistent namespaces.
+- Do not edit Task 3 channel/Sendblue implementation except where an owning Codex contract strictly requires it.
+- Preserve all wire bytes, auth headers, status mapping, stored keys/values/revisions/TTLs, and runtime behavior.
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk,
+HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit,
+Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers when the
+code is fallible, async, runtime-owned, collection-heavy, or crosses a package,
+RPC, SSR, command, config, or service boundary.
+
+Reuse canonical schemas, types, service contracts, errors, and branded
+identifiers from the owning package. Do not define standalone DTO mirrors or
+duplicate fields such as id: string, slug: string, status, or post metadata
+outside their canonical schema/type owner.
+
+Keep one-off Effect logic inline at the consumer. Do not add tiny wrappers,
+mappers, transformers, switch/case branches, instanceof checks, unsafe casts,
+or manual encode/decode adapters when an Effect Schema/RPC/Match/Result/Exit
+primitive or owning service contract should carry the behavior.
+
+For UI work, use the primitive -> composite -> layout -> route chain. Let
+leaves own the data, commands, loading, empty, error, retry, skeleton, and
+fallback behavior for the exact fragment they render. Do not add nested
+feature wrappers merely to shorten route JSX, and do not prop-drill query
+results, selected ids, loading flags, command callbacks, or derived option
+lists when a leaf can own the narrow value.
+
+For reusable URL state, use schema-owned search and route-identity contracts.
+Keep the app router as the URL writer, and do not import app route modules into
+reusable packages.
+
+Verification gates:
+- bun run check:boundaries
+- package-focused Codex OAuth and proxy tests/typechecks/builds
+- bun run check
+- bun run knip
+- bun run check-types
+- bun run test
+- bun --env-file=apps/agent/.env.preview.local run verification when practical
+- git diff --check
+Audit your own work for flat linear Effect.gen/Effect.fn operations, tagged errors handled in outer pipes, no raw public semantic primitives, no sync production codecs, no global fetch in Effect programs, no unsafe casts, no DTO mirrors/manual readers, and no helper sprawl.
