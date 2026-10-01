@@ -1,0 +1,4 @@
+SPEC for these: [$prd-writer](/Users/cooper/Projects/bundjil/.agents/skills/prd-writer/SKILL.md) 
+
+Before any production promotion, perform one clean preview redeploy using only the encrypted Vercel variables, then define production auth, proxy URL, credential/profile provisioning, rollback, and monitoring.
+Draft and implement a Sendblue channel SPEC: signed webhook verification, sender identity mapping, inbound session routing, outbound replies, replay protection, preview proof.
