@@ -1,0 +1,27 @@
+Work in /Users/cooper/Projects/bundjil. Implement exactly task reconcile-production-documentation from docs/product-specs/vercel-production-promotion.tasks.json, using docs/product-specs/vercel-production-promotion.md and accepted evidence in docs/exec-plans/active/vercel-production-promotion.md and docs/exec-plans/active/sendblue-eve-channel.md. This is the final serial prd-implementer task. Own documentation/ledger reconciliation across README.md, ARCHITECTURE.md, apps/agent/README.md, apps/codex-proxy/README.md, docs/architecture/**, related docs/product-specs/** Codex/Sendblue specs and task ledgers, and docs/exec-plans/active/** that require current-state updates. Do not edit runtime implementation unless a documentation verification failure proves a narrow defect; report before broadening. You are not alone in the repo; preserve existing work and do not revert others.
+
+Read first: AGENTS.md, .agents/skills/prd-implementer/SKILL.md, the promotion SPEC/task list, both active plans, docs/architecture/effect-patterns.md, repo-structure.md, eve-agent.md, testing-and-quality.md.
+
+Accepted facts:
+- commit db49c45 accepted Sendblue Production and is pushed to main.
+- current proxy REDACTED and agent dpl_6g91e8CEg7JTkQnAEtvAdeR6CWrT are READY; accepted source was e53e7a4; rollbacks are in the plan.
+- Codex subscription proxy is live and proved through Eve.
+- Sendblue Production route matrix, provider inbound, 15-event Eve replay through waiting, one proxy completion, one DELIVERED outbound, replay suppression, inventories, rollback order, and zero-log-leak evidence are accepted in plans/task ledger.
+- temporary Production bundle is removed; 1Password and Vercel own credentials.
+- exact Production line was removed from tracked test fixtures and replaced with reserved synthetic numbers.
+- never include content, full phone numbers, handles, run/session ids, protected URLs, credentials, ciphertext, token counts, or raw provider bodies.
+
+Requirements:
+1. Reconcile root/app docs, architecture, related Codex/Sendblue specs/tasks/plans with actual Production/test/CLI call graphs.
+2. Remove stale Preview-only, future-tense, Production-gated/not-configured, pending/in-progress, wrong host/scope/mode, and stale deployment claims where Production evidence supersedes them. Preserve historical evidence explicitly as historical.
+3. Document ownership, Effect Config/Redacted/Schema/Context/Layer/ManagedRuntime patterns, Eve OIDC plus distinct Vercel bypass and route auth, durable Upstash replay, Codex encrypted OAuth storage/refresh, rollback and monitoring. No unsupported claims.
+4. Reconcile task/ledger statuses only when evidence proves them. Do not mark reconcile-production-documentation complete or fill its parent audit evidence; parent owns the three passes. Leave its completedPasses 0.
+5. Decide plan archival from repo convention only; do not invent state.
+6. Run stale/leak/task-ledger/untracked-artifact scans, focused checks, jq empty for changed JSON, git diff --check, bun run verification.
+7. Do not commit/push. Report changed files, corrected claims, scans, verification, retained historical language.
+
+Use Effect TS native approaches first. Prefer Data, Schema, Array, Chunk, HashSet, HashMap, Match, Context, Layer, Config, Service, Record, Result, Exit, Bun/Platform Command, and ManagedRuntime over plain TypeScript helpers for fallible/async/runtime/boundary code.
+
+Reuse canonical schemas, types, service contracts, errors, and branded identifiers from owners. No standalone DTO mirrors or duplicated identity fields. Keep one-off Effect logic inline. No tiny wrappers/mappers, switch/case, instanceof, unsafe casts, manual adapters, raw JSON helpers, process.env examples, or helper sprawl where Effect primitives/contracts fit. Keep primary Effects flat and linear with tagged handling in the following pipe.
+
+No UI is expected. If UI appears, stop for a separate SPEC; leaf-component and React composition rules remain mandatory.
