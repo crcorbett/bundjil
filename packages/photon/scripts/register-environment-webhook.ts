@@ -17,7 +17,7 @@ import {
   Schema,
 } from "effect";
 
-import authorityEnvelopeSchema from "../../../.agents/skills/docs-maintainer/assets/harness/authority-envelope.schema.json" with { type: "json" };
+import authorityEnvelopeSchema from "../../../tooling/schemas/authority-envelope.schema.json" with { type: "json" };
 import productionWebhookCutoverAuthorityPolicy from "../schemas/production-webhook-cutover-authority.schema.json" with { type: "json" };
 import {
   PhotonEnvironmentWebhookReceipt,

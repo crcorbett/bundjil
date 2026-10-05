@@ -2,7 +2,7 @@ import { assert, it } from "@effect/vitest";
 import { Ajv2020 } from "ajv/dist/2020.js";
 import { Effect, Exit, Schema } from "effect";
 
-import boundedReceiptContract from "../../../.agents/skills/docs-maintainer/assets/harness/bounded-receipt.schema.json" with { type: "json" };
+import boundedReceiptContract from "../../../tooling/schemas/bounded-receipt.schema.json" with { type: "json" };
 import { decodeSyntheticFixture } from "../src/__testing__/fixtures.js";
 import {
   AdoptionManifest,

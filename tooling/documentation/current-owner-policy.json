@@ -119,12 +119,7 @@
     {
       "id": "fixed-coordination-ritual",
       "claimType": "mandatory-ritual",
-      "ownerPaths": [
-        "AGENTS.md",
-        ".agents/skills/prd-writer/SKILL.md",
-        ".agents/skills/prd-review/SKILL.md",
-        ".agents/skills/prd-implementer/SKILL.md"
-      ],
+      "ownerPaths": ["AGENTS.md"],
       "requiredTermGroups": [
         ["audit pass", "pass audit", "subagent", "review pass"],
         ["always", "every implementation", "fixed", "mandatory", "required"]

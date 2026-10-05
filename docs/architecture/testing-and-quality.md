@@ -20,8 +20,7 @@ Run from the repo root:
 ```bash
 bun run check:boundaries
 bun run check:effect-setup
-bun run check:docs
-bun run check:skills
+
 bun run check:authority
 bun run check:controls
 bun run check:verification
@@ -48,7 +47,7 @@ historical evidence while current owners and paths remain checked.
 The old HGI-301 test that pinned exact wording in docs and skills is also
 retired; current semantic claims are checked by the documentation policy and
 skill instructions by the skill policy. Its dated fixture remains as history.
-`bun run check:skills` rejects
+rejects
 broken/missing skill mirrors, invalid metadata/reference routes,
 contradictory executable examples, and stale
 Site-specific overlays in the relevant repo-owned skills, and confirms the
@@ -704,8 +703,7 @@ Use `rg` for docs checks:
 
 ```bash
 rg -n "old-path|old-package|old-command" README.md AGENTS.md docs apps packages
-rg -n "docs/architecture/(effect-patterns|repo-structure|testing-and-quality)" README.md AGENTS.md docs ARCHITECTURE.md
-bun run check:skills
+
 bun run check:docs
 bun run check:authority
 ```

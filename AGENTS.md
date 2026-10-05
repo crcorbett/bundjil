@@ -9,8 +9,8 @@ the narrowest current owner; do not load completed rollout history by default.
 2. Read `docs/README.md`, then only the routed current architecture, SPEC,
    plan, runbook, and proof owner needed for the task.
 3. Update the earliest durable owner in the same slice as code/config changes.
-4. For every material PRD or ordinary change, invoke the repository-local
-   `.agents/skills/docs-maintainer`, record `Change required`, `Preserve`, or
+4. For every material PRD or ordinary change, invoke the plugin
+   `development-workflows:docs-maintainer`, record `Change required`, `Preserve`, or
    evidenced `N/A` across its impact ledger, and run `bun run check:docs`.
 5. Run the smallest focused check, then `bun run verification` before handoff.
 6. Keep runtime/provider claims separate from repository proof and record
@@ -26,7 +26,7 @@ the narrowest current owner; do not load completed rollout history by default.
   Raw clients, generic SDK callbacks, raw `id: string`,
   primitive semantic config, `instanceof` policy, and unchecked SDK output
   are forbidden. For every provider or SDK adapter change, invoke the
-  repository-local `.agents/skills/effect-client-wrapper` before deciding the
+  plugin `development-workflows:effect-client-wrapper` before deciding the
   boundary shape.
 - Keep primary Effects flat, linear, sequential, lazy, composable, and readable.
   Keep one-use mapping, decoding, and error translation inline. Helpers require
@@ -52,12 +52,12 @@ the narrowest current owner; do not load completed rollout history by default.
 - Harness controls, feedback promotion, and automation admission:
   `docs/standards/controls.md`
 - Provider and SDK client boundary design:
-  `.agents/skills/effect-client-wrapper/SKILL.md`
-- New SPEC and task drafting: `.agents/skills/prd-writer/SKILL.md`
+  `development-workflows:effect-client-wrapper`
+- New SPEC and task drafting: `development-workflows:prd-writer`
 - React and visible component composition:
   `.agents/skills/building-components/SKILL.md`
 - Documentation impact and owner maintenance:
-  `.agents/skills/docs-maintainer/SKILL.md`
+  `development-workflows:docs-maintainer`
 - Critical journeys, proof packets, bounded receipts, and evidence retention:
   `docs/verification/README.md`
 - Current SPEC/tasks: `docs/product-specs/index.md`
@@ -78,7 +78,7 @@ the narrowest current owner; do not load completed rollout history by default.
 
 Use Bun from the repository root. Boundary/provider work runs
 `bun run check:boundaries`, `bun run check:effect-setup`, `bun run check:docs`,
-`bun run check:skills`, `bun run check:authority`, and
+`bun run check:authority`, and
 `bun run check:controls`, `bun run check:verification`; every accepted slice runs
 `bun run verification`.
 
@@ -86,3 +86,10 @@ Repository instructions cannot authorize deployments, provider writes,
 credential changes, webhook changes, releases, or production operations.
 External systems own their current state at readback time, and consequential
 operations require a target-owned runbook and explicit authority.
+
+## Shared development skills
+
+Before starting work, follow [the plugin lookup](docs/skills.md) and load the
+latest published Commonplace `development-workflows` plugin. Do not use saved
+repository copies or assume a cached plugin version is current. Read the local
+profiles in `docs/skill-profiles/` alongside the plugin.

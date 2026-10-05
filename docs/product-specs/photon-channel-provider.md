@@ -754,7 +754,7 @@ domain and retain previous deployment/config references for rollback.
   copied replay credential, or old replay data is read, imported, or used as
   fallback.
 - `bun run check:boundaries`, `bun run check:effect-setup`,
-  `bun run check:skills`, focused package/app checks, negative legacy-pattern
+  focused package/app checks, negative legacy-pattern
   scans, `bun run verification`, and `git diff --check` pass.
 
 ## Downstream impact ledger

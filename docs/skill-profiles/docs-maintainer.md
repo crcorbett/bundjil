@@ -28,7 +28,7 @@ work. Durable output uses repository-relative paths only.
 | Lint, formatting, TypeScript, boundary exceptions, tests, build, Turbo, and CI                           | Executable config, `lint/**`, `tooling/**`, workflow source, and `docs/architecture/testing-and-quality.md`      | Root/app/package README only where a supported command changes                              |
 | Harness controls, feedback promotion, automation admission, and report-only freshness                    | `docs/standards/controls.md`, its typed registers, and `tooling/control-policy*.ts`                              | `tooling/documentation/freshness-candidate.ts`; authority/runbook owner for external action |
 | GitHub CI, release, Claude review, and background automation                                             | `.github/workflows/**`, `docs/operations/automation-register.md`, and `docs/operations/github-actions-lock.json` | `tooling/authority-policy*.ts`; `docs/verification/**`; HGI-309 external-setting owner      |
-| Skill, mirror, or agent instruction                                                                      | `.agents/skills/<name>/**`, `.claude/skills/<name>`, and `tooling/skill-policy*.ts`                              | `agents/openai.yaml`, `AGENTS.md`, and affected PRD route                                   |
+| Skill, mirror, or agent instruction                                                                      | `docs/skills.md` and `docs/skill-profiles/`; retained local skills only where no plugin replacement exists       | `agents/openai.yaml`, `AGENTS.md`, and affected PRD route                                   |
 | Current SPEC/task/plan                                                                                   | `docs/product-specs/index.md`, exact SPEC/tasks, and `docs/exec-plans/active/README.md`                          | Completed route plus execution/validation receipts only after acceptance                    |
 | Dated audit or decision evidence                                                                         | `docs/documentation-audit/**`                                                                                    | Pointer from the current owner; evidence never becomes standing policy                      |
 | Current Vercel, Executor, Sendblue, Upstash, secret, webhook, workflow, or messaging state               | Target-owned external readback at its observation time                                                           | Sanitized dated evidence; source, a successful command, or an old receipt is not actuality  |
@@ -90,11 +90,7 @@ back; a generic lifecycle reminder is not sufficient.
 Run the smallest owning checks during the slice. Validate changed local skills:
 
 ```sh
-python3 tooling/quick_validate.py .agents/skills/docs-maintainer
-python3 tooling/quick_validate.py .agents/skills/prd-writer
-python3 tooling/quick_validate.py .agents/skills/prd-review
-python3 tooling/quick_validate.py .agents/skills/prd-implementer
-bun run check:skills
+
 bun run check:docs
 bun run check:authority
 bun run check:controls

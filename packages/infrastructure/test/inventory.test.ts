@@ -18,7 +18,7 @@ import { assert, it as effectIt } from "@effect/vitest";
 import { Ajv2020 } from "ajv/dist/2020.js";
 import { Effect, Layer, Redacted, Schema } from "effect";
 
-import authorityEnvelopeContract from "../../../.agents/skills/docs-maintainer/assets/harness/authority-envelope.schema.json" with { type: "json" };
+import authorityEnvelopeContract from "../../../tooling/schemas/authority-envelope.schema.json" with { type: "json" };
 import readOnlyInventoryAuthorityPolicy from "../schemas/read-only-inventory-authority.schema.json" with { type: "json" };
 import {
   canonicalizeInfrastructureObservedManifest,

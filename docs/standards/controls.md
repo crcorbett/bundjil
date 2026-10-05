@@ -137,8 +137,7 @@ Run the focused owners first:
 bun run check:controls
 bun run test:controls
 bun run check:boundaries
-bun run check:docs
-bun run check:skills
+
 bun run check:authority
 bun run check:verification
 ```
