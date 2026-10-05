@@ -2,7 +2,7 @@ import { assert } from "@effect/vitest";
 import { Ajv2020 } from "ajv/dist/2020.js";
 import { describe, it } from "vitest";
 
-import authorityEnvelopeSchema from "../../../.agents/skills/docs-maintainer/assets/harness/authority-envelope.schema.json" with { type: "json" };
+import authorityEnvelopeSchema from "../../../tooling/schemas/authority-envelope.schema.json" with { type: "json" };
 import productionStableEnvironmentAuthorityPolicy from "../schemas/production-stable-vercel-environment-authority.schema.json" with { type: "json" };
 import stableEnvironmentAuthorityPolicy from "../schemas/stable-vercel-environment-authority.schema.json" with { type: "json" };
 

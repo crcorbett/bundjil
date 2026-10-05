@@ -55,3 +55,7 @@ Other repository-specific or third-party skills remain local where there is no
 replacement in this plugin. They must not override the shared skills above.
 Historical audit and proof records describe the version used at that time;
 they do not select the current plugin version.
+
+The JSON contracts used by infrastructure and Photon commands live in
+`tooling/schemas/`. They are repository-owned runtime data rules, not saved
+skill instructions or checks for installed skills.

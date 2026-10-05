@@ -4,7 +4,7 @@ import nodePath from "node:path";
 import { Ajv2020 } from "ajv/dist/2020.js";
 import { Config, Effect, FileSystem, Schema } from "effect";
 
-import authorityEnvelopeSchema from "../../../../.agents/skills/docs-maintainer/assets/harness/authority-envelope.schema.json" with { type: "json" };
+import authorityEnvelopeSchema from "../../../../tooling/schemas/authority-envelope.schema.json" with { type: "json" };
 import previewConfigurationAuthorityPolicy from "../../schemas/preview-vercel-configuration-authority.schema.json" with { type: "json" };
 import { InfrastructureDestructivePolicy } from "../schemas.js";
 import { VercelPreviewEnvironmentValue } from "./configuration.js";

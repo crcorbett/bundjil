@@ -19,8 +19,8 @@ import {
   Schema,
 } from "effect";
 
-import authorityEnvelopeSchema from "../../../.agents/skills/docs-maintainer/assets/harness/authority-envelope.schema.json" with { type: "json" };
-import boundedReceiptSchema from "../../../.agents/skills/docs-maintainer/assets/harness/bounded-receipt.schema.json" with { type: "json" };
+import authorityEnvelopeSchema from "../../../tooling/schemas/authority-envelope.schema.json" with { type: "json" };
+import boundedReceiptSchema from "../../../tooling/schemas/bounded-receipt.schema.json" with { type: "json" };
 import readOnlyInventoryAuthorityPolicy from "../schemas/read-only-inventory-authority.schema.json" with { type: "json" };
 import {
   loadInfrastructureCommandConfig,

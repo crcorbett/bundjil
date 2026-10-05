@@ -2,7 +2,7 @@ import { assert } from "@effect/vitest";
 import { Ajv2020 } from "ajv/dist/2020.js";
 import { describe, it } from "vitest";
 
-import authorityEnvelopeSchema from "../../../.agents/skills/docs-maintainer/assets/harness/authority-envelope.schema.json" with { type: "json" };
+import authorityEnvelopeSchema from "../../../tooling/schemas/authority-envelope.schema.json" with { type: "json" };
 import vercelGitLinkAuthorityPolicy from "../schemas/vercel-git-link-authority.schema.json" with { type: "json" };
 
 const authority = {

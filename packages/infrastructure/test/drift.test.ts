@@ -2,10 +2,10 @@ import { Ajv2020 } from "ajv/dist/2020.js";
 import { Effect, Schema } from "effect";
 import { describe, expect, it } from "vitest";
 
-import authorityEnvelopeSchema from "../../../.agents/skills/docs-maintainer/assets/harness/authority-envelope.schema.json" with { type: "json" };
-import boundedReceiptSchema from "../../../.agents/skills/docs-maintainer/assets/harness/bounded-receipt.schema.json" with { type: "json" };
-import controlRecordSchema from "../../../.agents/skills/docs-maintainer/assets/harness/control-record.schema.json" with { type: "json" };
 import infrastructureDriftControl from "../../../docs/standards/alchemy-infrastructure-drift.control.json" with { type: "json" };
+import authorityEnvelopeSchema from "../../../tooling/schemas/authority-envelope.schema.json" with { type: "json" };
+import boundedReceiptSchema from "../../../tooling/schemas/bounded-receipt.schema.json" with { type: "json" };
+import controlRecordSchema from "../../../tooling/schemas/control-record.schema.json" with { type: "json" };
 import driftAuthorityPolicy from "../schemas/drift-report-authority.schema.json" with { type: "json" };
 import {
   buildInfrastructureDriftReceipt,

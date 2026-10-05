@@ -1,9 +1,9 @@
 {
   "extends": "../../tsconfig.base.json",
   "include": [
-    "../../.agents/skills/docs-maintainer/assets/harness/bounded-receipt.schema.json",
-    "../../.agents/skills/docs-maintainer/assets/harness/authority-envelope.schema.json",
-    "../../.agents/skills/docs-maintainer/assets/harness/control-record.schema.json",
+    "../../tooling/schemas/bounded-receipt.schema.json",
+    "../../tooling/schemas/authority-envelope.schema.json",
+    "../../tooling/schemas/control-record.schema.json",
     "../../alchemy.run.ts",
     "../../alchemy.preview.run.ts",
     "../../alchemy.stable.run.ts",

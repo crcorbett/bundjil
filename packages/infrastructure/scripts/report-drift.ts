@@ -29,9 +29,9 @@ import {
 } from "effect";
 import * as FetchHttpClient from "effect/unstable/http/FetchHttpClient";
 
-import authorityEnvelopeSchema from "../../../.agents/skills/docs-maintainer/assets/harness/authority-envelope.schema.json" with { type: "json" };
-import boundedReceiptSchema from "../../../.agents/skills/docs-maintainer/assets/harness/bounded-receipt.schema.json" with { type: "json" };
 import { buildStableInfrastructureDriftStack } from "../../../alchemy.stable.run.js";
+import authorityEnvelopeSchema from "../../../tooling/schemas/authority-envelope.schema.json" with { type: "json" };
+import boundedReceiptSchema from "../../../tooling/schemas/bounded-receipt.schema.json" with { type: "json" };
 import driftAuthorityPolicy from "../schemas/drift-report-authority.schema.json" with { type: "json" };
 import { loadAdoptionCommand } from "../src/adoption-command.js";
 import type { AdoptionManifest } from "../src/adoption-manifest.js";
