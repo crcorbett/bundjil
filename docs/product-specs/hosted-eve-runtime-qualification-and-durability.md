@@ -513,8 +513,7 @@ bun run --filter @bundjil/agent build
 bun run --filter @bundjil/agent preflight:production
 bun run check:boundaries
 bun run check:effect-setup
-bun run check:docs
-bun run check:skills
+
 bun run check:authority
 bun run check:controls
 bun run check:verification

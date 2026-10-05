@@ -775,7 +775,7 @@ or an Eve journey.
    boundary policy results.
 9. The implementation runs focused tests, Effect language-server diagnostics,
    `bun run check:boundaries`, `bun run check:effect-setup`,
-   `bun run check:docs`, `bun run check:skills`, `bun run check:authority`,
+   `bun run check:docs`, `bun run check:authority`,
    `bun run check:controls`, `bun run check:verification`, and
    `bun run verification`; all required docs, runbooks, environment samples,
    proof artifacts, and rollout/rollback notes are updated before acceptance.

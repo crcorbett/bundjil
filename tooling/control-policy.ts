@@ -157,7 +157,6 @@ const requiredControls = [
   "boundary-provenance",
   "ultracite-lint-format",
   "documentation-owner-policy",
-  "skill-mirror-policy",
   "workflow-authority-policy",
   "critical-journey-proof-policy",
   "dependency-export-hygiene",

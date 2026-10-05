@@ -540,7 +540,7 @@ The sibling ledger is the full machine-readable owner.
 | `ENP-REQ-006` | Each rule's unit and installed-Oxlint fixtures reject/accept exact syntax and stale exceptions fail.              | Testing visitor objects only or linting current source only.     | `bun run test:lint`; lint fixture receipt.                                   | AST rules are intentionally not type/data-flow complete.   |
 | `ENP-REQ-007` | Finding inventory maps every edit to a named failure and preserves recorded wire/state fixtures.                  | Bulk formatter or codemod success.                               | Targeted package tests and compatibility receipt.                            | Untouched code is not re-proved.                           |
 | `ENP-REQ-008` | Refreshed merged-base inventory names exact final SHA and resolves each branch target.                            | Applying old branch line numbers.                                | Git identity/read-only diff plus affected agent checks.                      | Does not re-qualify hosted runtime.                        |
-| `ENP-REQ-009` | Docs-maintainer ledger has Change required, Preserve, or evidenced N/A for every surface and policy checks pass.  | Updating only AGENTS or only a README.                           | `bun run check:docs`, `bun run check:skills`; docs receipt.                  | Docs checks prove consistency, not runtime.                |
+| `ENP-REQ-009` | Docs-maintainer ledger has Change required, Preserve, or evidenced N/A for every surface and policy checks pass.  | Updating only AGENTS or only a README.                           | `bun run check:docs`, ; docs receipt.                                        | Docs checks prove consistency, not runtime.                |
 | `ENP-REQ-010` | Ledger contains complete proof fields for every requirement and rule.                                             | Broad verification alone.                                        | PRD review and task-ledger parse.                                            | Traceability is not behaviour.                             |
 | `ENP-REQ-011` | Focused commands and final `bun run verification` pass on one exact candidate.                                    | Old green output or partial workspace checks.                    | Verification owner terminal receipt.                                         | No external/provider claim.                                |
 | `ENP-REQ-012` | One ordered five-pass receipt is newer than all dependency evidence; findings reopen owners.                      | Per-task ritual or pre-implementation review.                    | Terminal audit task and closeout receipt.                                    | Missing live or replay oracles remain explicit non-claims. |
@@ -720,8 +720,7 @@ bun run check:boundaries
 bun run --filter @bundjil/store test
 bun run --filter @bundjil/codex test
 bun run --filter @bundjil/agent test
-bun run check:docs
-bun run check:skills
+
 bun run check
 bun run verification
 git diff --check

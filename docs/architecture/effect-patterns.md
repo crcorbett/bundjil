@@ -274,7 +274,7 @@ and generic wrapper/helper modules are forbidden.
 If a third-party signature unavoidably requires a primitive, register the exact
 adapter symbol in `tooling/boundary-exceptions.ts`. Do not widen a public
 service contract or add a cast to satisfy it. Follow
-`.agents/skills/effect-client-wrapper/SKILL.md` when creating or reviewing the
+`development-workflows:effect-client-wrapper` when creating or reviewing the
 wrapper.
 
 ## Effect Control Flow

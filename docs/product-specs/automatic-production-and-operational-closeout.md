@@ -545,8 +545,7 @@ bun run --filter @bundjil/infrastructure test
 bun run check:authority
 bun run check:controls
 bun run check:verification
-bun run check:docs
-bun run check:skills
+
 ```
 
 Hosted acceptance requires the merged exact main SHA's CI run, Production run,
