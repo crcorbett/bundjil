@@ -3,7 +3,7 @@ document_type: architecture-standard
 lifecycle: current
 authority: canonical
 owner: bundjil-quality-owner
-last_reviewed: 2026-10-01
+last_reviewed: 2026-10-06
 review_trigger: verification, lint, test, CI, proof, documentation, or skill-control change
 ---
 
@@ -143,8 +143,11 @@ remain in their owning local stores.
 
 The hosted repository is [Bundjil on Entire](https://entire.io/gh/crcorbett/bundjil).
 This clone keeps its direct GitHub `origin` and uses a separate `entire` remote
-on `aws-ap-southeast-2.entire.io`. The ignored local setting
-`strategy_options.checkpoint_push_remote` selects `entire`. To connect another
+on `aws-ap-southeast-2.entire.io`. The shared
+`strategy_options.checkpoint_push_remote` selects `entire`, so new working
+copies inherit that upload destination. An ignored `.entire/settings.local.json`
+override takes priority; keep it set to `entire` too. Check that `entire status`
+names `entire`. To connect another
 clone, use `entire repo remote add entire /gh/crcorbett/bundjil --cluster aws-ap-southeast-2.entire.io`,
 then `entire enable --agent codex --telemetry=false --absolute-git-hook-path --checkpoint-push-remote entire`.
 This adds a remote without replacing an existing one. A normal commit
@@ -152,6 +155,7 @@ and `git push entire HEAD` upload the chat checkpoints and send source changes
 through to GitHub. A push only to `origin`, or ending a chat, does not prove
 checkpoint publication. Verify hosted transcripts and the exact GitHub commit
 separately from `entire status`.
+New chat activity after a push waits for the next push through `entire`.
 
 The native Codex and Claude Code importers support `--dry-run`, `--path` and
 `--session`. Preview before importing; repeat previews after import to check
