@@ -1,6 +1,6 @@
 import { layerLive as SendblueTransportLive } from "@bundjil/sendblue";
 import { Effect, Layer } from "effect";
-import { FetchHttpClient } from "effect/unstable/http";
+import { FetchHttpClient } from "effect/http";
 
 import { layerLive as ChannelLive } from "./channel.js";
 import {

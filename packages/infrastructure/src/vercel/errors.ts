@@ -19,32 +19,32 @@ const VercelReadErrorFields = {
   message: VercelReadErrorMessage,
 };
 
-export class VercelCredentialError extends Schema.TaggedErrorClass<VercelCredentialError>()(
+export class VercelCredentialError extends Schema.TaggedError<VercelCredentialError>()(
   "VercelCredentialError",
   { reason: VercelCredentialFailureReason }
 ) {}
 
-export class VercelProjectsReadError extends Schema.TaggedErrorClass<VercelProjectsReadError>()(
+export class VercelProjectsReadError extends Schema.TaggedError<VercelProjectsReadError>()(
   "VercelProjectsReadError",
   VercelReadErrorFields
 ) {}
 
-export class VercelDomainsReadError extends Schema.TaggedErrorClass<VercelDomainsReadError>()(
+export class VercelDomainsReadError extends Schema.TaggedError<VercelDomainsReadError>()(
   "VercelDomainsReadError",
   VercelReadErrorFields
 ) {}
 
-export class VercelEnvironmentVariablesReadError extends Schema.TaggedErrorClass<VercelEnvironmentVariablesReadError>()(
+export class VercelEnvironmentVariablesReadError extends Schema.TaggedError<VercelEnvironmentVariablesReadError>()(
   "VercelEnvironmentVariablesReadError",
   VercelReadErrorFields
 ) {}
 
-export class VercelMarketplaceBindingsReadError extends Schema.TaggedErrorClass<VercelMarketplaceBindingsReadError>()(
+export class VercelMarketplaceBindingsReadError extends Schema.TaggedError<VercelMarketplaceBindingsReadError>()(
   "VercelMarketplaceBindingsReadError",
   VercelReadErrorFields
 ) {}
 
-export class VercelDeploymentsReadError extends Schema.TaggedErrorClass<VercelDeploymentsReadError>()(
+export class VercelDeploymentsReadError extends Schema.TaggedError<VercelDeploymentsReadError>()(
   "VercelDeploymentsReadError",
   VercelReadErrorFields
 ) {}

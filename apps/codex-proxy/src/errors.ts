@@ -13,7 +13,7 @@ export const CodexProxySchemaBoundary = Schema.Literals([
 
 export type CodexProxySchemaBoundary = typeof CodexProxySchemaBoundary.Type;
 
-export class CodexProxyRouteError extends Schema.TaggedErrorClass<CodexProxyRouteError>()(
+export class CodexProxyRouteError extends Schema.TaggedError<CodexProxyRouteError>()(
   "CodexProxyRouteError",
   {
     boundary: Schema.optional(CodexProxySchemaBoundary),

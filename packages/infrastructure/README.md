@@ -47,6 +47,13 @@ credential, raw error or stack. That bounded result identifies the failed
 control step; GitHub logs and Vercel readback remain the operational evidence
 owners.
 
+Alchemy `2.0.0-beta.83` separates drift detection from repair. Existing `*-sync`
+commands now use `alchemy drift --no-input` for observation; only the explicit
+repair command adds `--repair`. Saved R2 bucket, prefix and resource identities
+remain unchanged. A narrow dependency patch allows the already-managed R2
+bucket to be opened without AWS bucket-configuration calls. No bucket is
+created or reconfigured by that path; a missing bucket fails.
+
 ## Supported commands
 
 Run package checks from the repository root:

@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "cd ../.. && bun run build --filter=@bundjil/agent",
+  "buildCommand": "cd ../.. && bun run build:vercel --filter=@bundjil/agent",
   "git": {
     "deploymentEnabled": false
   }

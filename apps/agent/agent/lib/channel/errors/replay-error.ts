@@ -1,6 +1,6 @@
 import { Schema } from "effect";
 
-export class ChannelReplayError extends Schema.TaggedErrorClass<ChannelReplayError>()(
+export class ChannelReplayError extends Schema.TaggedError<ChannelReplayError>()(
   "ChannelReplayError",
   {
     operation: Schema.Literals([

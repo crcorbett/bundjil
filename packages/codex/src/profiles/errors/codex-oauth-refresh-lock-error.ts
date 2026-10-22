@@ -8,7 +8,7 @@ import {
   CodexProfileErrorMessage,
 } from "../error-contracts.js";
 
-export class CodexOAuthRefreshLockError extends Schema.TaggedErrorClass<CodexOAuthRefreshLockError>()(
+export class CodexOAuthRefreshLockError extends Schema.TaggedError<CodexOAuthRefreshLockError>()(
   "CodexOAuthRefreshLockError",
   {
     operation: CodexOAuthRefreshLockOperation,

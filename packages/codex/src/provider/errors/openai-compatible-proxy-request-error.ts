@@ -5,7 +5,7 @@ import {
   OpenAICompatibleProxyOperation,
 } from "../error-contracts.js";
 
-export class OpenAICompatibleProxyRequestError extends Schema.TaggedErrorClass<OpenAICompatibleProxyRequestError>()(
+export class OpenAICompatibleProxyRequestError extends Schema.TaggedError<OpenAICompatibleProxyRequestError>()(
   "OpenAICompatibleProxyRequestError",
   {
     operation: OpenAICompatibleProxyOperation,

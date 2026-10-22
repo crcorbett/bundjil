@@ -358,7 +358,7 @@ describe("Production promotion preflight", () => {
         approval: "granted",
         operationAuthority: undefined,
       }).pipe(Effect.runSync)
-    ).toThrow("Unexpected key");
+    ).toThrow("Expected");
     expect(() =>
       decode({ ...proxyProvisioned, storedProfileProof: undefined }).pipe(
         Effect.runSync
@@ -385,30 +385,30 @@ describe("Production promotion preflight", () => {
         ...beforeFirstMutation,
         proxy: { ...beforeFirstMutation.proxy, mode: "live" },
       }).pipe(Effect.runSync)
-    ).toThrow("Unexpected key");
+    ).toThrow("Expected");
     expect(() =>
       decode({
         ...proxyProvisioned,
         acceptedProxy: proxyAcceptedAgentConfigured.acceptedProxy,
       }).pipe(Effect.runSync)
-    ).toThrow("Unexpected key");
+    ).toThrow("Expected");
     expect(() =>
       decode({
         ...proxyAcceptedAgentConfigured,
         acceptedAgent: agentAcceptedRollbackReady.acceptedAgent,
       }).pipe(Effect.runSync)
-    ).toThrow("Unexpected key");
+    ).toThrow("Expected");
     expect(() =>
       decode({ ...agentAcceptedRollbackReady, soak: { completed: true } }).pipe(
         Effect.runSync
       )
-    ).toThrow("Unexpected key");
+    ).toThrow("Expected");
     expect(() =>
       decode({
         ...channelProductionPromotion,
         channel: { ...channelInventory, legacyBindingsPresent: true },
       }).pipe(Effect.runSync)
-    ).toThrow("Unexpected key");
+    ).toThrow("Expected");
   });
 
   vitestIt(

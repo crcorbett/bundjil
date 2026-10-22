@@ -40,7 +40,7 @@ const VercelGitLinkAuthorityCommandFailureReason = Schema.Literals([
   "fileContractInvalid",
   "policyInvalid",
 ]);
-class VercelGitLinkAuthorityCommandError extends Schema.TaggedErrorClass<VercelGitLinkAuthorityCommandError>()(
+class VercelGitLinkAuthorityCommandError extends Schema.TaggedError<VercelGitLinkAuthorityCommandError>()(
   "VercelGitLinkAuthorityCommandError",
   { reason: VercelGitLinkAuthorityCommandFailureReason }
 ) {}

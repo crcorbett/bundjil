@@ -412,7 +412,7 @@ const isSchemaTaggedErrorClass = (node: AstNode | undefined) =>
   node.object?.type === "Identifier" &&
   node.object.name === "Schema" &&
   node.property?.type === "Identifier" &&
-  node.property.name === "TaggedErrorClass";
+  node.property.name === "TaggedError";
 
 const taggedErrorNames = (
   node: ClassDeclarationNode
@@ -477,11 +477,11 @@ export const taggedErrorNameRule = {
   meta: {
     docs: {
       description:
-        "Require Schema.TaggedErrorClass declaration, self-type, and literal tag names to agree.",
+        "Require Schema.TaggedError declaration, self-type, and literal tag names to agree.",
     },
     messages: {
       mismatch:
-        "Schema.TaggedErrorClass names must agree (class: {{className}}, self-type: {{selfTypeName}}, tag: {{tagName}}).",
+        "Schema.TaggedError names must agree (class: {{className}}, self-type: {{selfTypeName}}, tag: {{tagName}}).",
     },
     type: "problem",
   },

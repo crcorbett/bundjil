@@ -5,7 +5,7 @@ import {
   UpstashKeyValueStoreErrorMessage,
 } from "../error-contracts.js";
 
-export class UpstashKeyValueStoreConfigError extends Schema.TaggedErrorClass<UpstashKeyValueStoreConfigError>()(
+export class UpstashKeyValueStoreConfigError extends Schema.TaggedError<UpstashKeyValueStoreConfigError>()(
   "UpstashKeyValueStoreConfigError",
   {
     boundary: UpstashKeyValueStoreConfigBoundary,

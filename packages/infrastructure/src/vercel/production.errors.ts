@@ -47,7 +47,7 @@ export const AutomaticProductionBlockedReceiptJson = Schema.fromJsonString(
   AutomaticProductionBlockedReceipt
 );
 
-export class ProductionDeploymentError extends Schema.TaggedErrorClass<ProductionDeploymentError>()(
+export class ProductionDeploymentError extends Schema.TaggedError<ProductionDeploymentError>()(
   "ProductionDeploymentError",
   {
     operation: ProductionDeploymentOperation,

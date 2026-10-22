@@ -7,11 +7,12 @@ import nodePath from "node:path";
 import { Ajv2020 } from "ajv/dist/2020.js";
 import { AlchemyContextLive } from "alchemy/AlchemyContext";
 import { ArtifactStore, createArtifactStore } from "alchemy/Artifacts";
-import { selectCli } from "alchemy/Cli/selectCli";
+import { LoggingCli } from "alchemy/Cli/LoggingCli";
+import * as AlchemySync from "alchemy/Drift";
+import * as Interaction from "alchemy/Interaction";
 import * as AlchemyPlan from "alchemy/Plan";
 import * as AlchemyStack from "alchemy/Stack";
 import { State } from "alchemy/State";
-import * as AlchemySync from "alchemy/Sync";
 import { PlatformServices } from "alchemy/Util/PlatformServices";
 import {
   Cause,
@@ -27,7 +28,7 @@ import {
   Record,
   Schema,
 } from "effect";
-import * as FetchHttpClient from "effect/unstable/http/FetchHttpClient";
+import * as FetchHttpClient from "effect/http/FetchHttpClient";
 
 import { buildStableInfrastructureDriftStack } from "../../../alchemy.stable.run.js";
 import authorityEnvelopeSchema from "../../../tooling/schemas/authority-envelope.schema.json" with { type: "json" };
@@ -149,7 +150,7 @@ const InfrastructureDriftNativeProviderFailureError = Schema.Struct({
 });
 type InfrastructureDriftNativeProviderFailureError =
   typeof InfrastructureDriftNativeProviderFailureError.Type;
-class InfrastructureDriftNativeBoundaryError extends Schema.TaggedErrorClass<InfrastructureDriftNativeBoundaryError>()(
+class InfrastructureDriftNativeBoundaryError extends Schema.TaggedError<InfrastructureDriftNativeBoundaryError>()(
   "InfrastructureDriftNativeBoundaryError",
   {
     phase: InfrastructureDriftNativePhase,
@@ -165,7 +166,7 @@ const InfrastructureDriftCommandFailureReason = Schema.Literals([
   "productionTargetRejected",
   "receiptIncompatible",
 ]);
-class InfrastructureDriftCommandError extends Schema.TaggedErrorClass<InfrastructureDriftCommandError>()(
+class InfrastructureDriftCommandError extends Schema.TaggedError<InfrastructureDriftCommandError>()(
   "InfrastructureDriftCommandError",
   { reason: InfrastructureDriftCommandFailureReason }
 ) {}
@@ -179,7 +180,7 @@ const InfrastructureDriftBoundaryFailureReason = Schema.Literals([
   "stateConfigurationInvalid",
   "stateInitializationFailed",
 ]);
-class InfrastructureDriftBoundaryError extends Schema.TaggedErrorClass<InfrastructureDriftBoundaryError>()(
+class InfrastructureDriftBoundaryError extends Schema.TaggedError<InfrastructureDriftBoundaryError>()(
   "InfrastructureDriftBoundaryError",
   { reason: InfrastructureDriftBoundaryFailureReason }
 ) {}
@@ -817,7 +818,8 @@ const runtime = Layer.mergeAll(
   FetchHttpClient.layer,
   Layer.provideMerge(AlchemyContextLive, PlatformServices),
   Layer.succeed(ArtifactStore, createArtifactStore()),
-  selectCli(),
+  LoggingCli.pipe(Layer.provide(PlatformServices)),
+  Interaction.layerNonInteractive(),
   driftStateLayer,
   ConfigProvider.layer(ConfigProvider.fromEnv())
 );

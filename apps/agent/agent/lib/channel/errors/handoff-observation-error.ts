@@ -1,6 +1,6 @@
 import { Schema } from "effect";
 
-export class ChannelHandoffObservationError extends Schema.TaggedErrorClass<ChannelHandoffObservationError>()(
+export class ChannelHandoffObservationError extends Schema.TaggedError<ChannelHandoffObservationError>()(
   "ChannelHandoffObservationError",
   {
     operation: Schema.Literals(["initialize", "fingerprint", "observe"]),

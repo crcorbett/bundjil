@@ -1,11 +1,7 @@
 /* oxlint-disable unicorn/no-array-method-this-argument -- Effect Array data-first combinators are not native Array methods with a thisArg. */
 
 import { Array, Effect, Layer, Match, Redacted, Schema } from "effect";
-import {
-  HttpClient,
-  HttpClientRequest,
-  HttpClientResponse,
-} from "effect/unstable/http";
+import { HttpClient, HttpClientRequest, HttpClientResponse } from "effect/http";
 
 import {
   SecretOwner,
@@ -73,7 +69,7 @@ const VercelPhotonWebhookBindingEnvironmentRequest = Schema.Struct({
 
 const VercelPhotonWebhookBindingRequest = Schema.Array(
   VercelPhotonWebhookBindingEnvironmentRequest
-).pipe(Schema.check(Schema.isLengthBetween(4, 4)));
+).pipe(Schema.check(Schema.isMinLength(4), Schema.isMaxLength(4)));
 
 const VercelPhotonWebhookBindingCreatedEnvironment = Schema.Struct({
   id: VercelEnvironmentVariableId,

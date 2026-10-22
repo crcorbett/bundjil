@@ -1,6 +1,6 @@
 import { PersistenceMemory } from "@bundjil/store/memory";
 import { Context, Effect, Layer, Option, Redacted, Ref, Schema } from "effect";
-import { HttpClient } from "effect/unstable/http";
+import { HttpClient } from "effect/http";
 
 import { CodexOAuthClient } from "../auth/client.js";
 import type { CodexOAuthTokenRefreshResult } from "../auth/credentials.js";

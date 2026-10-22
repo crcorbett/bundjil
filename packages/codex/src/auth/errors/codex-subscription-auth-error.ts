@@ -40,7 +40,7 @@ export const CodexSubscriptionAuthFailureReason = Schema.Literals([
 export type CodexSubscriptionAuthFailureReason =
   typeof CodexSubscriptionAuthFailureReason.Type;
 
-export class CodexSubscriptionAuthError extends Schema.TaggedErrorClass<CodexSubscriptionAuthError>()(
+export class CodexSubscriptionAuthError extends Schema.TaggedError<CodexSubscriptionAuthError>()(
   "CodexSubscriptionAuthError",
   {
     operation: CodexSubscriptionAuthOperation,

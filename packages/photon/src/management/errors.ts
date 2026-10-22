@@ -19,32 +19,32 @@ const PhotonManagementReadErrorFields = {
   message: PhotonManagementReadErrorMessage,
 };
 
-export class PhotonProjectsReadError extends Schema.TaggedErrorClass<PhotonProjectsReadError>()(
+export class PhotonProjectsReadError extends Schema.TaggedError<PhotonProjectsReadError>()(
   "PhotonProjectsReadError",
   PhotonManagementReadErrorFields
 ) {}
 
-export class PhotonPlatformsReadError extends Schema.TaggedErrorClass<PhotonPlatformsReadError>()(
+export class PhotonPlatformsReadError extends Schema.TaggedError<PhotonPlatformsReadError>()(
   "PhotonPlatformsReadError",
   PhotonManagementReadErrorFields
 ) {}
 
-export class PhotonSharedUsersReadError extends Schema.TaggedErrorClass<PhotonSharedUsersReadError>()(
+export class PhotonSharedUsersReadError extends Schema.TaggedError<PhotonSharedUsersReadError>()(
   "PhotonSharedUsersReadError",
   PhotonManagementReadErrorFields
 ) {}
 
-export class PhotonWebhooksReadError extends Schema.TaggedErrorClass<PhotonWebhooksReadError>()(
+export class PhotonWebhooksReadError extends Schema.TaggedError<PhotonWebhooksReadError>()(
   "PhotonWebhooksReadError",
   PhotonManagementReadErrorFields
 ) {}
 
-export class PhotonLinesReadError extends Schema.TaggedErrorClass<PhotonLinesReadError>()(
+export class PhotonLinesReadError extends Schema.TaggedError<PhotonLinesReadError>()(
   "PhotonLinesReadError",
   PhotonManagementReadErrorFields
 ) {}
 
-export class PhotonBillingReadError extends Schema.TaggedErrorClass<PhotonBillingReadError>()(
+export class PhotonBillingReadError extends Schema.TaggedError<PhotonBillingReadError>()(
   "PhotonBillingReadError",
   PhotonManagementReadErrorFields
 ) {}

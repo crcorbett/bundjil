@@ -45,7 +45,7 @@ import {
   Stream,
 } from "effect";
 import * as FileSystem from "effect/FileSystem";
-import { HttpClient, HttpClientResponse } from "effect/unstable/http";
+import { HttpClient, HttpClientResponse } from "effect/http";
 import { describe, it as vitestIt } from "vitest";
 
 import { CodexProxyRouteError } from "../src/errors.js";
@@ -71,7 +71,7 @@ const encodeChatCompletionRequest = Schema.encodeUnknownSync(
   Schema.fromJsonString(OpenAICompatibleChatCompletionRequest)
 );
 const encodeUnknownJson = Schema.encodeUnknownSync(
-  Schema.UnknownFromJsonString
+  Schema.fromJsonString(Schema.Unknown)
 );
 const CodexProxyStreamFailureLogs = Schema.Array(
   Schema.Tuple([

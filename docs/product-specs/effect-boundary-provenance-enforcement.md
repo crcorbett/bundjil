@@ -201,7 +201,7 @@ export const InboundMessage = Schema.Struct({
 
 export type InboundMessage = typeof InboundMessage.Type;
 
-export class ChannelBoundaryError extends Schema.TaggedErrorClass<ChannelBoundaryError>()(
+export class ChannelBoundaryError extends Schema.TaggedError<ChannelBoundaryError>()(
   "ChannelBoundaryError",
   { message: Schema.NonEmptyString }
 ) {}
@@ -282,7 +282,7 @@ serialized values rather than leaking the native primitives.
 
 ### Errors And Diagnostics
 
-Public and expected failures use `Schema.TaggedErrorClass` with safe,
+Public and expected failures use `Schema.TaggedError` with safe,
 owner-named fields. A private adapter may retain `cause: unknown` only if the
 cause never crosses serialization, logs, HTTP, tools, or package API and the
 adapter maps it once to a safe public error. Provider bodies and secrets are

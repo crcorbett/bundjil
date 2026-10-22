@@ -70,12 +70,12 @@ const VercelPreviewConfigurationErrorFields = {
   message: VercelPreviewConfigurationErrorMessage,
 };
 
-export class VercelPreviewConfigurationReadError extends Schema.TaggedErrorClass<VercelPreviewConfigurationReadError>()(
+export class VercelPreviewConfigurationReadError extends Schema.TaggedError<VercelPreviewConfigurationReadError>()(
   "VercelPreviewConfigurationReadError",
   VercelPreviewConfigurationErrorFields
 ) {}
 
-export class VercelPreviewConfigurationWriteError extends Schema.TaggedErrorClass<VercelPreviewConfigurationWriteError>()(
+export class VercelPreviewConfigurationWriteError extends Schema.TaggedError<VercelPreviewConfigurationWriteError>()(
   "VercelPreviewConfigurationWriteError",
   VercelPreviewConfigurationErrorFields
 ) {}

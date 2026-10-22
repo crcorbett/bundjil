@@ -301,7 +301,7 @@ Follow-up evidence, 2026-07-12:
   the proxy. Focused package/app checks and `bun run verification` passed.
 - Preview deployment `dpl_2gnQwmyeFJXmXMyNgVYCYqWyv1kC` for commit `91a4e84`
   is `READY`. Direct probes recorded `GET /health` as HTTP 200 with `mode:
-mock` and an unauthenticated completion request as HTTP 401. No credential
+  mock` and an unauthenticated completion request as HTTP 401. No credential
   value was requested or displayed.
 - The Executor Personal Vercel API cannot create a Marketplace Upstash resource.
   The Vercel Marketplace Upstash page is reachable, but the available browser

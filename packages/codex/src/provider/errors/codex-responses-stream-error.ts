@@ -5,7 +5,7 @@ import {
   CodexResponsesStreamOperation,
 } from "../error-contracts.js";
 
-export class CodexResponsesStreamError extends Schema.TaggedErrorClass<CodexResponsesStreamError>()(
+export class CodexResponsesStreamError extends Schema.TaggedError<CodexResponsesStreamError>()(
   "CodexResponsesStreamError",
   {
     operation: CodexResponsesStreamOperation,

@@ -1,8 +1,8 @@
-import { localDev, vercelOidc } from "eve/channels/auth";
+import { vercelOidc } from "eve/channels/auth";
 import { exportJWK, generateKeyPair, SignJWT } from "jose";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import eveChannel from "../agent/channels/eve.js";
+import eveChannel, { localhostDevelopmentAuth } from "../agent/channels/eve.js";
 
 describe("Eve auth policy", () => {
   afterEach(() => {
@@ -10,12 +10,23 @@ describe("Eve auth policy", () => {
   });
 
   it("authors the installed Vercel OIDC and localhost-only local development policy", () => {
+    vi.stubEnv("EVE_DEV", "1");
     expect(eveChannel).toBeDefined();
     expect(
-      localDev()(new Request("http://127.0.0.1/eve/v1/session"))
+      localhostDevelopmentAuth(new Request("http://127.0.0.1/eve/v1/session"))
     ).not.toBeNull();
     expect(
-      localDev()(new Request("https://bundjil-agent.vercel.app/eve/v1/session"))
+      localhostDevelopmentAuth(
+        new Request("https://bundjil-agent.vercel.app/eve/v1/session")
+      )
+    ).toBeNull();
+  });
+
+  it("rejects local development authentication in production", () => {
+    vi.stubEnv("EVE_DEV", "0");
+    vi.stubEnv("VERCEL_ENV", "production");
+    expect(
+      localhostDevelopmentAuth(new Request("http://localhost/eve/v1/session"))
     ).toBeNull();
   });
 

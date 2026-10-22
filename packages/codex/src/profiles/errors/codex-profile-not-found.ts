@@ -6,7 +6,7 @@ import {
 } from "../../auth/credentials.js";
 import { CodexProfileErrorMessage } from "../error-contracts.js";
 
-export class CodexProfileNotFound extends Schema.TaggedErrorClass<CodexProfileNotFound>()(
+export class CodexProfileNotFound extends Schema.TaggedError<CodexProfileNotFound>()(
   "CodexProfileNotFound",
   {
     profileId: CodexOAuthProfileId,

@@ -5,7 +5,7 @@ import {
   WorkspaceSchemaErrorMessage,
 } from "./contracts.js";
 
-export class WorkspaceSchemaError extends Schema.TaggedErrorClass<WorkspaceSchemaError>()(
+export class WorkspaceSchemaError extends Schema.TaggedError<WorkspaceSchemaError>()(
   "WorkspaceSchemaError",
   {
     boundary: WorkspaceSchemaBoundary,

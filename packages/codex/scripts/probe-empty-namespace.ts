@@ -1,5 +1,5 @@
 import { Console, Effect, Exit, Schema } from "effect";
-import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
+import * as KeyValueStore from "effect/persistence/KeyValueStore";
 
 import { CodexUpstashPersistenceLive } from "../src/storage/upstash.js";
 

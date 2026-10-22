@@ -42,7 +42,7 @@ export type VercelStableEnvironmentAuthorityFailureReason =
 export type VercelStableEnvironmentAuthorityFailureReasonEncoded =
   typeof VercelStableEnvironmentAuthorityFailureReason.Encoded;
 
-export class VercelStableEnvironmentAuthorityError extends Schema.TaggedErrorClass<VercelStableEnvironmentAuthorityError>()(
+export class VercelStableEnvironmentAuthorityError extends Schema.TaggedError<VercelStableEnvironmentAuthorityError>()(
   "VercelStableEnvironmentAuthorityError",
   { reason: VercelStableEnvironmentAuthorityFailureReason }
 ) {}

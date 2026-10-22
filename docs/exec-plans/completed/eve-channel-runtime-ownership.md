@@ -148,8 +148,8 @@ Baseline: `cb10720e1eb43396f4b3351143c11002a2e96cf8`.
   tagged-error, host-value, `waitUntil`, request-signal, MemoMap/build-fiber,
   Scope/disposal, `runFork`, and `Fiber.await` scans; direct source reads; and
   `bun run --cwd apps/agent vitest run test/channel-config.test.ts
-test/channel-runtime.test.ts test/sendblue-channel.test.ts
-test/channel-vertical.test.ts`.
+  test/channel-runtime.test.ts test/sendblue-channel.test.ts
+  test/channel-vertical.test.ts`.
 - Findings: Eve state decodes from and encodes to the canonical adapter Schema;
   request/provider unknowns decode at their exact adapters; Services exchange
   decoded owner types; config is Schema-owned and redacted; public failures are

@@ -262,7 +262,7 @@ export const AdoptionManifestBuildMessage = Schema.NonEmptyString.pipe(
 export type AdoptionManifestBuildMessage =
   typeof AdoptionManifestBuildMessage.Type;
 
-export class AdoptionManifestBuildError extends Schema.TaggedErrorClass<AdoptionManifestBuildError>()(
+export class AdoptionManifestBuildError extends Schema.TaggedError<AdoptionManifestBuildError>()(
   "AdoptionManifestBuildError",
   {
     reason: Schema.Literals([

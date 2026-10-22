@@ -6,7 +6,7 @@ import {
   CodexAuthTokenName,
 } from "../error-contracts.js";
 
-export class CodexOAuthTokenMissing extends Schema.TaggedErrorClass<CodexOAuthTokenMissing>()(
+export class CodexOAuthTokenMissing extends Schema.TaggedError<CodexOAuthTokenMissing>()(
   "CodexOAuthTokenMissing",
   {
     profileId: CodexOAuthProfileId,

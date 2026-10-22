@@ -43,7 +43,7 @@ tool was used for the research below.
   calls, channels, tools, schema validation, and model configuration.
 - `Effect-TS/effect-smol`: DeepWiki confirmed the Effect v4 wrapper primitives:
   `Schema`, `Schema.decodeUnknownEffect`, `Schema.encodeEffect`,
-  `Schema.TaggedErrorClass`, `Context.Service`, `Layer.effect`,
+  `Schema.TaggedError`, `Context.Service`, `Layer.effect`,
   `Config.redacted`, `Effect.tryPromise`, `Effect.withSpan`, and
   `@effect/vitest`.
 
@@ -105,8 +105,8 @@ committed or printed in project docs.
   model `google/gemini-2.5-flash`, zero discovery errors, zero discovery
   warnings, and a connected Gateway endpoint with credential type `api-key`.
 - `POST /eve/v1/session` with the prompt `Use the workspace_status tool to
-tell me what packages are available in the Bundjil repo. Keep the answer
-short.` returned `ok: true`.
+  tell me what packages are available in the Bundjil repo. Keep the answer
+  short.` returned `ok: true`.
 - The streamed turn emitted `actions.requested` for the authored
   `workspace_status` tool, then `action.result` with status `completed`.
 - The tool result came from the Effect operation path and returned workspace
@@ -114,7 +114,7 @@ short.` returned `ok: true`.
   `@bundjil/eve-effect`.
 - The model completed with the summary:
   `The Bundjil repo contains the packages: @bundjil/core,
-@bundjil/effect-start, and @bundjil/eve-effect.`
+  @bundjil/effect-start, and @bundjil/eve-effect.`
 - The earlier Task 4 missing-credential result is retained as historical
   evidence of the expected failure mode when neither `AI_GATEWAY_API_KEY` nor
   `VERCEL_OIDC_TOKEN` is available.
@@ -214,7 +214,7 @@ primitive or owning service contract should carry the behavior.
 
 The wrapper pattern must follow the local `effect-client-wrapper` skill:
 
-- Define tagged errors with `Schema.TaggedErrorClass` or `Data.TaggedError`
+- Define tagged errors with `Schema.TaggedError` or `Data.TaggedError`
   when no schema encoding is needed.
 - Define a `Context.Service` or local service tag for named operations.
 - Use named operation methods instead of exposing only a generic `use`.

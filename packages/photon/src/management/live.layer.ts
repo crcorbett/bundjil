@@ -9,11 +9,7 @@ import {
   Schema,
 } from "effect";
 import type { ConfigError } from "effect/Config";
-import {
-  HttpClient,
-  HttpClientRequest,
-  HttpClientResponse,
-} from "effect/unstable/http";
+import { HttpClient, HttpClientRequest, HttpClientResponse } from "effect/http";
 
 import {
   PhotonE164PhoneNumber,

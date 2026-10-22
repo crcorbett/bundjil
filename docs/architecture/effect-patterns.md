@@ -35,7 +35,7 @@ runtime config, or provider boundaries:
 
 - `Schema` for payloads, config values, tool inputs, tool outputs, and domain
   contracts.
-- `Schema.TaggedErrorClass` or `Data.TaggedError` for expected failures.
+- `Schema.TaggedError` or `Data.TaggedError` for expected failures.
 - `Context.Service` and `Layer` for dependency-injected operations.
 - `Config` and `ConfigProvider` for runtime config.
 - Object-form `Effect.tryPromise({ try, catch })` for Promise or SDK calls,
@@ -89,8 +89,8 @@ delegates to an already named service operation; give its generator a useful
 function name for diagnostics. Do not add a pass-through accessor merely to
 rename a service method: it needs an existing public-package consumer or
 another concrete API-boundary reason. This distinction follows installed
-`effect@4.0.0-beta.101`; the reviewed v4 source revision is
-`1caab3cc30f626efbf15e59d74f539a487e5c85c`.
+`effect@4.0.5`; the reviewed v4 source revision is
+`7f524e25cfb49a71ac39b0f44278d08d40dda5de`.
 
 Use this file layout when a package grows past one or two operations:
 
@@ -131,7 +131,7 @@ For every operation:
    Keep `typeof Contract.Encoded` inside the adapter.
 3. Wrap only the Promise call with object-form
    `Effect.tryPromise({ try, catch })` and map raw failure once to an
-   owner-named, safe `Schema.TaggedErrorClass` failure.
+   owner-named, safe `Schema.TaggedError` failure.
 4. Decode the complete provider response immediately with
    `Schema.decodeUnknownEffect`; use `Schema.decodeEffect` instead when the SDK
    statically returns the codec's `Encoded` type.
@@ -367,7 +367,7 @@ clear owner and concrete value.
 
 ## Persistence
 
-Use Effect's native `effect/unstable/persistence/KeyValueStore` for ordinary
+Use Effect's native `effect/persistence/KeyValueStore` for ordinary
 string and binary persistence. Treat its unstable import path as a contract
 tested by `@bundjil/store`; `KeyValueStore.modify` is not an
 atomic coordination operation. Claims, leases, fencing, compare-and-remove,
@@ -604,7 +604,7 @@ acceptance evidence.
 Expected failures should be typed and tagged:
 
 ```ts
-export class WorkspaceSchemaError extends Schema.TaggedErrorClass<WorkspaceSchemaError>()(
+export class WorkspaceSchemaError extends Schema.TaggedError<WorkspaceSchemaError>()(
   "WorkspaceSchemaError",
   {
     boundary: WorkspaceSchemaBoundary,
@@ -630,10 +630,10 @@ Rules:
   service/package source and infrastructure scripts. A defect conversion is
   allowed only at an exact host-framework edge whose API requires an
   infallible Layer, with that constraint documented beside the composition.
-- An exported `Schema.TaggedErrorClass` declaration name, generic self-type,
+- An exported `Schema.TaggedError` declaration name, generic self-type,
   and literal `_tag` must be the same capability-owned error name. The root
   `bundjil/tagged-error-name` rule enforces this mechanical invariant.
-- Every exported yieldable typed error must use `Schema.TaggedErrorClass`, not
+- Every exported yieldable typed error must use `Schema.TaggedError`, not
   `Data.TaggedError`, so its encoded contract can be checked and round-tripped.
   The `public-data-tagged-error` boundary rule owns this invariant. Private
   adapter and operator-only errors may use `Data.TaggedError` when they do not
@@ -655,7 +655,7 @@ Rules:
   causes.
 - Owner-named fields remain mandatory when a tagged error reuses a shared field
   object. Do not hide `Schema.String` or `Schema.NonEmptyString` in an aliased
-  object passed to `Schema.TaggedErrorClass`; define one bounded Schema named
+  object passed to `Schema.TaggedError`; define one bounded Schema named
   for that error family. `inline-string-schema` resolves local and imported
   field-object identifiers as well as inline object literals. Brand identities
   and values used for routing, equality, lookup, or persistence. A bounded

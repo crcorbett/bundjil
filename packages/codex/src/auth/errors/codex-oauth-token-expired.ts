@@ -6,7 +6,7 @@ import {
   CodexAuthErrorMessage,
 } from "../error-contracts.js";
 
-export class CodexOAuthTokenExpired extends Schema.TaggedErrorClass<CodexOAuthTokenExpired>()(
+export class CodexOAuthTokenExpired extends Schema.TaggedError<CodexOAuthTokenExpired>()(
   "CodexOAuthTokenExpired",
   {
     profileId: CodexOAuthProfileId,

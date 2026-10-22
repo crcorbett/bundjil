@@ -19,7 +19,7 @@ credentials, or Production.
 ## Preconditions
 
 - Work from a clean or intentionally scoped worktree and record `git rev-parse
-HEAD` plus `git status --short`.
+  HEAD` plus `git status --short`.
 - Use Bun from the repository root.
 - Use a dedicated non-Production Executor toolkit and non-Production provider
   identities. Never reuse a Production bearer, routing key, webhook secret,

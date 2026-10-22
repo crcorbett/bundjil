@@ -92,16 +92,16 @@ apps/agent
 
 @bundjil/codex
   -> effect
-  -> effect/unstable/persistence/KeyValueStore
+  -> effect/persistence/KeyValueStore
   -> @bundjil/store
   -> direct HTTPS fetch to chatgpt.com/backend-api/codex/responses
 
 @bundjil/store
-  -> effect/unstable/persistence/KeyValueStore
+  -> effect/persistence/KeyValueStore
   -> @upstash/redis only through its explicit /upstash subpath
 
 apps/codex-proxy
-  -> effect/unstable/http
+  -> effect/http
   -> @bundjil/codex
 ```
 

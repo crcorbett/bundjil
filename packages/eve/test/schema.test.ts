@@ -1,5 +1,5 @@
 import { assert, it } from "@effect/vitest";
-import { Effect } from "effect";
+import { Effect, Schema } from "effect";
 
 import { WorkspaceStatusInput, WorkspaceStatusSuccess } from "../src/index.js";
 import { toEveSchema } from "../src/schema.js";
@@ -20,7 +20,7 @@ it.effect(
         {
           issues: [
             {
-              message: 'Expected a value with a length of at least 1, got ""',
+              message: "Expected a value with a length of at least 1",
               path: ["question"],
             },
           ],
@@ -35,30 +35,18 @@ it.effect(
           additionalProperties: false,
           properties: {
             agentSummary: {
-              allOf: [
-                {
-                  minLength: 1,
-                },
-              ],
+              minLength: 1,
               type: "string",
             },
             packageNames: {
               items: {
-                allOf: [
-                  {
-                    minLength: 1,
-                  },
-                ],
+                minLength: 1,
                 type: "string",
               },
               type: "array",
             },
             workspaceName: {
-              allOf: [
-                {
-                  minLength: 1,
-                },
-              ],
+              minLength: 1,
               type: "string",
             },
           },
@@ -66,5 +54,44 @@ it.effect(
           type: "object",
         }
       );
+    })
+);
+
+it.effect(
+  "keeps nested JSON descriptions and runtime validation equally strict",
+  () =>
+    Effect.gen(function* () {
+      const schema = toEveSchema(
+        Schema.Struct({
+          value: Schema.Struct({ label: Schema.String }).annotate({
+            identifier: "NestedValue",
+          }),
+        })
+      );
+      const valid = yield* Effect.promise(() =>
+        Promise.resolve(
+          schema["~standard"].validate({ value: { label: "ok" } })
+        )
+      );
+      const extra = yield* Effect.promise(() =>
+        Promise.resolve(
+          schema["~standard"].validate({ value: { label: "ok", extra: true } })
+        )
+      );
+      assert.deepStrictEqual(valid, { value: { value: { label: "ok" } } });
+      assert.isDefined(extra.issues);
+      const current = schema["~standard"].jsonSchema.input({
+        target: "draft-2020-12",
+      });
+      const legacy = schema["~standard"].jsonSchema.input({
+        target: "draft-07",
+      });
+      assert.property(current, "$defs");
+      assert.property(legacy, "definitions");
+      assert.propertyVal(current, "additionalProperties", false);
+      assert.propertyVal(legacy, "additionalProperties", false);
+      assert.throws(() => {
+        schema["~standard"].jsonSchema.input({ target: "unsupported" });
+      }, "Unsupported JSON Schema target");
     })
 );

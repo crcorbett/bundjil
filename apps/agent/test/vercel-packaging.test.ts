@@ -10,21 +10,21 @@ const installedEveDirectory = new URL("node_modules/eve/", repositoryDirectory);
 
 const AgentPackage = Schema.Struct({
   dependencies: Schema.Struct({
-    eve: Schema.Literal("0.29.5"),
+    eve: Schema.Literal("0.82.0"),
   }),
 });
 
 const InstalledEvePackage = Schema.Struct({
   dependencies: Schema.Struct({
-    nitro: Schema.Literal("3.0.260610-beta"),
+    nitro: Schema.Literal("3.0.260903-beta"),
   }),
   name: Schema.Literal("eve"),
-  version: Schema.Literal("0.29.5"),
+  version: Schema.Literal("0.82.0"),
 });
 
 const VercelConfig = Schema.Struct({
   buildCommand: Schema.Literal(
-    "cd ../.. && bun run build --filter=@bundjil/agent"
+    "cd ../.. && bun run build:vercel --filter=@bundjil/agent"
   ),
   git: Schema.Struct({ deploymentEnabled: Schema.Literal(false) }),
 });
@@ -46,7 +46,7 @@ const BuildRoute = Schema.Struct({
 const BuildOutputConfig = Schema.Struct({
   framework: Schema.Struct({
     name: Schema.Literal("nitro"),
-    version: Schema.Literal("0.29.5"),
+    version: Schema.Literal("0.82.0"),
   }),
   routes: Schema.Array(BuildRoute),
   version: Schema.Literal(3),
@@ -89,51 +89,12 @@ describe("Vercel packaging", () => {
       )
     );
 
-    expect(packageConfig.dependencies.eve).toBe("0.29.5");
-    expect(lock).toContain('"eve": ["eve@0.29.5"');
-    expect(lock).toContain('"undici": "8.9.0"');
+    expect(packageConfig.dependencies.eve).toBe("0.82.0");
+    expect(lock).toContain('"eve": ["eve@0.82.0"');
+    expect(lock).toContain('"undici": "8.10.2"');
     expect(installedPackage.name).toBe("eve");
-    expect(installedPackage.version).toBe("0.29.5");
-    expect(installedPackage.dependencies.nitro).toBe("3.0.260610-beta");
-  });
-
-  it("retains Eve send, session workflow and child-turn ownership", async () => {
-    const sendSource = await readFile(
-      new URL("dist/src/channel/send.js", installedEveDirectory),
-      "utf-8"
-    );
-    const workflowRuntimeSource = await readFile(
-      new URL("dist/src/execution/workflow-runtime.js", installedEveDirectory),
-      "utf-8"
-    );
-    const workflowEntrySource = await readFile(
-      new URL("dist/src/execution/workflow-entry.js", installedEveDirectory),
-      "utf-8"
-    );
-    const workflowStepsSource = await readFile(
-      new URL("dist/src/execution/workflow-steps.js", installedEveDirectory),
-      "utf-8"
-    );
-
-    expect(sendSource).toContain(".deliver(");
-    expect(sendSource).toContain(".run(");
-    expect(sendSource).toContain("isRuntimeNoActiveSessionError(e)");
-    expect(sendSource).toContain("Cannot deliver inputResponses");
-    expect(workflowRuntimeSource).toContain(
-      "await resumeHook(e.continuationToken"
-    );
-    expect(workflowRuntimeSource).toContain(
-      "HookNotFoundError.is(r)?new RuntimeNoActiveSessionError"
-    );
-    expect(workflowRuntimeSource).toContain(
-      "await startWorkflowPreferLatest(workflowEntryReference"
-    );
-    expect(workflowEntrySource).toContain("async function workflowEntry(");
-    expect(workflowEntrySource).toContain('"use workflow"');
-    expect(workflowEntrySource).toContain("dispatchAndAwaitTurn");
-    expect(workflowStepsSource).toContain(
-      "await startWorkflowPreferLatest(turnWorkflowReference"
-    );
+    expect(installedPackage.version).toBe("0.82.0");
+    expect(installedPackage.dependencies.nitro).toBe("3.0.260903-beta");
   });
 
   it("keeps the root filtered build and Eve-owned Nitro configuration seam", async () => {
@@ -163,7 +124,7 @@ describe("Vercel packaging", () => {
     );
 
     expect(config.buildCommand).toBe(
-      "cd ../.. && bun run build --filter=@bundjil/agent"
+      "cd ../.. && bun run build:vercel --filter=@bundjil/agent"
     );
     expect(config.git.deploymentEnabled).toBeFalsy();
     expect(turbo.tasks["@bundjil/agent#build"].env).toContain(
@@ -184,12 +145,14 @@ describe("Vercel packaging", () => {
 
     expect(
       decode({
-        buildCommand: "cd ../.. && bun run build --filter=@bundjil/agent",
+        buildCommand:
+          "cd ../.. && bun run build:vercel --filter=@bundjil/agent",
       })._tag
     ).toBe("Failure");
     expect(
       decode({
-        buildCommand: "cd ../.. && bun run build --filter=@bundjil/agent",
+        buildCommand:
+          "cd ../.. && bun run build:vercel --filter=@bundjil/agent",
         git: { deploymentEnabled: true },
       })._tag
     ).toBe("Failure");

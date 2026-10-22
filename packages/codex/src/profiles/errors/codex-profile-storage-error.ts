@@ -6,7 +6,7 @@ import {
   CodexProfileStorageOperation,
 } from "../error-contracts.js";
 
-export class CodexProfileStorageError extends Schema.TaggedErrorClass<CodexProfileStorageError>()(
+export class CodexProfileStorageError extends Schema.TaggedError<CodexProfileStorageError>()(
   "CodexProfileStorageError",
   {
     operation: CodexProfileStorageOperation,

@@ -279,7 +279,7 @@ deployment claim.
   boundary suite to 131 tests without an exception; a Web Crypto rejection
   fixture proves the exact safe encoded error without the private cause.
 - Focused Sendblue typecheck and 10 tests pass. The complete `bun run
-verification` gate passes with all nine package typechecks and all fifteen
+  verification` gate passes with all nine package typechecks and all fifteen
   test/build tasks green; the changed Sendblue and agent tasks executed while
   unaffected tasks replayed from the shared Turbo cache. The final owned-source
   scan is empty for `Promise.all` and `Promise.race`.

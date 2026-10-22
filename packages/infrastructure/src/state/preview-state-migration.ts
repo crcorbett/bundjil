@@ -184,7 +184,7 @@ export const PreviewStateMigrationPolicy = Schema.Struct({
 export type PreviewStateMigrationPolicy =
   typeof PreviewStateMigrationPolicy.Type;
 
-export class PreviewStateMigrationError extends Schema.TaggedErrorClass<PreviewStateMigrationError>()(
+export class PreviewStateMigrationError extends Schema.TaggedError<PreviewStateMigrationError>()(
   "PreviewStateMigrationError",
   {
     reason: PreviewStateMigrationFailureReason,

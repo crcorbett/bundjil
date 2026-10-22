@@ -53,7 +53,7 @@ and escalation rules are owned by the
 
 ## Compiler compatibility
 
-The installed Spectrum `12.3.0` provider declaration does not satisfy its own
+The installed Spectrum `12.13.0` provider declaration does not satisfy its own
 generic factory constraint under TypeScript 7. The private acquisition call
 keeps narrow, documented `@ts-expect-error` annotations for that mismatch.
 Runtime configuration, request encoding, response decoding and provider tests

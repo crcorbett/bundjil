@@ -1365,7 +1365,7 @@ candidates through the controls admission process.
   endpoint before deleting the old one, then wait beyond the documented retry
   horizon.
 - Never destroy a stack to roll back Production. `alchemy destroy --stage
-prod` is blocked by policy.
+  prod` is blocked by policy.
 - A partial or uncertain provider result stops promotion and records the last
   observed physical identity and safe recovery path.
 

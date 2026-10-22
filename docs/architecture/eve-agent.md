@@ -41,7 +41,7 @@ The source supports two model selections:
 Eve HTTP/API -> apps/agent/agent/agent.ts -> agent/config.ts
   -> gateway model string
   |  codex-proxy LanguageModel
-       -> agent/instrumentation.ts records no inputs/outputs
+       -> agent/instrumentation/otel.ts records no inputs/outputs
        -> W3C trace context to the configured private proxy origin only
        -> apps/codex-proxy /v1/chat/completions
        -> proxy continues the trace until its SSE response settles
@@ -67,25 +67,22 @@ not supported architecture paths. This enhancement is not required for the
 completed Terra/high rollout; its future proof gate lives in the
 [Codex Terra SPEC](../product-specs/codex-terra-high-reasoning.md).
 
-As of the installed Eve `0.29.5`, that enhancement prerequisite is unavailable.
-`defineDynamic` can select a live model at `step.started`, but the public
-resolver receives `event: unknown` and a session-level context, not a stable
-turn, step, or attempt identity. The documented stream `meta.id` exists only
-after durable emission and cannot be repurposed as a pre-egress resolver input.
-The [dated local receipt (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/codex-terra-eve-correlation-blocked-2026-08-09.json)
-retains this limitation. Do not add a fallback bridge from message contents,
-telemetry, internal Eve source, process state, proxy-only counters, or a
-standalone receipt that cannot meet the required correlation contract.
+The historical Eve `0.29.5` investigation could not establish a supported
+pre-egress correlation value. That result is not a current claim about Eve
+`0.82.0`; a separate investigation must check its public contracts before
+implementing the optional enhancement. Do not infer this proof from telemetry,
+message contents or process-local state.
 
 ## Boundary invariants
 
 - `agent/config.ts` decodes model-provider configuration through Effect Config
   and Schemas; secrets are redacted. `model-provider.ts` owns model
   construction.
-- `agent/instrumentation.ts` is an Eve-owned telemetry boundary, not a model
+- `agent/instrumentation/otel.ts` is an Eve-owned telemetry boundary, not a model
   wrapper. It uses the already-decoded selected provider configuration to
   restrict Vercel OpenTelemetry fetch propagation to the private Codex proxy
-  origin and disables AI SDK input/output capture. The trace exists for the
+  origin and disables AI SDK input/output capture. Explicit default Workflow
+  retention keeps stored sessions independently of trace content. The trace exists for the
   operator's restricted observability only; Bundjil never retains raw session/turn IDs,
   prompts, responses, tokens, tools, or reasoning in a repository receipt.
 - `workspace_status` bridges Effect Schema once at the Eve edge, delegates to
@@ -223,35 +220,28 @@ acceptance or durable execution. Current local build proof loads both provider
 roots; future bundle splitting, warm-instance reuse, scale-out, freeze, and
 shutdown remain deployment readback questions.
 
-Pinned and lock-resolved Eve `0.29.5` owns the durable boundary behind
-the route-owned `send()` operation. `send()` first awaits
-`runtime.deliver()`, whose Workflow runtime awaits `resumeHook` and returns the
-owning run identity. On any delivery rejection, including but not limited to
-Eve's no-active-session error, `send()` can fall through to `runtime.run()`;
-that operation awaits `startWorkflowPreferLatest` for Eve's session
-`workflowEntry`. The session driver dispatches each logical turn through
-`startWorkflowPreferLatest(turnWorkflowReference)`.
+Pinned and lock-resolved Eve `0.82.0` owns the durable boundary behind
+`from(address).send()`. Bundjil passes its existing continuation token as the
+address. Eve namespaces it by channel, requests delivery to the existing
+session, and creates a session when no active owner accepts the message.
+An unexpected delivery error is not treated as permission to start another run.
 
 ```text
 Channel webhook
   -> EveChannelDispatch
-  -> Eve send()
-     -> deliver() -> resumeHook -> existing owner run
-     |  any delivery rejection -> run() -> startWorkflowPreferLatest
-        -> workflowEntry session driver
-        -> dispatchAndAwaitTurn
-        -> startWorkflowPreferLatest(turnWorkflowReference)
+  -> Eve from(existing continuation token).send()
+     -> dispatchContinuation -> existing session
+     -> createSession when no active session accepts the message
+     -> Eve-owned Workflow session
 ```
 
-Bundjil must not add an app-owned Workflow, raw Workflow client, queue
-fallback, or mirrored runtime service around this call graph. Resolution of
-`send()` is the earliest source-level Workflow acceptance boundary, but an
-established continuation still requires intended/accepted run convergence:
-Eve's all-error fallback can otherwise resolve through a different new run.
-Source inspection alone does not prove that hosted convergence.
+Bundjil adds no second Workflow, raw Workflow client or queue fallback.
+It still awaits acceptance and checks the returned session identity against
+stored continuity before acknowledging the webhook. Local tests cover this
+contract; only a hosted readback can establish live delivery and continuity.
 
 When `VERCEL=1`, Eve directly creates Nitro with the Vercel preset. Eve
-`0.29.5` supplies Build Output framework metadata but exposes no
+`0.82.0` supplies Build Output framework metadata but exposes no
 Bundjil-facing `vercel.functions` option for the ordinary generated
 `__server`. Eve separately patches the generated Workflow `flow` function to
 Node 24, its namespaced queue trigger, and `maxDuration: "max"`. Bundjil
@@ -264,7 +254,7 @@ deployment must read back its own mapping and effective durations.
 Vercel's supported Nitro configuration owner is
 `defineNitroConfig({ vercel: { functions: { maxDuration }}})`. Because Eve
 creates Nitro internally and exposes no application input for that object in
-`0.29.5`, Bundjil cannot use the supported seam without an upstream Eve
+`0.82.0`, Bundjil cannot use the supported seam without an upstream Eve
 change. A source `vercel.json` glob must name a real source entrypoint and
 therefore cannot safely target the generated `__server`. Until measurements
 show a need and a supported Eve seam exists, retain the effective project

@@ -5,7 +5,7 @@ import {
   CodexOAuthClientOperation,
 } from "../error-contracts.js";
 
-export class CodexOAuthOperationError extends Schema.TaggedErrorClass<CodexOAuthOperationError>()(
+export class CodexOAuthOperationError extends Schema.TaggedError<CodexOAuthOperationError>()(
   "CodexOAuthOperationError",
   {
     operation: CodexOAuthClientOperation,

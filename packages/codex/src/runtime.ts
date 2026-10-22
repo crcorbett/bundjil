@@ -1,6 +1,6 @@
 import * as BunHttpClient from "@effect/platform-bun/BunHttpClient";
 import { Effect, Layer, Option } from "effect";
-import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
+import * as KeyValueStore from "effect/persistence/KeyValueStore";
 
 import {
   CodexOAuthClient,

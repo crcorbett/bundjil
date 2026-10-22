@@ -200,7 +200,7 @@ export const canonicalizeInfrastructureObservedManifest = Effect.fn(
   )
 );
 
-export class InfrastructureInventoryReadError extends Schema.TaggedErrorClass<InfrastructureInventoryReadError>()(
+export class InfrastructureInventoryReadError extends Schema.TaggedError<InfrastructureInventoryReadError>()(
   "InfrastructureInventoryReadError",
   {
     reason: Schema.Literals([

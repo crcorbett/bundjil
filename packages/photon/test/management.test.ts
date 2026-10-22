@@ -1,6 +1,7 @@
 import { assert, it } from "@effect/vitest";
 import { Effect, Layer, Redacted, Schema } from "effect";
-import { HttpClient, HttpClientResponse } from "effect/unstable/http";
+import { HttpClient, HttpClientResponse } from "effect/http";
+import * as UrlParams from "effect/http/UrlParams";
 
 import {
   layerPhotonManagementLive,
@@ -75,7 +76,9 @@ it.effect(
         requests.push({
           method: request.method,
           url: request.url,
-          urlParams: [...request.urlParams],
+          urlParams: [
+            ...new URLSearchParams(UrlParams.toString(request.urlParams)),
+          ],
         });
         const response = (() => {
           if (request.url.endsWith("imessage/") && request.method === "GET") {

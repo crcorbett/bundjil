@@ -77,7 +77,7 @@ const InfrastructureInventoryCommandFailureReason = Schema.Literals([
   "inventoryModeRequired",
   "receiptIncompatible",
 ]);
-class InfrastructureInventoryCommandError extends Schema.TaggedErrorClass<InfrastructureInventoryCommandError>()(
+class InfrastructureInventoryCommandError extends Schema.TaggedError<InfrastructureInventoryCommandError>()(
   "InfrastructureInventoryCommandError",
   { reason: InfrastructureInventoryCommandFailureReason }
 ) {}

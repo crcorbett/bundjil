@@ -1,6 +1,6 @@
 import { EveSessionId } from "@bundjil/eve";
 import { Context, Effect, Layer, Option, Schema } from "effect";
-import type { SendFn } from "eve/channels";
+import type { ChannelFrom } from "eve/channels";
 
 import { EveChannelDispatchError } from "./errors.js";
 import { ChannelHandoff } from "./handoff.js";
@@ -50,7 +50,9 @@ export const layerFailureMemory = Layer.succeed(
   })
 );
 
-export const layerEve = (send: SendFn<typeof ChannelAdapterState.Encoded>) =>
+export const layerEve = (
+  from: ChannelFrom<typeof ChannelAdapterState.Encoded>
+) =>
   Layer.effect(
     EveChannelDispatch,
     Effect.gen(function* makeEveChannelDispatch() {
@@ -86,7 +88,7 @@ export const layerEve = (send: SendFn<typeof ChannelAdapterState.Encoded>) =>
             );
             const accepted = yield* Effect.tryPromise({
               try: () =>
-                send(input.message.text, {
+                from(input.continuationToken).send(input.message.text, {
                   auth: {
                     attributes: {
                       channel: input.message.conversation.provider,
@@ -95,7 +97,6 @@ export const layerEve = (send: SendFn<typeof ChannelAdapterState.Encoded>) =>
                     principalId: input.principalId,
                     principalType: "user",
                   },
-                  continuationToken: input.continuationToken,
                   state,
                 }),
               catch: () =>

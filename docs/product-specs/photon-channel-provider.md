@@ -372,7 +372,7 @@ SDK construction. Provider packages never read `process.env`.
 `@bundjil/channel` owns the safe public error vocabulary used by the service:
 webhook authentication/schema failure, request encoding failure, known
 provider rejection, unavailable/timeout, uncertain delivery, and unsupported
-operation. Each `Schema.TaggedErrorClass` contains only provider, operation,
+operation. Each `Schema.TaggedError` contains only provider, operation,
 sanitized reason, and optional safe status/retry classification. Provider
 packages may use private errors internally, but each live Layer maps them once
 to the common service error before returning. This keeps both Layers genuinely
@@ -381,7 +381,7 @@ substitutable.
 Each live operation is one named, flat, sequential `Effect.fn`/`Effect.gen`:
 encode the provider request, make one HTTP/Promise call, immediately decode the
 complete provider result, then return a decoded common result. Raw failures
-map once to safe `Schema.TaggedErrorClass` values. Live and deterministic
+map once to safe `Schema.TaggedError` values. Live and deterministic
 memory Layers are explicit exports.
 
 The Photon SDK boundary additionally emits one allowlisted operational

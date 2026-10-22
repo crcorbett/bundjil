@@ -24,7 +24,7 @@ const PhotonProviderProofReason = Schema.Literals([
   "topologyNotRestored",
 ]);
 
-export class PhotonProviderProofError extends Schema.TaggedErrorClass<PhotonProviderProofError>()(
+export class PhotonProviderProofError extends Schema.TaggedError<PhotonProviderProofError>()(
   "PhotonProviderProofError",
   {
     operation: PhotonProviderProofOperation,

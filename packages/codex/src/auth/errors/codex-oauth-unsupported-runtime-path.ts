@@ -5,7 +5,7 @@ import {
   CodexOAuthClientOperation,
 } from "../error-contracts.js";
 
-export class CodexOAuthUnsupportedRuntimePath extends Schema.TaggedErrorClass<CodexOAuthUnsupportedRuntimePath>()(
+export class CodexOAuthUnsupportedRuntimePath extends Schema.TaggedError<CodexOAuthUnsupportedRuntimePath>()(
   "CodexOAuthUnsupportedRuntimePath",
   {
     operation: CodexOAuthClientOperation,

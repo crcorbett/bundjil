@@ -1,6 +1,6 @@
 import { assert, it } from "@effect/vitest";
 import { Effect, Layer, Redacted, Schema } from "effect";
-import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
+import * as KeyValueStore from "effect/persistence/KeyValueStore";
 
 import {
   CodexCliAuthCache,
@@ -29,7 +29,7 @@ const fixtureIdToken = "fixture-id-token";
 const invalidLocalAuthFile = "/nonexistent/bundjil-codex-auth.json";
 
 const encodeUnknownJson = Schema.encodeUnknownSync(
-  Schema.UnknownFromJsonString
+  Schema.fromJsonString(Schema.Unknown)
 );
 
 const renderForLeakCheck = (value: unknown) =>
@@ -234,7 +234,7 @@ it.effect("rejects malformed cache data without leaking cache values", () =>
     if (error._tag !== "CodexLocalProfileImportError") {
       return;
     }
-    assert.strictEqual(error.operation, "validateExpiry");
+    assert.strictEqual(error.operation, "decodeCache");
     assert.notInclude(renderForLeakCheck(error), fixtureAccessToken);
   })
 );

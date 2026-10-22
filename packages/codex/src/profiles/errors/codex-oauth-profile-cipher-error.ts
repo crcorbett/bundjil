@@ -7,7 +7,7 @@ import {
   CodexProfileErrorMessage,
 } from "../error-contracts.js";
 
-export class CodexOAuthProfileCipherError extends Schema.TaggedErrorClass<CodexOAuthProfileCipherError>()(
+export class CodexOAuthProfileCipherError extends Schema.TaggedError<CodexOAuthProfileCipherError>()(
   "CodexOAuthProfileCipherError",
   {
     operation: CodexOAuthProfileCipherOperation,

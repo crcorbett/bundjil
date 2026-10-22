@@ -54,8 +54,8 @@ or disposes a runtime per request, adds no Channel-wide retry, and does not
 treat a safe fingerprint as hosted durability proof. Local Build Output and a
 named deployment readback remain separate proof classes.
 
-Pinned Eve `0.29.5` owns durable session start/resume and turn child workflows
-behind its route-owned `send()` operation. Bundjil adds no second Workflow or
+Pinned Eve `0.82.0` owns durable session start/resume behind its route-owned
+`from(address).send()` operation. The existing continuation token is the address. Bundjil adds no second Workflow or
 raw Workflow client. The root/Turbo test command generates ordinary and Vercel Build
 Output and verifies Eve's generated Workflow `max` separately from the
 ordinary function's unset duration; it makes no hosted claim. Eve creates
@@ -93,6 +93,12 @@ exists in source or builds. A provider-selection and Production-promotion SPEC
 must be accepted before deployment, environment binding, webhook cutover, or
 legacy deployment retirement.
 
+Telemetry is declared in `agent/instrumentation/otel.ts`. Eve owns the single
+OpenTelemetry setup; input and output content stay disabled. Explicit default
+Workflow retention preserves stored sessions independently of that trace policy.
+Local development authentication requires both Eve development mode and a
+loopback request URL. Production still requires Vercel OIDC.
+
 ## Public commands
 
 Run from the repository root:
@@ -102,6 +108,7 @@ bun run --filter @bundjil/agent dev:no-ui
 bun run --filter @bundjil/agent check-types
 bunx turbo run test --filter=@bundjil/agent
 bun run --filter @bundjil/agent build
+bun run build:vercel --filter=@bundjil/agent
 bun run --filter @bundjil/agent preflight:production
 ```
 

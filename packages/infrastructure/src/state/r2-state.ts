@@ -6,8 +6,8 @@ import {
 import * as BunHttpClient from "@effect/platform-bun/BunHttpClient";
 import { AWSEnvironment, makeS3State } from "alchemy/AWS";
 import { State } from "alchemy/State";
-import { Config, Effect, Layer, Redacted, Schema } from "effect";
-import type { HttpClient } from "effect/unstable/http/HttpClient";
+import { Config, Effect, Layer, Schema } from "effect";
+import type { HttpClient } from "effect/http/HttpClient";
 
 export const AlchemyR2AccountId = Schema.String.pipe(
   Schema.check(Schema.isPattern(/^[a-f0-9]{32}$/u)),
@@ -50,7 +50,7 @@ export const AlchemyR2StateFailureReason = Schema.Literals([
   "configurationInvalid",
   "initializationFailed",
 ]);
-export class AlchemyR2StateError extends Schema.TaggedErrorClass<AlchemyR2StateError>()(
+export class AlchemyR2StateError extends Schema.TaggedError<AlchemyR2StateError>()(
   "AlchemyR2StateError",
   { reason: AlchemyR2StateFailureReason }
 ) {}
@@ -100,8 +100,8 @@ const layerForAlchemyR2StateConfig = (config: AlchemyR2StateConfig) => {
   const endpoint =
     `https://${config.accountId}.r2.cloudflarestorage.com` as const;
   const credentials = AwsCredentials.fromCredentials({
-    accessKeyId: Redacted.value(config.accessKeyId),
-    secretAccessKey: Redacted.value(config.secretAccessKey),
+    accessKeyId: config.accessKeyId,
+    secretAccessKey: config.secretAccessKey,
   });
   const region = Layer.succeed(AwsRegion.Region, Effect.succeed("auto"));
   const providerEndpoint = Layer.succeed(
@@ -143,6 +143,7 @@ const layerForAlchemyR2StateConfig = (config: AlchemyR2StateConfig) => {
         makeS3State({
           bucketName: config.bucketName,
           prefix: config.prefix,
+          manageBucket: false,
         }).pipe(Effect.provideContext(context))
       );
     })

@@ -1,0 +1,56 @@
+diff --git a/lib/AWS/StateStore/State.d.ts b/lib/AWS/StateStore/State.d.ts
+index e34d967dea8462d696cc1d53c7e852e194c3d5b5..39a97bd3bf67f34c6cbd5b08eb8412517f1c6644 100644
+--- a/lib/AWS/StateStore/State.d.ts
++++ b/lib/AWS/StateStore/State.d.ts
+@@ -7,6 +7,8 @@ import { State, type StateService } from "../../State/State.ts";
+ import { AWSEnvironment } from "../Environment.ts";
+ import { type BucketEncryption } from "../S3/Bucket.ts";
+ export interface S3StateOptions {
++  /** Set false for an existing externally managed S3-compatible bucket. */
++  manageBucket?: boolean;
+     /**
+      * Name of the S3 bucket that holds the state objects. The bucket is
+      * created on first use if it does not exist.
+diff --git a/lib/AWS/StateStore/State.js b/lib/AWS/StateStore/State.js
+index 81211b24444a0edaf56e238b36972f0d6795f79b..353718e7087b6eaf66701528070fbde837a53011 100644
+--- a/lib/AWS/StateStore/State.js
++++ b/lib/AWS/StateStore/State.js
+@@ -167,7 +167,11 @@ export const makeS3State = (options = {}) => Effect.gen(function* () {
+     const bucket = yield* Effect.cached(Effect.gen(function* () {
+         const { accountId, region } = yield* AWSEnvironment.current;
+         const bucketName = options.bucketName ?? createStateBucketName(accountId, region);
+-        yield* ensureStateBucket(bucketName, region, options);
++        if (options.manageBucket === false) {
++          yield* s3.headBucket({ Bucket: bucketName });
++        } else {
++          yield* ensureStateBucket(bucketName, region, options);
++        }
+         return bucketName;
+     }).pipe(Effect.provideContext(context), Effect.mapError(toError)));
+     // Close over the captured context so every StateService method is
+diff --git a/src/AWS/StateStore/State.ts b/src/AWS/StateStore/State.ts
+index 8acc8ea2358a5eb8ac7d723e5fa3a46082dff412..d0f0db99023e12a4683bbdf5e8915689744be4a9 100644
+--- a/src/AWS/StateStore/State.ts
++++ b/src/AWS/StateStore/State.ts
+@@ -37,6 +37,8 @@ const OUTPUT_FILE = "__stack_output__.json";
+ const DELETE_BATCH_SIZE = 1000;
+ 
+ export interface S3StateOptions {
++  /** Set false for an existing externally managed S3-compatible bucket. */
++  manageBucket?: boolean;
+   /**
+    * Name of the S3 bucket that holds the state objects. The bucket is
+    * created on first use if it does not exist.
+@@ -238,7 +240,11 @@ export const makeS3State = (options: S3StateOptions = {}) =>
+       Effect.gen(function* () {
+         const { accountId, region } = yield* AWSEnvironment.current;
+         const bucketName = options.bucketName ?? createStateBucketName(accountId, region);
+-        yield* ensureStateBucket(bucketName, region, options);
++        if (options.manageBucket === false) {
++          yield* s3.headBucket({ Bucket: bucketName });
++        } else {
++          yield* ensureStateBucket(bucketName, region, options);
++        }
+         return bucketName;
+       }).pipe(Effect.provideContext(context), Effect.mapError(toError)),
+     );

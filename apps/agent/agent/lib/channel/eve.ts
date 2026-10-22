@@ -156,7 +156,7 @@ export const createChannelEveChannel = <E>(
     },
     events: makeChannelEveEvents(channelRuntime),
     routes: [
-      POST(webhookPath, async (request, { send }) => {
+      POST(webhookPath, async (request, { from }) => {
         const result = await channelRuntime.runPromise(
           Effect.gen(function* handleChannelWebhook() {
             const query = yield* Schema.decodeUnknownEffect(
@@ -232,7 +232,7 @@ export const createChannelEveChannel = <E>(
                   Effect.andThen(settlement)
                 );
               }),
-              Effect.provide(EveChannelDispatchEve(send)),
+              Effect.provide(EveChannelDispatchEve(from)),
               Effect.catchTag("EveChannelDispatchError", (error) =>
                 Match.value(error.reason).pipe(
                   Match.when("rejected", () =>

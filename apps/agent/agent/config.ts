@@ -12,7 +12,7 @@ import {
 } from "./model-provider.js";
 import type { AgentModelProviderConfig } from "./model-provider.js";
 
-export class AgentModelProviderConfigError extends Schema.TaggedErrorClass<AgentModelProviderConfigError>()(
+export class AgentModelProviderConfigError extends Schema.TaggedError<AgentModelProviderConfigError>()(
   "AgentModelProviderConfigError",
   { message: AgentModelProviderDiagnostic }
 ) {}

@@ -133,7 +133,7 @@ const isEffectHttpTransportType = (node: ts.TypeNode) => {
     if (
       !ts.isImportDeclaration(statement) ||
       !ts.isStringLiteral(statement.moduleSpecifier) ||
-      statement.moduleSpecifier.text !== "effect/unstable/http"
+      statement.moduleSpecifier.text !== "effect/http"
     ) {
       return false;
     }
@@ -326,7 +326,7 @@ const inspectClassDeclaration = (
   report(
     node,
     "public-data-tagged-error",
-    "Exported typed errors must use Schema.TaggedErrorClass so their public encoded contract is explicit and testable."
+    "Exported typed errors must use Schema.TaggedError so their public encoded contract is explicit and testable."
   );
 };
 
@@ -584,7 +584,7 @@ const inspectInlineSchema = (
     !(isExportedSchema(node) || isWithinPublicDeclaration(node)) ||
     (schemaConstructor !== "Schema.Struct" &&
       schemaConstructor !== "Schema.TaggedStruct" &&
-      schemaConstructor !== "Schema.TaggedErrorClass")
+      schemaConstructor !== "Schema.TaggedError")
   ) {
     return;
   }

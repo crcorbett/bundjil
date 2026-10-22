@@ -8,7 +8,8 @@ import {
   Redacted,
   Schema,
 } from "effect";
-import { HttpClient, HttpClientResponse } from "effect/unstable/http";
+import { HttpClient, HttpClientResponse } from "effect/http";
+import * as UrlParams from "effect/http/UrlParams";
 
 import {
   DiscoverVercelProject,
@@ -519,7 +520,9 @@ it.effect(
             assert.strictEqual(url.pathname, "/v6/deployments");
             deploymentPage += 1;
             let deploymentCursor: string | null = null;
-            for (const [key, value] of request.urlParams) {
+            for (const [key, value] of new URLSearchParams(
+              UrlParams.toString(request.urlParams)
+            )) {
               if (key === "until") {
                 deploymentCursor = value;
               }

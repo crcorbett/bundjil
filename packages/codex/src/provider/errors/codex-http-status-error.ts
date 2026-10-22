@@ -6,7 +6,7 @@ import {
   CodexProviderErrorMessage,
 } from "../error-contracts.js";
 
-export class CodexHttpStatusError extends Schema.TaggedErrorClass<CodexHttpStatusError>()(
+export class CodexHttpStatusError extends Schema.TaggedError<CodexHttpStatusError>()(
   "CodexHttpStatusError",
   {
     operation: CodexHttpClientOperation,
