@@ -5,7 +5,7 @@ import {
   CodexProviderErrorMessage,
 } from "../error-contracts.js";
 
-export class CodexHttpNetworkError extends Schema.TaggedErrorClass<CodexHttpNetworkError>()(
+export class CodexHttpNetworkError extends Schema.TaggedError<CodexHttpNetworkError>()(
   "CodexHttpNetworkError",
   {
     operation: CodexHttpClientOperation,

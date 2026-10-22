@@ -439,7 +439,7 @@ tagged error, Layer export, or DTO.
 | Eve dispatch                     | `EveChannelDispatch.dispatch(ChannelPreparedInbound.Type)`                                                            | Request-local live Layer captures only Eve's typed `send`; encode `ChannelAdapterState` before the Promise call.       |
 | Provider operations              | `ChannelSendMessageInput.Type`, `ChannelSendAccepted.Type`, `ChannelPresenceInput.Type`, `ChannelPresenceResult.Type` | Preserve named `ChannelTransport` operations and immediate provider encode/decode.                                     |
 | Configuration                    | `ChannelConfig`, `SendblueConfig`, `PhotonConfig`, `UpstashPersistenceOptions` owner Schemas                          | Preserve `Config.schema`, redacted secrets, and provider-specific config acquisition.                                  |
-| Errors                           | Existing app and `@bundjil/channel` `Schema.TaggedErrorClass` values                                                  | Preserve safe tags and route `catchTags`; no raw Layer/SDK cause or generic runtime error crosses outward.             |
+| Errors                           | Existing app and `@bundjil/channel` `Schema.TaggedError` values                                                       | Preserve safe tags and route `catchTags`; no raw Layer/SDK cause or generic runtime error crosses outward.             |
 
 Primary Effect programs remain flat and meaningful. Typed expected failures
 are handled in `.pipe(...)` with `catchTag`, `catchTags`, or `mapError`. The

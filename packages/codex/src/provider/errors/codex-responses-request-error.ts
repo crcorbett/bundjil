@@ -5,7 +5,7 @@ import {
   CodexResponsesSchemaBoundary,
 } from "../error-contracts.js";
 
-export class CodexResponsesRequestError extends Schema.TaggedErrorClass<CodexResponsesRequestError>()(
+export class CodexResponsesRequestError extends Schema.TaggedError<CodexResponsesRequestError>()(
   "CodexResponsesRequestError",
   {
     boundary: CodexResponsesSchemaBoundary,

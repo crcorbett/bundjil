@@ -57,7 +57,7 @@ export type PhotonWebhookBindingFailureMessage =
 export type PhotonWebhookBindingFailureMessageEncoded =
   typeof PhotonWebhookBindingFailureMessage.Encoded;
 
-export class PhotonWebhookBindingWriteError extends Schema.TaggedErrorClass<PhotonWebhookBindingWriteError>()(
+export class PhotonWebhookBindingWriteError extends Schema.TaggedError<PhotonWebhookBindingWriteError>()(
   "PhotonWebhookBindingWriteError",
   {
     operation: PhotonWebhookBindingOperation,

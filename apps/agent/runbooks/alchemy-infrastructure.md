@@ -182,13 +182,13 @@ Photon projects, manifests, or physical identities.
    ```sh
    bun alchemy deploy --stage preview --adopt --yes
    bun alchemy plan --stage preview
-   bun alchemy sync --stage preview --dry-run
-   bun alchemy sync --stage preview --dry-run
+   bun alchemy drift --stage preview --no-input
+   bun alchemy drift --stage preview --no-input
 
    bun alchemy deploy --stage prod --adopt --yes
    bun alchemy plan --stage prod
-   bun alchemy sync --stage prod --dry-run
-   bun alchemy sync --stage prod --dry-run
+   bun alchemy drift --stage prod --no-input
+   bun alchemy drift --stage prod --no-input
    ```
 
 5. Require the post-adoption plan to be all no-op and both sync dry-runs to be

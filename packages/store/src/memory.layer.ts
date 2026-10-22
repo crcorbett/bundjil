@@ -11,7 +11,7 @@ import {
   SynchronizedRef,
   pipe,
 } from "effect";
-import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
+import * as KeyValueStore from "effect/persistence/KeyValueStore";
 
 import {
   AtomicKeyValueStore,

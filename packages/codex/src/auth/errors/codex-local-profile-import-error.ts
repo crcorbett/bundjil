@@ -5,7 +5,7 @@ import {
   CodexLocalProfileImportOperation,
 } from "../error-contracts.js";
 
-export class CodexLocalProfileImportError extends Schema.TaggedErrorClass<CodexLocalProfileImportError>()(
+export class CodexLocalProfileImportError extends Schema.TaggedError<CodexLocalProfileImportError>()(
   "CodexLocalProfileImportError",
   {
     operation: CodexLocalProfileImportOperation,

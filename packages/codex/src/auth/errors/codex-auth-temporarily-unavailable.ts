@@ -13,7 +13,7 @@ export const CodexAuthTemporaryFailureReason = Schema.Literals([
 export type CodexAuthTemporaryFailureReason =
   typeof CodexAuthTemporaryFailureReason.Type;
 
-export class CodexAuthTemporarilyUnavailable extends Schema.TaggedErrorClass<CodexAuthTemporarilyUnavailable>()(
+export class CodexAuthTemporarilyUnavailable extends Schema.TaggedError<CodexAuthTemporarilyUnavailable>()(
   "CodexAuthTemporarilyUnavailable",
   {
     reason: CodexAuthTemporaryFailureReason,

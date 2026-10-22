@@ -6,7 +6,7 @@ import {
 } from "@bundjil/codex";
 import * as BunHttpClient from "@effect/platform-bun/BunHttpClient";
 import { Console, Effect, Schema } from "effect";
-import { HttpClient, HttpClientRequest } from "effect/unstable/http";
+import { HttpClient, HttpClientRequest } from "effect/http";
 
 import {
   CodexProxyConfigLayer,

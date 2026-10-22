@@ -364,7 +364,7 @@ imports from the canonical local schema/error modules:
 ```ts
 import { Context, Effect, Layer, Schema } from "effect";
 
-export class SendblueRequestError extends Schema.TaggedErrorClass<SendblueRequestError>()(
+export class SendblueRequestError extends Schema.TaggedError<SendblueRequestError>()(
   "SendblueRequestError",
   {
     message: Schema.NonEmptyString,

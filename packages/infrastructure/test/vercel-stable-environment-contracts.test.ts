@@ -8,7 +8,7 @@ import {
   Redacted,
   Schema,
 } from "effect";
-import { HttpClient, HttpClientResponse } from "effect/unstable/http";
+import { HttpClient, HttpClientResponse } from "effect/http";
 
 import { SecretOwner, SecretReferenceId } from "../src/secret-reference.js";
 import {

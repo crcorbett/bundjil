@@ -1,6 +1,6 @@
 import { assert, it } from "@effect/vitest";
 import { Effect, Exit, Inspectable, Layer, Redacted, Schema } from "effect";
-import { HttpClient, HttpClientResponse } from "effect/unstable/http";
+import { HttpClient, HttpClientResponse } from "effect/http";
 
 import {
   emptyPhotonWebhookBindingMemory,

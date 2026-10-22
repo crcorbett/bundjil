@@ -21,7 +21,7 @@ export const PhotonSdkTransportStatus = Schema.Int.check(
 );
 export type PhotonSdkTransportStatus = typeof PhotonSdkTransportStatus.Type;
 
-export class PhotonSdkObservedFailure extends Schema.TaggedErrorClass<PhotonSdkObservedFailure>()(
+export class PhotonSdkObservedFailure extends Schema.TaggedError<PhotonSdkObservedFailure>()(
   "PhotonSdkObservedFailure",
   {
     operation: PhotonSdkOperation,

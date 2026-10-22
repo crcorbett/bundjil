@@ -43,7 +43,7 @@ const AdoptionManifestCommandFailureReason = Schema.Literals([
   "adoptionPathConflictsWithInventory",
   "inventoryArtifactInvalid",
 ]);
-class AdoptionManifestCommandError extends Schema.TaggedErrorClass<AdoptionManifestCommandError>()(
+class AdoptionManifestCommandError extends Schema.TaggedError<AdoptionManifestCommandError>()(
   "AdoptionManifestCommandError",
   { reason: AdoptionManifestCommandFailureReason }
 ) {}

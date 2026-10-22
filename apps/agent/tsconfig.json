@@ -3,6 +3,8 @@
   "include": ["./agent/**/*.ts", "./scripts/**/*.ts", "./test/**/*.ts"],
   "compilerOptions": {
     "strictNullChecks": true,
-    "types": ["bun"]
+    "types": ["bun"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler"
   }
 }

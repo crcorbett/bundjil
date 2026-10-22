@@ -10,7 +10,7 @@ import {
   Scope,
   Stream,
 } from "effect";
-import { HttpClient, HttpClientRequest } from "effect/unstable/http";
+import { HttpClient, HttpClientRequest } from "effect/http";
 
 import {
   codexResponsesEndpointConfig,

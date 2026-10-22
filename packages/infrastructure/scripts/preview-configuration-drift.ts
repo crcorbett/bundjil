@@ -17,7 +17,7 @@ const PreviewConfigurationDriftFailureReason = Schema.Literals([
   "preconditionFailed",
   "readbackFailed",
 ]);
-class PreviewConfigurationDriftError extends Schema.TaggedErrorClass<PreviewConfigurationDriftError>()(
+class PreviewConfigurationDriftError extends Schema.TaggedError<PreviewConfigurationDriftError>()(
   "PreviewConfigurationDriftError",
   { reason: PreviewConfigurationDriftFailureReason }
 ) {}

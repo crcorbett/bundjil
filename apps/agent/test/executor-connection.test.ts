@@ -100,6 +100,8 @@ it.effect(
       if (!auth || typeof auth === "function" || !("getToken" in auth)) {
         assert.fail("Expected static bearer authentication.");
       } else {
+        // Eve normalises credentialOwner to its legacy internal principalType field.
+        // oxlint-disable-next-line typescript/no-deprecated -- This verifies the installed framework output, not authored configuration.
         assert.strictEqual(auth.principalType, "app");
       }
 

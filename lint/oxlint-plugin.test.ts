@@ -37,7 +37,7 @@ describe("bundjil/tagged-error-name", () => {
       ruleTester.run("tagged-error-name", taggedErrorNameRule, {
         valid: [
           `
-          class ExampleError extends Schema.TaggedErrorClass<ExampleError>()(
+          class ExampleError extends Schema.TaggedError<ExampleError>()(
             "ExampleError",
             {}
           ) {}
@@ -47,7 +47,7 @@ describe("bundjil/tagged-error-name", () => {
         invalid: [
           {
             code: `
-            class WrongDeclaration extends Schema.TaggedErrorClass<ExampleError>()(
+            class WrongDeclaration extends Schema.TaggedError<ExampleError>()(
               "ExampleError",
               {}
             ) {}
@@ -56,7 +56,7 @@ describe("bundjil/tagged-error-name", () => {
           },
           {
             code: `
-            class ExampleError extends Schema.TaggedErrorClass<WrongSelfType>()(
+            class ExampleError extends Schema.TaggedError<WrongSelfType>()(
               "ExampleError",
               {}
             ) {}
@@ -65,7 +65,7 @@ describe("bundjil/tagged-error-name", () => {
           },
           {
             code: `
-            class ExampleError extends Schema.TaggedErrorClass<ExampleError>()(
+            class ExampleError extends Schema.TaggedError<ExampleError>()(
               "WrongLiteralTag",
               {}
             ) {}

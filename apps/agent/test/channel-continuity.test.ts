@@ -2,7 +2,7 @@ import { ChannelInboundTextMessage } from "@bundjil/channel";
 import { PersistenceMemory } from "@bundjil/store/memory";
 import { assert, it } from "@effect/vitest";
 import { Effect, Layer, Schema } from "effect";
-import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
+import * as KeyValueStore from "effect/persistence/KeyValueStore";
 
 import {
   ChannelReplay,

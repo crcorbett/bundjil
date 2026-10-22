@@ -2,8 +2,8 @@ import { createHash } from "node:crypto";
 
 import { assert, it } from "@effect/vitest";
 import { ConfigProvider, Effect, Inspectable, Layer, Schema } from "effect";
+import { HttpClient, HttpClientResponse } from "effect/http";
 import { TestClock } from "effect/testing";
-import { HttpClient, HttpClientResponse } from "effect/unstable/http";
 
 import {
   CapturePhotonCandidateInventory,

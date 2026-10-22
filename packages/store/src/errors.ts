@@ -5,7 +5,7 @@ import {
   AtomicKeyValueStoreOperation,
 } from "./schemas.js";
 
-export class AtomicKeyValueStoreError extends Schema.TaggedErrorClass<AtomicKeyValueStoreError>()(
+export class AtomicKeyValueStoreError extends Schema.TaggedError<AtomicKeyValueStoreError>()(
   "AtomicKeyValueStoreError",
   {
     operation: AtomicKeyValueStoreOperation,

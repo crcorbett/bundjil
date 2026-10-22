@@ -14,6 +14,11 @@ secrets remain app-owned.
 The package export map and source are authoritative for the exact API. Do not
 mirror its contracts in a README or consumer-local DTO.
 
+The Schema bridge returns a plain Standard Schema object because Eve does not
+recognise Effect 4's callable schema values. Effect still owns validation and
+JSON Schema generation. Both representations reject extra object fields, and
+the bridge supports draft 2020-12 and draft-07 without copying domain contracts.
+
 ## Supported commands
 
 Run from the repository root:

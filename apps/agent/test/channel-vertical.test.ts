@@ -22,7 +22,7 @@ import {
   Schema,
   pipe,
 } from "effect";
-import type { RouteHandlerArgs, Session } from "eve/channels";
+import type { RouteHandlerArgs, ChannelSource } from "eve/channels";
 
 import {
   Channel,
@@ -51,6 +51,10 @@ import type {
   ChannelAdapterStateEncoded,
   ChannelHandoffObservation,
 } from "../agent/lib/channel/schemas.js";
+import {
+  makeChannelRouteArgs,
+  makeChannelSession,
+} from "./channel-host.fixture.js";
 
 const dispositionLogger = (messages: globalThis.Array<unknown>) =>
   Logger.make(({ message }) => {
@@ -134,32 +138,12 @@ const makeObservedRuntime = <R, E>(
     Layer.mergeAll(layer, Logger.layer([dispositionLogger(messages)]))
   );
 
-const makeSession = (): Session => ({
-  cancel: () => Promise.resolve({ status: "no_active_turn" as const }),
-  continuationToken: "channel:v1:photon:conversation-1",
-  getEventStream: () => Promise.resolve(new ReadableStream()),
-  getStreamTailIndex: () => Promise.resolve(-1),
-  id: "session-1",
-});
+const makeSession = () => makeChannelSession("session-1");
 
 const makeRouteArgs = (
-  send: RouteHandlerArgs<ChannelAdapterStateEncoded>["send"],
+  send: ChannelSource<ChannelAdapterStateEncoded>["send"],
   waitUntil: RouteHandlerArgs<ChannelAdapterStateEncoded>["waitUntil"]
-): RouteHandlerArgs<ChannelAdapterStateEncoded> => ({
-  cancel: () => Promise.resolve({ status: "no_active_turn" as const }),
-  clear: () => Promise.resolve({ status: "no_active_session" as const }),
-  compact: () => Promise.resolve({ status: "no_active_session" as const }),
-  getSession: makeSession,
-  params: {},
-  receive: () => Promise.resolve(makeSession()),
-  reset: () => Promise.resolve({ status: "no_active_session" as const }),
-  requestIp: null,
-  resolveActiveSession: (): ReturnType<
-    RouteHandlerArgs<ChannelAdapterStateEncoded>["resolveActiveSession"]
-  > => Promise.resolve<undefined>(globalThis.undefined),
-  send,
-  waitUntil,
-});
+) => makeChannelRouteArgs({ send, waitUntil });
 
 it.effect("runs the same clean app journey from both provider Layers", () =>
   Effect.gen(function* testProviderSubstitution() {
@@ -396,15 +380,19 @@ it.effect(
         }
         let sendCount = 0;
         const session = makeSession();
-        const args = makeRouteArgs(
-          () => {
+        const addresses: string[] = [];
+        const args = makeChannelRouteArgs({
+          onAddress: (address) => {
+            addresses.push(address);
+          },
+          send: () => {
             sendCount += 1;
             return Promise.resolve(session);
           },
-          () => {
+          waitUntil: () => {
             throw new Error("retry proof must complete before responding");
-          }
-        );
+          },
+        });
         const request = new Request(
           "https://example.invalid/eve/v1/photon/webhook?bundjil-proof=retry-once"
         );
@@ -419,6 +407,7 @@ it.effect(
         assert.strictEqual(first.status, 503);
         assert.strictEqual(retry.status, 204);
         assert.strictEqual(sendCount, 1);
+        assert.deepStrictEqual(addresses, ["channel:v1:photon:conversation-1"]);
         assert.deepStrictEqual(messages, [
           [
             "ChannelWebhookDisposition",
@@ -655,7 +644,7 @@ it.effect(
             ["ChannelWebhookDisposition", testCase.expected],
           ]);
           const encodedMessages = yield* Schema.encodeEffect(
-            Schema.UnknownFromJsonString
+            Schema.fromJsonString(Schema.Unknown)
           )(messages);
           assert.strictEqual(
             encodedMessages.includes("participant-leak-sentinel"),

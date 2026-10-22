@@ -175,7 +175,7 @@ ambient host primitives and explicit live-clock escape, not ban
 | `SubscriptionRef<A>`                  | A real consumer needs the current value followed by a replaying stream of committed changes.                                                   | The only consumer reads once or tests inspect a final capture. Publication is observable behavior and cost.          |
 | `ScopedRef<A>`                        | A current resource-backed client, connection, subscription, or handle must be replaced with correct acquisition/finalization.                  | The value is plain data; ordinary Layer scope already owns one stable resource.                                      |
 | v4 `Context.Reference` / `References` | Fiber-local or dynamically scoped context with a default, supplied through Effect context.                                                     | Shared mutable process state is intended. v4 removed the v3 `FiberRef` API.                                          |
-| `effect/unstable/reactivity` Atom     | A future reactive presentation/server-state owner has an `AtomRegistry`, subscriptions, invalidation, cache/disposal, and hydration semantics. | Backend runtime state, provider adapters, locks, replay state, or test captures.                                     |
+| `effect/reactivity` Atom              | A future reactive presentation/server-state owner has an `AtomRegistry`, subscriptions, invalidation, cache/disposal, and hydration semantics. | Backend runtime state, provider adapters, locks, replay state, or test captures.                                     |
 | Separate `@effect-atom/atom`          | Not admitted by this SPEC. It is a separate work-in-progress reactive frontend package and Bundjil has no dependency or owner for it.          | All current Bundjil backend/runtime work.                                                                            |
 
 `Ref` operations are atomic per reference; multiple Refs are not transactional
@@ -271,7 +271,7 @@ unknown host/provider value
 
 Provider/SDK Promises and DTOs remain private to the live adapter. The adapter
 uses `Effect.tryPromise({ try, catch })`, validates SDK output once, maps
-expected failures to safe `Schema.TaggedErrorClass` errors, and exposes no raw
+expected failures to safe `Schema.TaggedError` errors, and exposes no raw
 client or generic callback. Semantic identities are branded Schema-derived
 types. Configuration uses `Config.schema`, with secrets redacted. Every service
 has explicit live and memory/mock Layers.
@@ -611,7 +611,7 @@ errors.
 The next exported-contract pass found the only remaining exported production
 `Data.TaggedError`: `PreviewStateMigrationError`. It already carried a bounded
 reason and message, but it had no Schema-owned encoded contract and its optional
-counts were raw numbers. The error now uses `Schema.TaggedErrorClass`; both
+counts were raw numbers. The error now uses `Schema.TaggedError`; both
 counts use the branded `PreviewStateMigrationCount` Schema and are encoded only
 as non-negative integers. The package root exports the count codec alongside
 the existing migration contract. A direct encode/decode test preserves the
@@ -625,7 +625,7 @@ service operation, Layer, rollback path, or runbook.
 
 The following field-provenance pass found that five public error families could
 bypass `inline-string-schema` by passing a shared object containing
-`Schema.NonEmptyString` to `Schema.TaggedErrorClass`. Synthetic infrastructure,
+`Schema.NonEmptyString` to `Schema.TaggedError`. Synthetic infrastructure,
 Vercel read, Vercel Preview configuration, Vercel stable-environment, and Photon
 management errors now each use one owner-named diagnostic-message Schema bounded
 to 300 characters. These messages remain ordinary encoded strings: they are

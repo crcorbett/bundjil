@@ -1,6 +1,6 @@
 import { assert, it } from "@effect/vitest";
 import { Array, Effect, HashSet, Redacted, Schema, pipe } from "effect";
-import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
+import * as KeyValueStore from "effect/persistence/KeyValueStore";
 
 import type { UpstashPersistenceClient } from "../src/upstash-client.internal.js";
 import { buildUpstashPersistenceLayer } from "../src/upstash-layer.internal.js";
@@ -165,14 +165,14 @@ it.effect("maps malformed and rejected native responses to safe errors", () => {
     const store = yield* KeyValueStore.KeyValueStore;
     const getError = yield* store.get(privateMarker).pipe(Effect.flip);
     const rendered = yield* Schema.encodeUnknownEffect(
-      Schema.UnknownFromJsonString
+      Schema.fromJsonString(Schema.Unknown)
     )(getError);
     assert.strictEqual(rendered.includes(privateMarker), false);
     assert.strictEqual(getError.key, undefined);
     assert.strictEqual(getError.cause, undefined);
     const sizeError = yield* store.size.pipe(Effect.flip);
     const sizeRendered = yield* Schema.encodeUnknownEffect(
-      Schema.UnknownFromJsonString
+      Schema.fromJsonString(Schema.Unknown)
     )(sizeError);
     assert.strictEqual(sizeRendered.includes("foreign:key"), false);
     assert.strictEqual(sizeError.key, undefined);
@@ -210,7 +210,7 @@ it.effect("safely maps malformed and rejected scan providers", () => {
     const malformedStore = yield* KeyValueStore.KeyValueStore;
     const malformedError = yield* malformedStore.size.pipe(Effect.flip);
     const malformedRendered = yield* Schema.encodeUnknownEffect(
-      Schema.UnknownFromJsonString
+      Schema.fromJsonString(Schema.Unknown)
     )(malformedError);
     assert.strictEqual(malformedRendered.includes(privateMarker), false);
     assert.strictEqual(malformedError.key, undefined);
@@ -220,7 +220,7 @@ it.effect("safely maps malformed and rejected scan providers", () => {
       return yield* rejectedStore.size;
     }).pipe(Effect.provide(layerFor(rejected)), Effect.flip);
     const rejectedRendered = yield* Schema.encodeUnknownEffect(
-      Schema.UnknownFromJsonString
+      Schema.fromJsonString(Schema.Unknown)
     )(rejectedError);
     assert.strictEqual(rejectedRendered.includes(privateMarker), false);
     assert.strictEqual(rejectedError.key, undefined);
@@ -247,7 +247,7 @@ it.effect("skips empty clear and safely maps rejected provider reads", () => {
     assert.strictEqual(calls.length, 0);
     const error = yield* store.get("private-key").pipe(Effect.flip);
     const rendered = yield* Schema.encodeUnknownEffect(
-      Schema.UnknownFromJsonString
+      Schema.fromJsonString(Schema.Unknown)
     )(error);
     assert.strictEqual(rendered.includes(privateMarker), false);
     assert.strictEqual(error.key, undefined);

@@ -22,10 +22,6 @@ export {
   CodexLocalProfileImportOperation,
   CodexOAuthClientOperation,
 } from "./error-contracts.js";
-export type {
-  CodexLocalProfileImportOperation as CodexLocalProfileImportOperationType,
-  CodexOAuthClientOperation as CodexOAuthClientOperationType,
-} from "./error-contracts.js";
 export {
   CodexAuthTemporarilyUnavailable,
   CodexAuthTemporaryFailureReason,

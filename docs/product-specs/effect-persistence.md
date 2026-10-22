@@ -16,7 +16,7 @@ Create a small provider- and channel-agnostic workspace package named
 `@bundjil/effect-persistence`. The package will provide:
 
 1. an Upstash Redis adapter for Effect v4's native
-   `effect/unstable/persistence/KeyValueStore` service;
+   `effect/persistence/KeyValueStore` service;
 2. a supplemental `AtomicKeyValueStore` Effect service for atomic
    condition-and-mutation transactions that the native service cannot express;
 3. one deterministic memory Layer plus mocked-provider adapter tests that
@@ -203,7 +203,7 @@ export class AtomicKeyValueStore extends Context.Service<
 The tagged error owns its safe operation/message contract:
 
 ```ts
-export class AtomicKeyValueStoreError extends Schema.TaggedErrorClass<AtomicKeyValueStoreError>()(
+export class AtomicKeyValueStoreError extends Schema.TaggedError<AtomicKeyValueStoreError>()(
   "AtomicKeyValueStoreError",
   {
     operation: AtomicKeyValueStoreOperation,
@@ -369,7 +369,7 @@ The package must not mirror or wrap Effect's complete `KeyValueStore` API.
 Consumers import the native service directly:
 
 ```ts
-import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
+import * as KeyValueStore from "effect/persistence/KeyValueStore";
 ```
 
 The Upstash provider layer supplies `KeyValueStore.KeyValueStore` through

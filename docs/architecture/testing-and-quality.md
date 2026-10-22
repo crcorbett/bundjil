@@ -17,23 +17,42 @@ The five normal check categories are:
 
 `verification:internal` runs lint, Knip, types and the combined build/test graph.
 Turbo runs each build task once in that graph. Agent tests depend on the ordinary
-Eve build and then the Vercel build, so generated-route tests inspect fresh
+Eve build and then the Vercel build check, so generated-route tests inspect fresh
 outputs. The standalone build/test commands need the same synthetic Executor
 settings or the operator's intended build settings. CI runs the same
 `verification` wrapper as local development.
 
+The runtime and CI use Bun `1.4.3`. Commonplace's published
+`@commonplaces/oxlint-plugin` `0.6.0` supplies the shared general and formatting
+rules, replacing the copied rules under `tools/oxlint`. Bundjil's specific
+boundary rules, negative fixtures and exact host exceptions remain in place.
+The existing blocking Effect rules remain blocking; new advisory rules have
+not been made mandatory as part of this package update.
+
+The ordinary Eve build skips local sandbox prewarming so it needs no local
+virtual machine. `bun run build:vercel --filter=@bundjil/agent` produces the
+complete deployment output and remains the project's Vercel build command.
+The separate `build:vercel:check` skips sandbox preparation and is used before
+agent tests. Its output is only for checking routes and packaging, and must not
+be deployed. An actual Vercel build needs Vercel credentials to prepare its
+sandbox. The agent uses TypeScript's Bundler
+module resolution, matching Eve's build and resolving the extensionless type
+exports published by `@vercel/otel`; strict checking remains enabled.
+
 ## Compiler
 
 All workspace type checks and declaration builds use TypeScript `7.0.2`.
-`@effect/tsgo` `0.38.0` patches that compiler and Oxlint; its published support
-matrix covers TypeScript `7.0.2`, Oxlint `1.80.0` and `oxlint-tsgolint` `7.0.2001`.
+`@effect/tsgo` `0.56.0` patches that compiler and Oxlint; its published support
+matrix covers TypeScript `7.0.2`, Oxlint `1.89.0` and `oxlint-tsgolint` `7.0.2004`.
 `bun install` applies the patch, and `check:effect-setup` reapplies it before
 type checking. The existing `@effect/language-service` configuration name is
 also the documented configuration key for this native compiler integration.
 
 `tooling/compiler.test.ts` compiles positive and negative examples with the
 installed compiler, including an unrun Effect that must fail. Existing strict
-Effect settings remain enabled. Advisory suggestions are not new blocking lint
+Effect settings remain enabled. The configuration explicitly lists the existing
+Effect platform, HTTP, process and persistence APIs that the new compiler marks
+unstable; test files additionally admit `@effect/vitest`. Advisory suggestions are not new blocking lint
 rules.
 
 The lint boundary checker uses `typescript-compiler-api`, a pinned alias for

@@ -11,6 +11,8 @@ const modelConfig =
       };
 
 export default defineAgent({
+  // Keep existing stored-session retention independent of private trace content.
+  experimental: { workflow: { retention: "default" } },
   build: {
     externalDependencies: [
       "@bundjil/photon",

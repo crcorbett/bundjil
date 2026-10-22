@@ -47,6 +47,10 @@ import {
   ChannelReplayOptions,
   ChannelRoutingSecret,
 } from "../agent/lib/channel/schemas.js";
+import {
+  makeChannelRouteArgs,
+  makeChannelSession,
+} from "./channel-host.fixture.js";
 
 const fixtures = Effect.gen(function* decodeSendblueChannelFixtures() {
   const accepted = yield* Schema.decodeEffect(ChannelWebhookResult)({
@@ -210,26 +214,7 @@ const routeFor = <E>(
   return route;
 };
 
-const session = {
-  cancel: () => Promise.resolve({ status: "no_active_turn" as const }),
-  continuationToken: "sendblue:test",
-  getEventStream: () => Promise.resolve(new ReadableStream()),
-  getStreamTailIndex: () => Promise.resolve(-1),
-  id: "session-test",
-} satisfies Session;
-
-const routeControls = {
-  cancel: () => Promise.resolve({ status: "no_active_turn" as const }),
-  clear: () => Promise.resolve({ status: "no_active_session" as const }),
-  compact: () => Promise.resolve({ status: "no_active_session" as const }),
-  reset: () => Promise.resolve({ status: "no_active_session" as const }),
-  resolveActiveSession: (): ReturnType<
-    RouteHandlerArgs<ChannelMutableAdapterStateEncoded>["resolveActiveSession"]
-  > => Promise.resolve<undefined>(globalThis.undefined),
-} satisfies Pick<
-  RouteHandlerArgs<ChannelMutableAdapterStateEncoded>,
-  "cancel" | "clear" | "compact" | "reset" | "resolveActiveSession"
->;
+const session = makeChannelSession("session-test");
 
 const request = () =>
   new Request("https://agent.test/eve/v1/sendblue/webhook", {
@@ -277,21 +262,16 @@ it.effect("maps accepted, ignored, duplicate and failed channel ingress", () =>
 
     let sends = 0;
     let waitUntilRegistrations = 0;
-    const args = {
-      getSession: () => session,
-      params: {},
-      receive: () => Promise.resolve(session),
-      requestIp: null,
+    const args = makeChannelRouteArgs<ChannelMutableAdapterStateEncoded>({
       send: () => {
         sends += 1;
         return Promise.resolve(session);
       },
-      ...routeControls,
       waitUntil: (task) => {
         waitUntilRegistrations += 1;
         void task;
       },
-    } satisfies RouteHandlerArgs<ChannelMutableAdapterStateEncoded>;
+    }) satisfies RouteHandlerArgs<ChannelMutableAdapterStateEncoded>;
 
     const acceptedRoute = routeFor(acceptedRuntime);
     const acceptedResponse = yield* Effect.promise(() =>
@@ -344,11 +324,7 @@ it.effect(
       let sends = 0;
       let waitUntilRegistrations = 0;
       let responseResolved = false;
-      const args = {
-        getSession: () => session,
-        params: {},
-        receive: () => Promise.resolve(session),
-        requestIp: null,
+      const args = makeChannelRouteArgs<ChannelMutableAdapterStateEncoded>({
         send: () => {
           sends += 1;
           return runPromise(
@@ -358,11 +334,10 @@ it.effect(
             )
           );
         },
-        ...routeControls,
         waitUntil: () => {
           waitUntilRegistrations += 1;
         },
-      } satisfies RouteHandlerArgs<ChannelMutableAdapterStateEncoded>;
+      }) satisfies RouteHandlerArgs<ChannelMutableAdapterStateEncoded>;
       const route = routeFor(observed.runtime);
       const responseFiber = yield* Effect.forkChild(
         Effect.promise(() =>
@@ -443,15 +418,10 @@ it.effect(
         )
       );
 
-      const args = {
-        getSession: () => session,
-        params: {},
-        receive: () => Promise.resolve(session),
-        requestIp: null,
+      const args = makeChannelRouteArgs<ChannelMutableAdapterStateEncoded>({
         send: () => Promise.resolve(session),
-        ...routeControls,
         waitUntil: () => {},
-      } satisfies RouteHandlerArgs<ChannelMutableAdapterStateEncoded>;
+      }) satisfies RouteHandlerArgs<ChannelMutableAdapterStateEncoded>;
       const resumedResponse = yield* Effect.promise(() =>
         routeFor(resumed.runtime).handler(request(), args)
       );
@@ -516,20 +486,18 @@ it.effect("returns no 202 for rejected or defective pre-response handoff", () =>
     let typedFailureSends = 0;
     let typedFailureWaitUntilRegistrations = 0;
     const typedFailureResponse = yield* Effect.promise(() =>
-      routeFor(typedFailure.runtime).handler(request(), {
-        getSession: () => session,
-        params: {},
-        receive: () => Promise.resolve(session),
-        requestIp: null,
-        send: () => {
-          typedFailureSends += 1;
-          return Promise.reject(new Error("synthetic send rejection"));
-        },
-        ...routeControls,
-        waitUntil: () => {
-          typedFailureWaitUntilRegistrations += 1;
-        },
-      })
+      routeFor(typedFailure.runtime).handler(
+        request(),
+        makeChannelRouteArgs<ChannelMutableAdapterStateEncoded>({
+          send: () => {
+            typedFailureSends += 1;
+            return Promise.reject(new Error("synthetic send rejection"));
+          },
+          waitUntil: () => {
+            typedFailureWaitUntilRegistrations += 1;
+          },
+        })
+      )
     );
     assert.strictEqual(typedFailureResponse.status, 503);
     assert.strictEqual(typedFailureWaitUntilRegistrations, 0);
@@ -554,20 +522,18 @@ it.effect("returns no 202 for rejected or defective pre-response handoff", () =>
     let defectSends = 0;
     let defectWaitUntilRegistrations = 0;
     const defectExit = yield* Effect.promise(() =>
-      routeFor(defect.runtime).handler(request(), {
-        getSession: () => session,
-        params: {},
-        receive: () => Promise.resolve(session),
-        requestIp: null,
-        send: () => {
-          defectSends += 1;
-          return Promise.resolve(session);
-        },
-        ...routeControls,
-        waitUntil: () => {
-          defectWaitUntilRegistrations += 1;
-        },
-      })
+      routeFor(defect.runtime).handler(
+        request(),
+        makeChannelRouteArgs<ChannelMutableAdapterStateEncoded>({
+          send: () => {
+            defectSends += 1;
+            return Promise.resolve(session);
+          },
+          waitUntil: () => {
+            defectWaitUntilRegistrations += 1;
+          },
+        })
+      )
     ).pipe(Effect.exit);
     assert.strictEqual(Exit.hasDies(defectExit), true);
     assert.strictEqual(defectWaitUntilRegistrations, 0);
@@ -605,20 +571,15 @@ it.effect(
       let sends = 0;
       let waitUntilRegistrations = 0;
       const route = routeFor(observed.runtime);
-      const args = {
-        getSession: () => session,
-        params: {},
-        receive: () => Promise.resolve(session),
-        requestIp: null,
+      const args = makeChannelRouteArgs<ChannelMutableAdapterStateEncoded>({
         send: () => {
           sends += 1;
           return runPromise(Deferred.await(pending));
         },
-        ...routeControls,
         waitUntil: () => {
           waitUntilRegistrations += 1;
         },
-      } satisfies RouteHandlerArgs<ChannelMutableAdapterStateEncoded>;
+      }) satisfies RouteHandlerArgs<ChannelMutableAdapterStateEncoded>;
       const timedOut = yield* Effect.promise(() =>
         route.handler(request(), args)
       );
@@ -667,20 +628,18 @@ it.effect(
       let waitUntilRegistrations = 0;
       const handlerFiber = yield* Effect.forkChild(
         Effect.promise(() =>
-          routeFor(observed.runtime).handler(request(), {
-            getSession: () => session,
-            params: {},
-            receive: () => Promise.resolve(session),
-            requestIp: null,
-            send: () => {
-              sends += 1;
-              return Promise.resolve(session);
-            },
-            ...routeControls,
-            waitUntil: () => {
-              waitUntilRegistrations += 1;
-            },
-          })
+          routeFor(observed.runtime).handler(
+            request(),
+            makeChannelRouteArgs<ChannelMutableAdapterStateEncoded>({
+              send: () => {
+                sends += 1;
+                return Promise.resolve(session);
+              },
+              waitUntil: () => {
+                waitUntilRegistrations += 1;
+              },
+            })
+          )
         ).pipe(Effect.exit)
       );
       yield* Deferred.await(started);
@@ -729,20 +688,15 @@ it.effect(
                 method: "POST",
                 signal: controller.signal,
               }),
-              {
-                getSession: () => session,
-                params: {},
-                receive: () => Promise.resolve(session),
-                requestIp: null,
+              makeChannelRouteArgs<ChannelMutableAdapterStateEncoded>({
                 send: () => {
                   sends += 1;
                   return Promise.resolve(session);
                 },
-                ...routeControls,
                 waitUntil: () => {
                   waitUntilRegistrations += 1;
                 },
-              }
+              })
             )
             .then((response) => {
               responseResolved = true;
@@ -797,15 +751,10 @@ it.effect("returns 503 when routing fails before dispatch", () =>
     );
     yield* Effect.addFinalizer(() => runtime.disposeEffect);
     const route = routeFor(runtime);
-    const args = {
-      getSession: () => session,
-      params: {},
-      receive: () => Promise.resolve(session),
-      requestIp: null,
+    const args = makeChannelRouteArgs<ChannelMutableAdapterStateEncoded>({
       send: () => Promise.resolve(session),
-      ...routeControls,
       waitUntil: () => {},
-    } satisfies RouteHandlerArgs<ChannelMutableAdapterStateEncoded>;
+    }) satisfies RouteHandlerArgs<ChannelMutableAdapterStateEncoded>;
 
     assert.strictEqual(
       (yield* Effect.promise(() => route.handler(request(), args))).status,

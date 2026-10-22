@@ -348,7 +348,7 @@ export const ExecutorConnectionConfigOperation = Schema.Literals([
   "loadApiKey",
 ]);
 
-export class ExecutorConnectionConfigError extends Schema.TaggedErrorClass<ExecutorConnectionConfigError>()(
+export class ExecutorConnectionConfigError extends Schema.TaggedError<ExecutorConnectionConfigError>()(
   "ExecutorConnectionConfigError",
   {
     operation: ExecutorConnectionConfigOperation,
@@ -644,7 +644,7 @@ That frontend SPEC must follow
 `docs/architecture/frontend-composition.md` and require:
 
 - visible structure composed as high as practical through `primitive ->
-composite -> layout -> route`;
+  composite -> layout -> route`;
 - route or feature boundaries owning data loading, Effect execution, service/RPC
   calls, auth, mutations, commands, shared workflows, and schema-owned
   search/page/URL state; presentation leaves owning rendering, accessibility,

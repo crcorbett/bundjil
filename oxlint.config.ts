@@ -1,7 +1,6 @@
+import { general, style } from "@commonplaces/oxlint-plugin";
 import { recommended as effectTsgoRecommended } from "@effect/tsgo/oxlint-presets";
 import { defineConfig } from "oxlint";
-import core from "ultracite/oxlint/core";
-import react from "ultracite/oxlint/react";
 import vitest from "ultracite/oxlint/vitest";
 
 const bundjilVitest = {
@@ -29,7 +28,7 @@ const bundjilEffectTsgo = {
 };
 
 export default defineConfig({
-  extends: [core, react, bundjilVitest, bundjilEffectTsgo],
+  extends: [style, general, bundjilVitest, bundjilEffectTsgo],
   ignorePatterns: [
     "**/dist/**",
     "**/.turbo/**",
@@ -38,19 +37,10 @@ export default defineConfig({
     ".cursor/**",
     "lint/fixtures/**",
     "lint/codec-provenance.fixture.ts",
-    "tools/oxlint/anti-slop/**",
   ],
   jsPlugins: [
     "./lint/oxlint-plugin.ts",
-    "./lint/package-rules.ts",
-    {
-      name: "anti-slop",
-      specifier: "./tools/oxlint/anti-slop/index.ts",
-    },
-    {
-      name: "anti-slop-effect",
-      specifier: "./tools/oxlint/anti-slop/effect/index.ts",
-    },
+    "@commonplaces/oxlint-plugin/anti-slop-effect",
   ],
   overrides: [
     {
@@ -277,23 +267,7 @@ export default defineConfig({
     },
   ],
   rules: {
-    "anti-slop/no-chained-type-assertions": "error",
-    "anti-slop/no-conditional-empty-object-spread": "error",
-    "anti-slop/no-known-value-widening": "error",
-    "anti-slop/no-module-mocking": "error",
-    "anti-slop/no-object-parameters": "error",
-    "anti-slop/no-reflect-apply": "error",
-    "anti-slop/no-reflect-get": "error",
-    "anti-slop/no-runtime-typeof": "error",
-    "anti-slop/no-shape-in-symbol-names": "error",
-    "anti-slop/no-unknown-parameters": "error",
-    "anti-slop/no-unknown-returns": "error",
-    "anti-slop/no-unknown-type-aliases": "error",
-    "anti-slop/no-unsafe-dictionary-type": "error",
-    "anti-slop/no-widen-then-assert": "error",
-    "anti-slop/require-safety-comment-for-type-assertion": "error",
     "anti-slop-effect/no-service-constructor-imports": "error",
-    "package/no-cross-package-source-imports": "error",
     "eslint/func-names": "off",
     "eslint/func-style": "off",
     "eslint/max-classes-per-file": "off",

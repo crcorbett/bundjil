@@ -7,7 +7,7 @@ import {
 import { CodexOAuthProfileCommitOperation } from "../contracts.js";
 import { CodexProfileErrorMessage } from "../error-contracts.js";
 
-export class CodexOAuthProfileCommitConflict extends Schema.TaggedErrorClass<CodexOAuthProfileCommitConflict>()(
+export class CodexOAuthProfileCommitConflict extends Schema.TaggedError<CodexOAuthProfileCommitConflict>()(
   "CodexOAuthProfileCommitConflict",
   {
     operation: CodexOAuthProfileCommitOperation,

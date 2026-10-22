@@ -174,7 +174,7 @@ implementations, and schema-backed stores for non-string values.
 Bundjil's local Effect v4 reference uses the current effect-smol path:
 
 ```ts
-import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
+import * as KeyValueStore from "effect/persistence/KeyValueStore";
 ```
 
 The local source exposes `KeyValueStore`, `KeyValueStoreError`,
@@ -196,11 +196,11 @@ Executor personal DeepWiki on `Effect-TS/effect` confirmed the current Effect
 HTTP stack can expose a web-standard handler suitable for Vercel-style
 serverless entrypoints:
 
-- Use `effect/unstable/httpapi` (`HttpApi`, `HttpApiGroup`,
+- Use `effect/httpapi` (`HttpApi`, `HttpApiGroup`,
   `HttpApiEndpoint`, `HttpApiBuilder`, `HttpApiScalar`, `OpenApi`) for typed
   JSON management endpoints, schema-backed request/response validation, and
   OpenAPI generation.
-- Use `effect/unstable/http/HttpRouter` for raw routes that need exact body
+- Use `effect/http/HttpRouter` for raw routes that need exact body
   and streaming control. The Codex proxy's `/v1/chat/completions` route should
   be an `HttpRouter.add(...)` route, not a fully buffered typed JSON endpoint.
 - Use `HttpRouter.toWebHandler(...)` at the app boundary to produce a
@@ -290,7 +290,7 @@ DeepWiki queries completed on 2026-07-07:
   `mapError` / tagged boundaries. Its answer referenced the older
   `@effect/platform` package path, so Bundjil's local Effect v4 source remains
   authoritative for implementation imports:
-  `effect/unstable/persistence/KeyValueStore`.
+  `effect/persistence/KeyValueStore`.
 - `aaif-goose/goose`: DeepWiki confirmed Goose's `chatgpt_codex` provider is
   direct HTTP, not `codex app-server`, ACP, or a Codex CLI subprocess. Goose
   performs PKCE OAuth against `https://auth.openai.com`, uses client id
@@ -945,7 +945,7 @@ Package code must:
 - Use flat meaningful `Effect.gen` for primary operations.
 - Keep tagged error handling in `.pipe(...)` with `catchTag`, `catchTags`, or
   `mapError`.
-- Use `Schema.TaggedErrorClass` or `Data.TaggedError` for expected failures.
+- Use `Schema.TaggedError` or `Data.TaggedError` for expected failures.
 - Use `Effect.tryPromise` for SDK/fetch calls.
 - Add operation names with `Effect.withSpan` or `Effect.fn`.
 - Provide memory/mock layers for tests.

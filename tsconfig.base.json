@@ -4,6 +4,60 @@
     "plugins": [
       {
         "name": "@effect/language-service",
+        "allowedUnstableApis": [
+          "@effect/platform-bun/BunFileSystem",
+          "@effect/platform-bun/BunHttpServer",
+          "@effect/platform-bun/BunServices",
+          "effect/ByteSize",
+          "effect/FileSystem",
+          "effect/Path",
+          "effect/http/FetchHttpClient",
+          "effect/http/HttpClient",
+          "effect/http/HttpClientError",
+          "effect/http/HttpClientRequest",
+          "effect/http/HttpClientResponse",
+          "effect/http/HttpRouter",
+          "effect/http/HttpServer",
+          "effect/http/HttpServerError",
+          "effect/http/HttpServerRequest",
+          "effect/http/HttpServerResponse",
+          "effect/http/UrlParams",
+          "effect/net/NetAddress",
+          "effect/persistence/KeyValueStore",
+          "effect/process/ChildProcess",
+          "effect/process/ChildProcessSpawner"
+        ],
+        "overrides": [
+          {
+            "include": ["**/test/**/*.ts", "**/test-alchemy/**/*.ts"],
+            "options": {
+              "allowedUnstableApis": [
+                "@effect/platform-bun/BunFileSystem",
+                "@effect/platform-bun/BunHttpServer",
+                "@effect/platform-bun/BunServices",
+                "@effect/vitest",
+                "effect/ByteSize",
+                "effect/FileSystem",
+                "effect/Path",
+                "effect/http/FetchHttpClient",
+                "effect/http/HttpClient",
+                "effect/http/HttpClientError",
+                "effect/http/HttpClientRequest",
+                "effect/http/HttpClientResponse",
+                "effect/http/HttpRouter",
+                "effect/http/HttpServer",
+                "effect/http/HttpServerError",
+                "effect/http/HttpServerRequest",
+                "effect/http/HttpServerResponse",
+                "effect/http/UrlParams",
+                "effect/net/NetAddress",
+                "effect/persistence/KeyValueStore",
+                "effect/process/ChildProcess",
+                "effect/process/ChildProcessSpawner"
+              ]
+            }
+          }
+        ],
         "diagnosticSeverity": {
           "anyUnknownInErrorContext": "error",
           "floatingEffect": "error",

@@ -268,7 +268,7 @@ plane.
   `/management` boundary. The latter owns canonical request/result Schemas,
   operation-specific safe errors, lazy redacted credentials, exhaustive user
   pagination, full-envelope decoding, and live/memory Layers for Alchemy;
-- retains exact `@spectrum-ts/core` and `@spectrum-ts/imessage` `12.3.0` pins;
+- retains exact `@spectrum-ts/core` and `@spectrum-ts/imessage` `12.13.0` pins;
 - owns no Eve, identity, routing, replay, persistence, environment binding,
   provider-selection, deployment, or Production policy.
 

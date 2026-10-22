@@ -1,6 +1,6 @@
 import { Schema } from "effect";
 
-export class EveChannelDispatchError extends Schema.TaggedErrorClass<EveChannelDispatchError>()(
+export class EveChannelDispatchError extends Schema.TaggedError<EveChannelDispatchError>()(
   "EveChannelDispatchError",
   {
     reason: Schema.Literals([

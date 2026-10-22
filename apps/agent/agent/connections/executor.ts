@@ -16,7 +16,7 @@ export default defineMcpClientConnection({
   description:
     "Executor: use selected connected services under explicit read, approval, and block policies.",
   auth: {
-    principalType: "app",
+    credentialOwner: "app",
     getToken: async () => {
       const key = await Effect.runPromise(
         loadExecutorApiKey().pipe(Effect.provide(ExecutorConfigProviderLayer))

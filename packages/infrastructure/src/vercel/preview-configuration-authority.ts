@@ -68,7 +68,7 @@ export type VercelPreviewConfigurationAuthorityFailureReason =
 export type VercelPreviewConfigurationAuthorityFailureReasonEncoded =
   typeof VercelPreviewConfigurationAuthorityFailureReason.Encoded;
 
-export class VercelPreviewConfigurationAuthorityError extends Schema.TaggedErrorClass<VercelPreviewConfigurationAuthorityError>()(
+export class VercelPreviewConfigurationAuthorityError extends Schema.TaggedError<VercelPreviewConfigurationAuthorityError>()(
   "VercelPreviewConfigurationAuthorityError",
   { reason: VercelPreviewConfigurationAuthorityFailureReason }
 ) {}

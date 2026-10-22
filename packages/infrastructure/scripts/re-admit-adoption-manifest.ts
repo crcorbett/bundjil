@@ -47,7 +47,7 @@ const ReadmissionCommandFailureReason = Schema.Literals([
   "baseArtifactInvalid",
   "inventoryArtifactInvalid",
 ]);
-class ReadmissionCommandError extends Schema.TaggedErrorClass<ReadmissionCommandError>()(
+class ReadmissionCommandError extends Schema.TaggedError<ReadmissionCommandError>()(
   "ReadmissionCommandError",
   { reason: ReadmissionCommandFailureReason }
 ) {}

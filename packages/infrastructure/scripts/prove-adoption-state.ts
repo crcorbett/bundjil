@@ -112,7 +112,7 @@ const AdoptionProofBlockedReason = Schema.Literals([
   "remote-state-resource-missing",
   "unclassified",
 ]);
-class AdoptionProofError extends Schema.TaggedErrorClass<AdoptionProofError>()(
+class AdoptionProofError extends Schema.TaggedError<AdoptionProofError>()(
   "AdoptionProofError",
   { reason: AdoptionProofBlockedReason }
 ) {}

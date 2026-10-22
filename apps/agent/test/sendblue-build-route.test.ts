@@ -4,7 +4,10 @@ import { assert } from "@effect/vitest";
 import { Schema } from "effect";
 import { describe, it } from "vitest";
 
-const outputFile = new URL("../.output/server/index.mjs", import.meta.url);
+const outputFile = new URL(
+  "../.output/server/_chunks/node-server.mjs",
+  import.meta.url
+);
 const compiledManifestFile = new URL(
   "../.output/.eve/compile/compiled-agent-manifest.json",
   import.meta.url
@@ -15,6 +18,9 @@ const tracedPackageFile = new URL(
 );
 const CompiledManifest = Schema.Struct({
   config: Schema.Struct({
+    experimental: Schema.Struct({
+      workflow: Schema.Struct({ retention: Schema.Literal("default") }),
+    }),
     build: Schema.optional(
       Schema.Struct({
         externalDependencies: Schema.optional(Schema.Array(Schema.String)),
@@ -35,9 +41,9 @@ const TracedPackage = Schema.Struct({
 describe("Channel build routes", () => {
   it("builds both webhooks at their public absolute routes", async () => {
     const output = await readFile(outputFile, "utf-8");
-    assert.include(output, 'route: "/eve/v1/sendblue/webhook"');
-    assert.include(output, 'route: "/eve/v1/photon/webhook"');
-    assert.notInclude(output, 'route: "/webhook"');
+    assert.include(output, "POST /eve/v1/sendblue/webhook");
+    assert.include(output, "POST /eve/v1/photon/webhook");
+    assert.notInclude(output, "POST /webhook");
     assert.include(output, "Channel.prepareInbound");
     assert.include(output, "SendblueTransport.sendMessage");
     assert.include(output, "PhotonTransport.sendMessage");
@@ -49,6 +55,10 @@ describe("Channel build routes", () => {
       JSON.parse(await readFile(compiledManifestFile, "utf-8"))
     );
 
+    assert.strictEqual(
+      manifest.config.experimental.workflow.retention,
+      "default"
+    );
     assert.deepStrictEqual(manifest.config.build?.externalDependencies, [
       "@bundjil/photon",
       "@grpc/grpc-js",
@@ -66,9 +76,9 @@ describe("Channel build routes", () => {
         "nice-grpc-common": tracedPackage.dependencies?.["nice-grpc-common"],
       },
       {
-        "@grpc/grpc-js": "1.14.4",
-        "nice-grpc": "2.1.16",
-        "nice-grpc-common": "2.0.3",
+        "@grpc/grpc-js": "1.14.6",
+        "nice-grpc": "2.1.17",
+        "nice-grpc-common": "2.0.4",
       }
     );
   });

@@ -82,7 +82,7 @@ const StateMigrationBlockedReason = Schema.Union([
 const StateMigrationDiagnosticCount = Schema.Int.pipe(
   Schema.check(Schema.isGreaterThanOrEqualTo(0))
 );
-class StateMigrationCommandError extends Schema.TaggedErrorClass<StateMigrationCommandError>()(
+class StateMigrationCommandError extends Schema.TaggedError<StateMigrationCommandError>()(
   "StateMigrationCommandError",
   {
     reason: StateMigrationBlockedReason,

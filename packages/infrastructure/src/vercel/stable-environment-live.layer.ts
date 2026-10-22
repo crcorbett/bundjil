@@ -5,11 +5,7 @@ import {
   PhotonWebhookSecret,
 } from "@bundjil/photon/config";
 import { Config, Effect, Layer, Match, Redacted, Schema } from "effect";
-import {
-  HttpClient,
-  HttpClientRequest,
-  HttpClientResponse,
-} from "effect/unstable/http";
+import { HttpClient, HttpClientRequest, HttpClientResponse } from "effect/http";
 
 import { SecretReferenceId } from "../secret-reference.js";
 import type { VercelAccessToken } from "./schemas.js";

@@ -12,6 +12,12 @@ task_ledger: runtime-boundary-streaming-and-deployment-proof.tasks.json
 
 # Runtime boundary, streaming, and deployment proof improvements
 
+Package update note (22 October 2026): the dependency table below records the
+original investigation. Current code uses Bun 1.4.3, Effect 4.0.5, Eve 0.82.0
+and Spectrum 12.13.0. The build, channel and saved-state compatibility changes
+are owned by the current architecture and package READMEs; the old version
+observations below are historical context.
+
 ## Status and decision
 
 This SPEC is the implemented improvement set derived from three completed

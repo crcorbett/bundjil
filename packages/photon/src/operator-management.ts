@@ -1,9 +1,5 @@
 import { Context, Effect, Layer, Schema } from "effect";
-import {
-  HttpClient,
-  HttpClientRequest,
-  HttpClientResponse,
-} from "effect/unstable/http";
+import { HttpClient, HttpClientRequest, HttpClientResponse } from "effect/http";
 
 import type { PhotonProviderProofOperation } from "./provider-proof.error.js";
 import { PhotonProviderProofError } from "./provider-proof.error.js";

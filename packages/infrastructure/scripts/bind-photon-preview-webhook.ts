@@ -90,7 +90,7 @@ const PhotonPreviewWebhookBindingFailureReason = Schema.Literals([
   "bindingFileRetained",
   "bindingReadbackInvalid",
 ]);
-class PhotonPreviewWebhookBindingError extends Schema.TaggedErrorClass<PhotonPreviewWebhookBindingError>()(
+class PhotonPreviewWebhookBindingError extends Schema.TaggedError<PhotonPreviewWebhookBindingError>()(
   "PhotonPreviewWebhookBindingError",
   { reason: PhotonPreviewWebhookBindingFailureReason }
 ) {}

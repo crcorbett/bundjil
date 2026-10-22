@@ -8,8 +8,8 @@ import {
   Redacted,
   Schema,
 } from "effect";
+import * as KeyValueStore from "effect/persistence/KeyValueStore";
 import { TestClock } from "effect/testing";
-import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
 import {
   CodexAccessTokenImportProfile,
@@ -50,7 +50,7 @@ import {
 } from "../src/testing/index.js";
 
 const encodeUnknownJson = Schema.encodeUnknownSync(
-  Schema.UnknownFromJsonString
+  Schema.fromJsonString(Schema.Unknown)
 );
 
 const renderForLeakCheck = (value: unknown) =>
