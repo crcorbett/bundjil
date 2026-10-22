@@ -56,7 +56,7 @@ named deployment readback remain separate proof classes.
 
 Pinned Eve `0.29.5` owns durable session start/resume and turn child workflows
 behind its route-owned `send()` operation. Bundjil adds no second Workflow or
-raw Workflow client. The test command generates ordinary and Vercel Build
+raw Workflow client. The root/Turbo test command generates ordinary and Vercel Build
 Output and verifies Eve's generated Workflow `max` separately from the
 ordinary function's unset duration; it makes no hosted claim. Eve creates
 Nitro internally and exposes no supported app input for
@@ -100,7 +100,7 @@ Run from the repository root:
 ```bash
 bun run --filter @bundjil/agent dev:no-ui
 bun run --filter @bundjil/agent check-types
-bun run --filter @bundjil/agent test
+bunx turbo run test --filter=@bundjil/agent
 bun run --filter @bundjil/agent build
 bun run --filter @bundjil/agent preflight:production
 ```
@@ -108,8 +108,10 @@ bun run --filter @bundjil/agent preflight:production
 `preflight:production` is a deliberately explicit read-only gate command. It
 emits one bounded receipt plus an integrity-checked sanitized detail artifact;
 it does not grant deployment authority or establish current provider state.
-`test` builds both the ordinary local Nitro output and the Vercel Build Output
-before running fixtures; generated artifacts remain ignored local preflight.
+The Turbo test command builds both ordinary Nitro output and Vercel Build
+Output before running fixtures. The package-local `test` script is the leaf
+Vitest command; use the root or Turbo command for fresh generated files.
+Generated artifacts remain ignored.
 
 ## Documentation routes
 

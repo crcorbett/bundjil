@@ -307,7 +307,7 @@ it.effect(
         ),
         true
       );
-      const encoded = Schema.encodeSync(Schema.UnknownFromJsonString)(
+      const encoded = yield* Schema.encodeEffect(Schema.UnknownFromJsonString)(
         observations
       );
       for (const sentinel of [
@@ -383,12 +383,10 @@ it.effect(
         }
         assert.strictEqual(failure.reason, expected);
         assert.strictEqual(requestCount, status === 409 ? 1 : 3);
-        assert.strictEqual(
-          Schema.encodeSync(Schema.UnknownFromJsonString)(failure).includes(
-            "sentinel"
-          ),
-          false
-        );
+        const encodedFailure = yield* Schema.encodeEffect(
+          Schema.UnknownFromJsonString
+        )(failure);
+        assert.strictEqual(encodedFailure.includes("sentinel"), false);
       }
 
       const unavailable = yield* Effect.gen(function* () {
@@ -422,10 +420,10 @@ it.effect(
   "rejects ambiguous semantic users and exact callback URLs in memory",
   () =>
     Effect.gen(function* () {
-      const phone = Schema.decodeSync(PhotonSharedUserPhoneNumber)(
+      const phone = yield* Schema.decodeEffect(PhotonSharedUserPhoneNumber)(
         Redacted.make(fixture.phone)
       );
-      const callback = Schema.decodeSync(PhotonWebhookCallbackUrl)(
+      const callback = yield* Schema.decodeEffect(PhotonWebhookCallbackUrl)(
         Redacted.make(fixture.callback)
       );
       const userAttributes = PhotonSharedUserAttributes.make({

@@ -267,7 +267,7 @@ it.effect("stores subscription logins through fenced initial write", () =>
       yield* completeLogin({
         code: Redacted.make("code-secret"),
         state: Redacted.make("state-secret"),
-        redirectUri: Schema.decodeUnknownSync(CodexOAuthRedirectUri)(
+        redirectUri: yield* Schema.decodeEffect(CodexOAuthRedirectUri)(
           "http://localhost/callback"
         ),
       });
@@ -667,7 +667,7 @@ it.effect(
 
         const snapshot = yield* getCodexOAuthObserverSnapshot;
         const encodedSnapshot = renderForLeakCheck(
-          Schema.encodeUnknownSync(CodexOAuthObserverSnapshot)(snapshot)
+          yield* Schema.encodeEffect(CodexOAuthObserverSnapshot)(snapshot)
         );
 
         assert.strictEqual(snapshot.counters.refreshStarted, 1);

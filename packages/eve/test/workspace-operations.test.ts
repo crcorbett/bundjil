@@ -97,7 +97,7 @@ it.effect("can replace the operation with a memory layer", () =>
     }).pipe(
       Effect.provide(
         WorkspaceOperationsMemory(
-          Schema.decodeUnknownSync(WorkspaceStatusSuccess)({
+          yield* Schema.decodeEffect(WorkspaceStatusSuccess)({
             workspaceName: "memory-workspace",
             packageNames: ["@bundjil/memory-only"],
             agentSummary: "Memory-backed status for tests.",

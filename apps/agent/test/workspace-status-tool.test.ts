@@ -70,7 +70,7 @@ it.effect("executes the Eve tool through the live Effect named operation", () =>
 it.effect(
   "uses Effect Schema adapters for Eve input and output validation",
   () =>
-    Effect.sync(() => {
+    Effect.gen(function* testWorkspaceStatusSchemaAdapters() {
       assert.strictEqual(
         workspaceStatusTool.inputSchema,
         workspaceStatusInputSchema
@@ -101,7 +101,7 @@ it.effect(
         }
       );
 
-      const expectedWorkspaceStatus = Schema.decodeUnknownSync(
+      const expectedWorkspaceStatus = yield* Schema.decodeEffect(
         WorkspaceStatusSuccess
       )({
         workspaceName: "bundjil",

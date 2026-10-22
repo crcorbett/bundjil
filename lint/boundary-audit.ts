@@ -2,7 +2,7 @@ import { readdirSync } from "node:fs";
 import nodePath from "node:path";
 
 import { Console, Data, Effect, pipe } from "effect";
-import ts from "typescript";
+import ts from "typescript-compiler-api";
 
 import { boundaryExceptions } from "./boundary-exceptions.js";
 import type { BoundaryException, BoundaryRule } from "./boundary-exceptions.js";

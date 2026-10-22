@@ -164,16 +164,16 @@ it.effect("maps malformed and rejected native responses to safe errors", () => {
   return Effect.gen(function* safeErrorContract() {
     const store = yield* KeyValueStore.KeyValueStore;
     const getError = yield* store.get(privateMarker).pipe(Effect.flip);
-    const rendered = Schema.encodeUnknownSync(Schema.UnknownFromJsonString)(
-      getError
-    );
+    const rendered = yield* Schema.encodeUnknownEffect(
+      Schema.UnknownFromJsonString
+    )(getError);
     assert.strictEqual(rendered.includes(privateMarker), false);
     assert.strictEqual(getError.key, undefined);
     assert.strictEqual(getError.cause, undefined);
     const sizeError = yield* store.size.pipe(Effect.flip);
-    const sizeRendered = Schema.encodeUnknownSync(Schema.UnknownFromJsonString)(
-      sizeError
-    );
+    const sizeRendered = yield* Schema.encodeUnknownEffect(
+      Schema.UnknownFromJsonString
+    )(sizeError);
     assert.strictEqual(sizeRendered.includes("foreign:key"), false);
     assert.strictEqual(sizeError.key, undefined);
     assert.strictEqual(sizeError.cause, undefined);
@@ -209,24 +209,20 @@ it.effect("safely maps malformed and rejected scan providers", () => {
   return Effect.gen(function* scanFailureContract() {
     const malformedStore = yield* KeyValueStore.KeyValueStore;
     const malformedError = yield* malformedStore.size.pipe(Effect.flip);
-    assert.strictEqual(
-      Schema.encodeUnknownSync(Schema.UnknownFromJsonString)(
-        malformedError
-      ).includes(privateMarker),
-      false
-    );
+    const malformedRendered = yield* Schema.encodeUnknownEffect(
+      Schema.UnknownFromJsonString
+    )(malformedError);
+    assert.strictEqual(malformedRendered.includes(privateMarker), false);
     assert.strictEqual(malformedError.key, undefined);
     assert.strictEqual(malformedError.cause, undefined);
     const rejectedError = yield* Effect.gen(function* rejectedScanSize() {
       const rejectedStore = yield* KeyValueStore.KeyValueStore;
       return yield* rejectedStore.size;
     }).pipe(Effect.provide(layerFor(rejected)), Effect.flip);
-    assert.strictEqual(
-      Schema.encodeUnknownSync(Schema.UnknownFromJsonString)(
-        rejectedError
-      ).includes(privateMarker),
-      false
-    );
+    const rejectedRendered = yield* Schema.encodeUnknownEffect(
+      Schema.UnknownFromJsonString
+    )(rejectedError);
+    assert.strictEqual(rejectedRendered.includes(privateMarker), false);
     assert.strictEqual(rejectedError.key, undefined);
     assert.strictEqual(rejectedError.cause, undefined);
   }).pipe(Effect.provide(layerFor(malformed)));
@@ -250,9 +246,9 @@ it.effect("skips empty clear and safely maps rejected provider reads", () => {
     yield* store.clear;
     assert.strictEqual(calls.length, 0);
     const error = yield* store.get("private-key").pipe(Effect.flip);
-    const rendered = Schema.encodeUnknownSync(Schema.UnknownFromJsonString)(
-      error
-    );
+    const rendered = yield* Schema.encodeUnknownEffect(
+      Schema.UnknownFromJsonString
+    )(error);
     assert.strictEqual(rendered.includes(privateMarker), false);
     assert.strictEqual(error.key, undefined);
     assert.strictEqual(error.cause, undefined);

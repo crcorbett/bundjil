@@ -284,7 +284,7 @@ it.effect("rejects invalid transactions before provider I/O", () => {
   return Effect.gen(function* invalidTransactionContract() {
     const atomic = yield* AtomicKeyValueStore;
     const native = yield* KeyValueStore.KeyValueStore;
-    const duplicateConditions = Schema.decodeUnknownSync(
+    const duplicateConditions = yield* Schema.decodeEffect(
       AtomicKeyValueStoreTransaction
     )({
       conditions: [
@@ -293,7 +293,7 @@ it.effect("rejects invalid transactions before provider I/O", () => {
       ],
       mutations: [{ _tag: "Set", key: "duplicate", value: "value" }],
     });
-    const duplicateMutations = Schema.decodeUnknownSync(
+    const duplicateMutations = yield* Schema.decodeEffect(
       AtomicKeyValueStoreTransaction
     )({
       conditions: [{ _tag: "Absent", key: "mutation" }],
@@ -333,9 +333,9 @@ it.effect("maps rejected eval provider failures to safe atomic errors", () => {
   return Effect.gen(function* rejectedEvalContract() {
     const atomic = yield* AtomicKeyValueStore;
     const error = yield* atomic.transact(transaction).pipe(Effect.flip);
-    const rendered = Schema.encodeUnknownSync(Schema.UnknownFromJsonString)(
-      error
-    );
+    const rendered = yield* Schema.encodeUnknownEffect(
+      Schema.UnknownFromJsonString
+    )(error);
     assert.strictEqual(error.operation, "transact");
     assert.strictEqual(rendered.includes(privateProviderMarker), false);
     assert.strictEqual(rendered.includes("lease"), false);
@@ -371,9 +371,9 @@ it.effect(
     return Effect.gen(function* safeEvalErrorContract() {
       const atomic = yield* AtomicKeyValueStore;
       const error = yield* atomic.transact(transaction).pipe(Effect.flip);
-      const rendered = Schema.encodeUnknownSync(Schema.UnknownFromJsonString)(
-        error
-      );
+      const rendered = yield* Schema.encodeUnknownEffect(
+        Schema.UnknownFromJsonString
+      )(error);
       assert.strictEqual(error.operation, "transact");
       assert.strictEqual(rendered.includes(marker), false);
       assert.strictEqual("cause" in error, false);

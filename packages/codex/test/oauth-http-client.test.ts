@@ -38,7 +38,7 @@ it.effect("classifies authorization-code exchange execution timeouts", () =>
         return yield* client.exchangeAuthorizationCode({
           code: Redacted.make("code-secret"),
           codeVerifier: Redacted.make("verifier-secret"),
-          redirectUri: Schema.decodeUnknownSync(CodexOAuthRedirectUri)(
+          redirectUri: yield* Schema.decodeEffect(CodexOAuthRedirectUri)(
             "http://localhost:1455/auth/callback"
           ),
         });

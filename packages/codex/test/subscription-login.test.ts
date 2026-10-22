@@ -220,7 +220,7 @@ const makeLoginLayer = (
       Effect.succeed({
         code: Redacted.make("authorization-code-secret"),
         state: material.state,
-        redirectUri: Schema.decodeUnknownSync(CodexOAuthRedirectUri)(
+        redirectUri: yield* Schema.decodeEffect(CodexOAuthRedirectUri)(
           "http://localhost:1455/auth/callback"
         ),
       });
@@ -518,7 +518,7 @@ it.effect("uses form encoding for exchange and JSON for refresh", () =>
       yield* client.exchangeAuthorizationCode({
         code: Redacted.make("code secret"),
         codeVerifier: Redacted.make("verifier secret"),
-        redirectUri: Schema.decodeUnknownSync(CodexOAuthRedirectUri)(
+        redirectUri: yield* Schema.decodeEffect(CodexOAuthRedirectUri)(
           "http://localhost:1455/auth/callback"
         ),
       });
@@ -548,7 +548,7 @@ it.effect(
   "decodes and sanitizes schema-valid and malformed provider errors",
   () =>
     Effect.gen(function* testProviderErrorResponses() {
-      const validProviderError = Schema.encodeSync(
+      const validProviderError = yield* Schema.encodeEffect(
         Schema.fromJsonString(CodexOAuthProviderErrorResponse)
       )({
         error: CodexOAuthProviderErrorCode.make("invalid_grant"),
@@ -561,7 +561,7 @@ it.effect(
           .exchangeAuthorizationCode({
             code: Redacted.make("code-secret"),
             codeVerifier: Redacted.make("verifier-secret"),
-            redirectUri: Schema.decodeUnknownSync(CodexOAuthRedirectUri)(
+            redirectUri: yield* Schema.decodeEffect(CodexOAuthRedirectUri)(
               "http://localhost:1455/auth/callback"
             ),
           })
@@ -606,7 +606,7 @@ it.effect(
           callbackTimeoutMillis: 100,
         });
         const profile = yield* getProfile(subject);
-        const encodedResult = Schema.encodeSync(
+        const encodedResult = yield* Schema.encodeEffect(
           Schema.fromJsonString(Schema.Unknown)
         )(result);
 
