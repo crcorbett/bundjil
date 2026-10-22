@@ -69,7 +69,7 @@ it.effect(
       const decoded = yield* fixture;
       const methods: string[] = [];
       const client = HttpClient.make((request) =>
-        Effect.sync(() => {
+        Effect.gen(function* inspectPreviewConfigurationRequest() {
           assert.strictEqual(
             request.headers["authorization"],
             "Bearer vercel-token-sentinel"
@@ -135,14 +135,14 @@ it.effect(
           }
           const body = new TextDecoder().decode(request.body.body);
           if (request.method === "PATCH") {
-            const patch = Schema.decodeUnknownSync(
+            const patch = yield* Schema.decodeEffect(
               Schema.fromJsonString(
                 Schema.Struct({
                   enablePreviewFeedback: Schema.Boolean,
                   enableProductionFeedback: Schema.Null,
                 })
               )
-            )(body);
+            )(body).pipe(Effect.orDie);
             assert.strictEqual(patch.enablePreviewFeedback, true);
             assert.strictEqual(patch.enableProductionFeedback, null);
             return HttpClientResponse.fromWeb(
@@ -161,7 +161,7 @@ it.effect(
             );
           }
           if (request.method === "POST") {
-            const create = Schema.decodeUnknownSync(
+            const create = yield* Schema.decodeEffect(
               Schema.fromJsonString(
                 Schema.Struct({
                   key: Schema.Literal("BUNDJIL_ALCHEMY_PREVIEW_SPIKE"),
@@ -170,7 +170,7 @@ it.effect(
                   target: Schema.Tuple([Schema.Literal("preview")]),
                 })
               )
-            )(body);
+            )(body).pipe(Effect.orDie);
             assert.deepStrictEqual(create.target, ["preview"]);
             return HttpClientResponse.fromWeb(
               request,

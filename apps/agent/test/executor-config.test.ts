@@ -17,14 +17,14 @@ const modelEndpoint =
 const syntheticKey = "executor-config-synthetic-secret";
 
 it.effect("encodes and decodes only the Executor config error target tag", () =>
-  Effect.sync(() => {
+  Effect.gen(function* testExecutorConfigErrorCodec() {
     const expected = {
       _tag: "ExecutorConfigError",
       message: "ExecutorConfigError: loadApiKey",
       operation: "loadApiKey",
       reason: "Executor MCP credential configuration is invalid.",
     } as const;
-    const encoded = Schema.encodeUnknownSync(ExecutorConfigError)(
+    const encoded = yield* Schema.encodeEffect(ExecutorConfigError)(
       new ExecutorConfigError({
         message: expected.message,
         operation: expected.operation,
@@ -39,7 +39,7 @@ it.effect("encodes and decodes only the Executor config error target tag", () =>
     );
     assert.strictEqual(Schema.is(ExecutorConfigOperation)("loadApiKey"), true);
 
-    const decoded = Schema.decodeUnknownSync(ExecutorConfigError)(expected);
+    const decoded = yield* Schema.decodeEffect(ExecutorConfigError)(expected);
     assert.strictEqual(decoded._tag, "ExecutorConfigError");
     assert.strictEqual(Schema.is(ExecutorConfigError)(decoded), true);
 

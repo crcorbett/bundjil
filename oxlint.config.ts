@@ -1,3 +1,4 @@
+import { recommended as effectTsgoRecommended } from "@effect/tsgo/oxlint-presets";
 import { defineConfig } from "oxlint";
 import core from "ultracite/oxlint/core";
 import react from "ultracite/oxlint/react";
@@ -16,8 +17,19 @@ const bundjilVitest = {
   })),
 };
 
+// Retain the existing error policy; advisory recommendations are not new errors.
+const bundjilEffectTsgo = {
+  ...effectTsgoRecommended,
+  rules: Object.fromEntries(
+    Object.entries(effectTsgoRecommended.rules).map(([rule, severity]) => [
+      rule,
+      severity === "error" ? severity : "off",
+    ])
+  ),
+};
+
 export default defineConfig({
-  extends: [core, react, bundjilVitest],
+  extends: [core, react, bundjilVitest, bundjilEffectTsgo],
   ignorePatterns: [
     "**/dist/**",
     "**/.turbo/**",

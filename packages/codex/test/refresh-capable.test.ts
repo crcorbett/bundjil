@@ -155,9 +155,9 @@ it.effect("proactively refreshes inside skew and commits rotated fields", () =>
       { refreshResult },
       {
         refreshSkewMillis: 300_000,
-        lockTtlMillis: Schema.decodeUnknownSync(CodexOAuthRefreshLockTtlMillis)(
-          5000
-        ),
+        lockTtlMillis: yield* Schema.decodeEffect(
+          CodexOAuthRefreshLockTtlMillis
+        )(5000),
       }
     );
 
@@ -213,7 +213,7 @@ it.effect(
         },
         {
           refreshSkewMillis: 300_000,
-          lockTtlMillis: Schema.decodeUnknownSync(
+          lockTtlMillis: yield* Schema.decodeEffect(
             CodexOAuthRefreshLockTtlMillis
           )(5000),
         }
@@ -493,7 +493,7 @@ it.effect("uses a newer stored winner for a rejected older revision", () =>
     let refreshCalls = 0;
     const credential = yield* recoverAfterUnauthorized({
       subject: value,
-      observedCredentialRevision: Schema.decodeUnknownSync(
+      observedCredentialRevision: yield* Schema.decodeEffect(
         CodexOAuthCredentialRevision
       )("revision-rejected-secret"),
     }).pipe(

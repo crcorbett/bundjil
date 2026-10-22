@@ -122,10 +122,14 @@ const observeSdkSuccess = (
 const liveFactory: PhotonSdkFactory = {
   acquire: async (config) => {
     const app = await Spectrum({
+      // Spectrum 12.3.0's provider definition is incompatible with its own
+      // generic factory constraint under TypeScript 7, so overload selection
+      // reports each cloud field as belonging to the local-only overload.
+      // @ts-expect-error -- upstream overload mismatch described above.
       projectId: config.projectId,
+      // @ts-expect-error -- upstream overload mismatch described above.
       projectSecret: Redacted.value(config.projectSecret),
-      // @ts-expect-error Spectrum 12.3.0 models an absent events property as
-      // incompatible with its own AnyPlatformDef under exact optional types.
+      // @ts-expect-error -- upstream provider constraint mismatch.
       providers: [imessage.config()],
       telemetry: false,
       options: { logLevel: "warn" },

@@ -50,3 +50,11 @@ readback.
 Operational preconditions, authority, sequencing, evidence, rollback, stop,
 and escalation rules are owned by the
 [Photon runbook](../../apps/agent/runbooks/photon.md).
+
+## Compiler compatibility
+
+The installed Spectrum `12.3.0` provider declaration does not satisfy its own
+generic factory constraint under TypeScript 7. The private acquisition call
+keeps narrow, documented `@ts-expect-error` annotations for that mismatch.
+Runtime configuration, request encoding, response decoding and provider tests
+are unchanged; no raw client or unchecked result is exposed by this workaround.

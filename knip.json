@@ -10,7 +10,7 @@
         "alchemy.stable.run.ts",
         "lint/codec-provenance.fixture.ts"
       ],
-      "ignoreDependencies": ["vercel"],
+      "ignoreDependencies": ["vercel", "@effect/language-service"],
       "project": ["alchemy.*.run.ts", "tooling/**/*.ts", "lint/**/*.ts"],
       "ignore": ["lint/fixtures/**"]
     },

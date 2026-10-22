@@ -22,6 +22,27 @@ outputs. The standalone build/test commands need the same synthetic Executor
 settings or the operator's intended build settings. CI runs the same
 `verification` wrapper as local development.
 
+## Compiler
+
+All workspace type checks and declaration builds use TypeScript `7.0.2`.
+`@effect/tsgo` `0.38.0` patches that compiler and Oxlint; its published support
+matrix covers TypeScript `7.0.2`, Oxlint `1.80.0` and `oxlint-tsgolint` `7.0.2001`.
+`bun install` applies the patch, and `check:effect-setup` reapplies it before
+type checking. The existing `@effect/language-service` configuration name is
+also the documented configuration key for this native compiler integration.
+
+`tooling/compiler.test.ts` compiles positive and negative examples with the
+installed compiler, including an unrun Effect that must fail. Existing strict
+Effect settings remain enabled. Advisory suggestions are not new blocking lint
+rules.
+
+The lint boundary checker uses `typescript-compiler-api`, a pinned alias for
+TypeScript `6.0.3`. TypeScript 7 removed the compatible JavaScript compiler API;
+the new API is marked unstable and is not a drop-in replacement. This alias
+only supports source inspection and its fixtures. It is not the application
+compiler and does not weaken any boundary rule. Retire it after a separately
+tested port of those rules to the new API.
+
 Boundary checks remain type-aware and retain their negative fixtures and exact
 host exceptions. They inspect public contracts, Schema encode/decode use, safe
 errors and configuration, outbound writes and package boundaries. An exception

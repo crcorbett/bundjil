@@ -107,7 +107,7 @@ it.effect(
     Effect.gen(function* testStableEnvironmentLiveContract() {
       const decoded = yield* fixture;
       const client = HttpClient.make((request) =>
-        Effect.sync(() => {
+        Effect.gen(function* inspectPreviewEnvironmentRequest() {
           assert.strictEqual(request.method, "PATCH");
           assert.strictEqual(
             new URL(request.url).pathname,
@@ -120,7 +120,7 @@ it.effect(
           if (request.body._tag !== "Uint8Array") {
             throw new Error("Expected an encoded stable environment body.");
           }
-          const body = Schema.decodeUnknownSync(
+          const body = yield* Schema.decodeEffect(
             Schema.fromJsonString(
               Schema.Struct({
                 target: Schema.Tuple([Schema.Literal("preview")]),
@@ -130,7 +130,7 @@ it.effect(
             )
           )(new TextDecoder().decode(request.body.body), {
             onExcessProperty: "error",
-          });
+          }).pipe(Effect.orDie);
           assert.deepStrictEqual(body.target, ["preview"]);
           return HttpClientResponse.fromWeb(
             request,
@@ -340,11 +340,11 @@ it.effect(
       );
 
       const client = HttpClient.make((request) =>
-        Effect.sync(() => {
+        Effect.gen(function* inspectProductionEnvironmentRequest() {
           if (request.body._tag !== "Uint8Array") {
             throw new Error("Expected an encoded stable environment body.");
           }
-          const body = Schema.decodeUnknownSync(
+          const body = yield* Schema.decodeEffect(
             Schema.fromJsonString(
               Schema.Struct({
                 target: Schema.Tuple([Schema.Literal("production")]),
@@ -354,7 +354,7 @@ it.effect(
             )
           )(new TextDecoder().decode(request.body.body), {
             onExcessProperty: "error",
-          });
+          }).pipe(Effect.orDie);
           assert.deepStrictEqual(body.target, ["production"]);
           return HttpClientResponse.fromWeb(
             request,

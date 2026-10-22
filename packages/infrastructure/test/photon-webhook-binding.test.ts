@@ -209,7 +209,7 @@ it.effect(
     Effect.gen(function* testPhotonWebhookBindingLiveContract() {
       const input = yield* fixture;
       const client = HttpClient.make((request) =>
-        Effect.sync(() => {
+        Effect.gen(function* inspectPreviewBindingsRequest() {
           assert.strictEqual(
             request.headers["authorization"],
             "Bearer vercel-token-sentinel"
@@ -231,7 +231,7 @@ it.effect(
             throw new Error("Expected one encoded Vercel JSON request.");
           }
           const body = new TextDecoder().decode(request.body.body);
-          const decoded = Schema.decodeUnknownSync(
+          const decoded = yield* Schema.decodeEffect(
             Schema.fromJsonString(
               Schema.Array(
                 Schema.Struct({
@@ -247,7 +247,7 @@ it.effect(
                 })
               )
             )
-          )(body);
+          )(body).pipe(Effect.orDie);
           assert.strictEqual(decoded.length, 4);
           assert.strictEqual(
             decoded.find(
@@ -333,11 +333,11 @@ it.effect(
     Effect.gen(function* testPhotonWebhookBindingUpsertContract() {
       const input = yield* fixture;
       const mockClient = HttpClient.make((request) =>
-        Effect.sync(() => {
+        Effect.gen(function* inspectUpsertRequest() {
           if (request.body._tag !== "Uint8Array") {
             throw new Error("Expected one encoded Vercel JSON request.");
           }
-          const body = Schema.decodeUnknownSync(
+          const body = yield* Schema.decodeEffect(
             Schema.fromJsonString(
               Schema.Array(
                 Schema.Struct({
@@ -348,7 +348,7 @@ it.effect(
                 })
               )
             )
-          )(new TextDecoder().decode(request.body.body));
+          )(new TextDecoder().decode(request.body.body)).pipe(Effect.orDie);
           return HttpClientResponse.fromWeb(
             request,
             Response.json(
