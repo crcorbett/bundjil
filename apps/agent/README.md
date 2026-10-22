@@ -116,7 +116,9 @@ bun run --filter @bundjil/agent preflight:production
 emits one bounded receipt plus an integrity-checked sanitized detail artifact;
 it does not grant deployment authority or establish current provider state.
 The Turbo test command builds both ordinary Nitro output and Vercel Build
-Output before running fixtures. The package-local `test` script is the leaf
+Output before running fixtures, with sandbox preparation disabled. This output
+is for checks only. The separate `build:vercel` deployment command requires
+Vercel credentials and retains sandbox preparation. The package-local `test` script is the leaf
 Vitest command; use the root or Turbo command for fresh generated files.
 Generated artifacts remain ignored.
 

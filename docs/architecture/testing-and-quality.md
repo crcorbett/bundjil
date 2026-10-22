@@ -17,7 +17,7 @@ The five normal check categories are:
 
 `verification:internal` runs lint, Knip, types and the combined build/test graph.
 Turbo runs each build task once in that graph. Agent tests depend on the ordinary
-Eve build and then the Vercel build, so generated-route tests inspect fresh
+Eve build and then the Vercel build check, so generated-route tests inspect fresh
 outputs. The standalone build/test commands need the same synthetic Executor
 settings or the operator's intended build settings. CI runs the same
 `verification` wrapper as local development.
@@ -32,7 +32,10 @@ not been made mandatory as part of this package update.
 The ordinary Eve build skips local sandbox prewarming so it needs no local
 virtual machine. `bun run build:vercel --filter=@bundjil/agent` produces the
 complete deployment output and remains the project's Vercel build command.
-Both outputs are built before agent tests. The agent uses TypeScript's Bundler
+The separate `build:vercel:check` skips sandbox preparation and is used before
+agent tests. Its output is only for checking routes and packaging, and must not
+be deployed. An actual Vercel build needs Vercel credentials to prepare its
+sandbox. The agent uses TypeScript's Bundler
 module resolution, matching Eve's build and resolving the extensionless type
 exports published by `@vercel/otel`; strict checking remains enabled.
 

@@ -9,6 +9,12 @@ const generatedOutputDirectory = new URL(".vercel/output/", appDirectory);
 const installedEveDirectory = new URL("node_modules/eve/", repositoryDirectory);
 
 const AgentPackage = Schema.Struct({
+  scripts: Schema.Struct({
+    "build:vercel": Schema.Literal("VERCEL=1 eve build"),
+    "build:vercel:check": Schema.Literal(
+      "VERCEL=1 eve build --skip-sandbox-prewarm"
+    ),
+  }),
   dependencies: Schema.Struct({
     eve: Schema.Literal("0.82.0"),
   }),
@@ -89,6 +95,12 @@ describe("Vercel packaging", () => {
       )
     );
 
+    expect(packageConfig.scripts["build:vercel"]).not.toContain(
+      "--skip-sandbox-prewarm"
+    );
+    expect(packageConfig.scripts["build:vercel:check"]).toContain(
+      "--skip-sandbox-prewarm"
+    );
     expect(packageConfig.dependencies.eve).toBe("0.82.0");
     expect(lock).toContain('"eve": ["eve@0.82.0"');
     expect(lock).toContain('"undici": "8.10.2"');
