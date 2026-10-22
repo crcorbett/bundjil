@@ -59,7 +59,7 @@ reopens historical implementation or provider intent.
 ## FINDING-005 investigation boundary
 
 The completed
-[decision](../../documentation-audit/structural-audit-authority-artifact-decision-2026-08-01.json)
+[decision (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/documentation-audit/structural-audit-authority-artifact-decision-2026-08-01.json)
 defers consolidation. The seven infrastructure consumers share mode-`0600`,
 JSON, envelope, and safe-output policy but differ in 64 KiB/2 MiB bounds,
 raw-byte fingerprinting, task Schemas, conflict sets, output topology, return
@@ -88,7 +88,7 @@ affected receipt until focused and full proof pass again.
 
 The fresh independent Sol review found no correction across the five required
 passes. The dated
-[closeout receipt](../../documentation-audit/structural-audit-corrections-2026-08-01.receipt.json)
+[closeout receipt (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/documentation-audit/structural-audit-corrections-2026-08-01.receipt.json)
 records that result. Full `bun run verification` then passed with only the
 documented process-only synthetic Executor fixture; it made no Executor or
 other provider request.

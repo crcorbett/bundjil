@@ -2,10 +2,8 @@ import { Ajv2020 } from "ajv/dist/2020.js";
 import { Effect, Schema } from "effect";
 import { describe, expect, it } from "vitest";
 
-import infrastructureDriftControl from "../../../docs/standards/alchemy-infrastructure-drift.control.json" with { type: "json" };
 import authorityEnvelopeSchema from "../../../tooling/schemas/authority-envelope.schema.json" with { type: "json" };
 import boundedReceiptSchema from "../../../tooling/schemas/bounded-receipt.schema.json" with { type: "json" };
-import controlRecordSchema from "../../../tooling/schemas/control-record.schema.json" with { type: "json" };
 import driftAuthorityPolicy from "../schemas/drift-report-authority.schema.json" with { type: "json" };
 import {
   buildInfrastructureDriftReceipt,
@@ -145,14 +143,6 @@ describe("infrastructure drift report", () => {
     expect(
       hasAcceptedWriteOnlyBaseline({ ...baseline, action: "missing" })
     ).toBeFalsy();
-  });
-
-  it("accepts the report-only control through the fixed harness contract", () => {
-    const validate = new Ajv2020({
-      allErrors: true,
-      strict: false,
-    }).compile(controlRecordSchema);
-    expect(validate(infrastructureDriftControl)).toBeTruthy();
   });
 
   it("accepts only the fixed Preview read-only drift authority", () => {

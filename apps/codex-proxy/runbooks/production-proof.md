@@ -84,7 +84,7 @@ profiles/ciphertext, account IDs, authorization artifacts, or unsanitized logs.
    proof, and current/previous rollback references.
 
 3. **Proof gate:** stop unless the exact critical journey and Production packet
-   from [`docs/verification`](../../../docs/verification/README.md) name the
+   from [`docs/verification` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/verification/README.md) name the
    candidate, starting state, authority, health/auth/session oracle, external
    effects, evidence, limitation, non-claims, rollback, and recovery. Do not
    run `proof:preview` against Production.

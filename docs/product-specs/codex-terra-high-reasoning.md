@@ -175,7 +175,7 @@ context provides session identity, channel metadata, and messages, not a typed
 turn, step, or attempt identity. Eve documents a stable `meta.id` only after a
 stream event is durably emitted; it is not a supported model-resolver input.
 `runtimeContext` remains telemetry-only. The task is therefore blocked in the
-dated [sanitized receipt](../evidence/verification/packets/codex-terra-eve-correlation-blocked-2026-08-09.json).
+dated [sanitized receipt (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/codex-terra-eve-correlation-blocked-2026-08-09.json).
 Do not derive a substitute from message content or internal behavior.
 
 ## Ownership and canonical contracts
@@ -616,9 +616,9 @@ The accessible Personal Agent Runs surface does not expose `$eve.*` Workflow
 tags or a per-session model-attempt/proxy-request counter. This is the strongest
 current hosted evidence, not proof of zero upstream calls on replay. The dated
 detail and blocked packet
-[`codex-terra-preview-live-eve-upgraded-2026-08-04.json`](../evidence/verification/details/codex-terra-preview-live-eve-upgraded-2026-08-04.json)
+[`codex-terra-preview-live-eve-upgraded-2026-08-04.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/details/codex-terra-preview-live-eve-upgraded-2026-08-04.json)
 and
-[`codex-terra-preview-live-eve-upgraded-2026-08-04.json`](../evidence/verification/packets/codex-terra-preview-live-eve-upgraded-2026-08-04.json)
+[`codex-terra-preview-live-eve-upgraded-2026-08-04.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/codex-terra-preview-live-eve-upgraded-2026-08-04.json)
 retain that ceiling. The related proxy detail remains the separate owner of
 encrypted-profile and live Terra/high subscription SSE proof.
 
@@ -638,7 +638,7 @@ profile, persistence namespace, and cipher configuration, and the configured
 proof-only Vercel protection bypass did not admit the proof command. Do not
 reuse Production credentials or profile state to bypass those missing
 boundaries. The dated packet
-[`codex-terra-preview-blocked-2026-08-03.json`](../evidence/verification/packets/codex-terra-preview-blocked-2026-08-03.json)
+[`codex-terra-preview-blocked-2026-08-03.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/codex-terra-preview-blocked-2026-08-03.json)
 is the current provider receipt; it retains no secret or payload material.
 
 ### 2026-08-04 Preview persistence decision and binding
@@ -660,9 +660,9 @@ but not the logical boundary: Preview and Production must retain separate
 subject, profile, key prefix, cipher, access path, deployment, and proof.
 
 The historical metadata-only stop packet
-[`codex-terra-preview-isolation-blocked-2026-08-04.json`](../evidence/verification/packets/codex-terra-preview-isolation-blocked-2026-08-04.json)
+[`codex-terra-preview-isolation-blocked-2026-08-04.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/codex-terra-preview-isolation-blocked-2026-08-04.json)
 and billing stop packet remain valid history. The successor binding packet
-[`codex-terra-preview-shared-upstash-binding-2026-08-04.json`](../evidence/verification/packets/codex-terra-preview-shared-upstash-binding-2026-08-04.json)
+[`codex-terra-preview-shared-upstash-binding-2026-08-04.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/codex-terra-preview-shared-upstash-binding-2026-08-04.json)
 records this narrow decision and metadata readback. It does not establish
 store reachability, OAuth, profile isolation, deployment, provider acceptance,
 or an Eve journey.
@@ -774,7 +774,7 @@ or an Eve journey.
    Type/Encoded boundaries, no casts/manual mappers/helper sprawl, and clean
    boundary policy results.
 9. The implementation runs focused tests, Effect language-server diagnostics,
-   `bun run check:boundaries`, `bun run check:effect-setup`,
+   `bun run check`, `bun run check:effect-setup`,
    `bun run check:docs`, `bun run check:authority`,
    `bun run check:controls`, `bun run check:verification`, and
    `bun run verification`; all required docs, runbooks, environment samples,

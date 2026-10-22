@@ -273,7 +273,7 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    pre-mutation stage as a passing postcondition: promotion intentionally
    changes its stable-alias invariant. Bind boundary-matched HTTP, session,
    message, and Production results to the matching
-   [`docs/verification`](../../../docs/verification/README.md) packet. Repeat
+   [`docs/verification` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/verification/README.md) packet. Repeat
    both provider journeys through the stable domain and bind them to
    `BND-J12-dual-channel-production`; a deployment status alone is
    insufficient. During `ParallelCutover`, the one bounded Photon event must

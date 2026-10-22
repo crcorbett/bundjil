@@ -9,10 +9,9 @@ review_trigger: any SPEC/task or active-plan lifecycle change
 
 # Product specifications
 
-Current implementation intent requires both an active SPEC/task here and an
-entry under [`../exec-plans/active/`](../exec-plans/active/). Completed task
-ledgers remain beside their SPECs for provenance; they are not default current
-context.
+Use a short specification for a new product feature or an unresolved design decision.
+Ordinary fixes and cleanup can be described in their PR. Historical specifications
+are background only; their task ledgers remain in Git history.
 
 ## Proposed
 
@@ -24,12 +23,7 @@ No product specification is currently active.
 
 ## Implemented or superseded history
 
-The historical ledgers retain heterogeneous terminal provenance, including
-ledger-level `completed` and `implemented` states. The Vercel promotion ledger
-also retains a historical, scoped `approval.status: granted`. Every individual
-entry in those ledgers' required `tasks` arrays is completed, but that does not
-flatten the distinct ledger-level lifecycle or recorded approval fields. None
-is standing authority.
+These documents describe past work, not current provider state or permission.
 
 | SPEC                                                                                                                 | Lifecycle note                                                                                                                |
 | -------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
@@ -47,7 +41,7 @@ is standing authority.
 | [Eve Channel runtime ownership and supervision](eve-channel-runtime-ownership.md)                                    | Implemented runtime/supervision history; five-pass audit accepted                                                             |
 | [Eve Effect agent spike](eve-effect-agent-spike.md)                                                                  | Implemented spike history                                                                                                     |
 | [Executor MCP connection](executor-mcp-connection.md)                                                                | Implemented rollout history; not current provider truth                                                                       |
-| [Harness-governance documentation](harness-governance-documentation.md)                                              | Implemented local harness; HGI-309 remains separately deferred                                                                |
+| [Harness-governance documentation](harness-governance-documentation.md)                                              | Historical harness; audit machinery retired by the simplification                                                             |
 | [Hosted Eve runtime qualification and durable handoff](hosted-eve-runtime-qualification-and-durability.md)           | Implemented handoff and accepted Preview history; combined Production qualification remains inconclusive                      |
 | [Schema-driven Channels and Production promotion](photon-channel-provider.md)                                        | Implemented dual-provider rollout; dated receipt owns provider truth                                                          |
 | [Repository naming cleanup](repo-naming-cleanup.md)                                                                  | Implemented migration history                                                                                                 |

@@ -52,7 +52,7 @@ receipt and stores only integrity-checked sanitized detail.
   consequential steps.
 - Critical journeys, proof packets, bounded command receipts, and retained
   evidence are owned by
-  [`docs/verification/`](../../docs/verification/README.md). External systems
+  [`docs/verification/` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/verification/README.md). External systems
   remain authoritative for current state; a packet proves only its exact
   candidate, target, authority, observation, and stated postcondition.
 

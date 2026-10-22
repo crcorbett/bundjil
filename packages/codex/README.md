@@ -98,7 +98,7 @@ target-owned procedures and are not general setup instructions.
   their executable contracts, not provider authority or current state.
 - Dated provider responses, deployment observations, and journey proof are
   routed through
-  [`docs/verification/`](../../docs/verification/README.md). External systems
+  [`docs/verification/` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/verification/README.md). External systems
   still own current state; a retained packet proves only its exact target and
   observation window.
 

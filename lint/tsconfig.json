@@ -1,0 +1,9 @@
+{
+  "extends": "../tooling/tsconfig.json",
+  "include": [
+    "boundary-audit.ts",
+    "boundary-audit.test.ts",
+    "boundary-exceptions.ts"
+  ],
+  "exclude": ["fixtures/**", "codec-provenance.fixture.ts"]
+}

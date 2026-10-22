@@ -210,7 +210,7 @@ accepted dependency order:
   Workflow turn completed in 78.321 seconds.
 - No supported override seam or measured need exists, so the hosted default is
   retained. The former
-  [`HEQ-timeout-readback-2026-07-25.json`](../../evidence/verification/packets/HEQ-timeout-readback-2026-07-25.json)
+  [`HEQ-timeout-readback-2026-07-25.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/HEQ-timeout-readback-2026-07-25.json)
   packet is superseded by the accepted Preview packet and shared hosted detail.
 
 ### `qualify-final-preview` — accepted
@@ -231,7 +231,7 @@ accepted dependency order:
 - The initial two-callback fan-out journey produced two responses and is
   explicitly rejected. Accepted evidence follows sole-Preview isolation.
 - The accepted packet is
-  [`HEQ-preview-qualification-accepted-2026-07-25.json`](../../evidence/verification/packets/HEQ-preview-qualification-accepted-2026-07-25.json).
+  [`HEQ-preview-qualification-accepted-2026-07-25.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/HEQ-preview-qualification-accepted-2026-07-25.json).
   Sendblue routing and all branch-scoped proof variables were restored.
 
 ### `qualify-production-candidate` — completed with inconclusive aggregate
@@ -250,9 +250,9 @@ accepted dependency order:
   candidate-specific exact duplicate oracle therefore remains inconclusive;
   no synthetic identity or historical receipt is substituted.
 - The new packet is
-  [`HEQ-production-qualification-2026-07-25.json`](../../evidence/verification/packets/HEQ-production-qualification-2026-07-25.json).
+  [`HEQ-production-qualification-2026-07-25.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/HEQ-production-qualification-2026-07-25.json).
   The former
-  [`HEQ-production-qualification-blocked-2026-07-25.json`](../../evidence/verification/packets/HEQ-production-qualification-blocked-2026-07-25.json)
+  [`HEQ-production-qualification-blocked-2026-07-25.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/HEQ-production-qualification-blocked-2026-07-25.json)
   packet is superseded.
 - Production was not promoted. Final readback restores Production
   `dpl_E5bptPZXpfyTmQXwcgz5oLxvcSYY`, Preview
@@ -262,14 +262,14 @@ accepted dependency order:
 ### `terminal-five-pass-audit` — completed
 
 - The earlier local-only audit and
-  [`HEQ-terminal-five-pass-audit-2026-07-25.json`](../../evidence/verification/packets/HEQ-terminal-five-pass-audit-2026-07-25.json)
+  [`HEQ-terminal-five-pass-audit-2026-07-25.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/HEQ-terminal-five-pass-audit-2026-07-25.json)
   are superseded because later hosted authority and receipt-bearing work
   changed dependency evidence.
 - The replacement audit ran exactly once after hosted packets, restoration
   readback, and focused gates were current. All five passes accepted with no
   findings, and `bun run verification` passed during that audit.
 - The accepted successor is
-  [`HEQ-terminal-five-pass-hosted-audit-2026-07-25.json`](../../evidence/verification/packets/HEQ-terminal-five-pass-hosted-audit-2026-07-25.json).
+  [`HEQ-terminal-five-pass-hosted-audit-2026-07-25.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/HEQ-terminal-five-pass-hosted-audit-2026-07-25.json).
   It preserves accepted Preview and inconclusive combined Production without
   upgrading the missing Photon exact duplicate oracle.
 

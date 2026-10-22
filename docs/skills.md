@@ -29,10 +29,10 @@ from its agent skill folders to a personal installation.
    paths and commands; the plugin holds the shared instructions. Record the
    version used in the task's evidence when a proof record is required.
 
-This is an agent startup requirement. The old checks for copied shared
-skills have been removed. Code, package and documentation checks remain; they
-do not prove that an agent refreshed its installation or that an online lookup
-succeeded.
+This is an agent startup requirement. Routine verification checks code and
+configuration; it does not prove that an online plugin lookup succeeded.
+The local documentation profile keeps maintenance proportional: update affected
+owners, without audit ledgers or receipt-only PRs.
 
 ## Shared skills
 

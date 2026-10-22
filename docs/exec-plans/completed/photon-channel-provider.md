@@ -14,7 +14,7 @@ Status: Complete — dual-Channel Production accepted
 
 Spec: [`../../product-specs/photon-channel-provider.md`](../../product-specs/photon-channel-provider.md)
 
-Task ledger: [`../../product-specs/photon-channel-provider.tasks.json`](../../product-specs/photon-channel-provider.tasks.json)
+Task ledger: [`../../product-specs/photon-channel-provider.tasks.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/product-specs/photon-channel-provider.tasks.json)
 
 ## Execution rule
 
@@ -188,7 +188,7 @@ Removal order:
 - Eve's framework state may receive one complete encoded snapshot assignment
   in the thin adapter. Domain services return immutable decoded values.
 - Any primitive forced by a third-party signature is confined to its exact
-  adapter symbol and admitted to `tooling/boundary-exceptions.ts` only after a
+  adapter symbol and admitted to `lint/boundary-exceptions.ts` only after a
   focused negative fixture proves the exception cannot broaden.
 
 ## Consumer journeys to re-prove
@@ -226,14 +226,14 @@ internal state/status/test structure:
 
 ### Promotion task progress
 
-| Task                               | Status    | Acceptance receipt                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| ---------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Reopen SPEC and plan               | Completed | PRD review and writer phases specified all promotion owners and gates; every repository check passed with no live mutation                                                                                                                                                                                                                                                                                                                                                                     |
-| Build promotion contracts          | Completed | Free managed-shared contracts, fail-closed preflight, current docs/governance, 20 Photon tests, 16 preflight tests, and full verification passed                                                                                                                                                                                                                                                                                                                                               |
-| Reconcile Photon and prove Preview | Completed | Pushed source `daab3e04ef4a7ae043904893a6ae9ee05d79a83e` and READY deployment `dpl_HL8XcE9GRRYtQBUSaujhebzdrKK4` proved signed ingress, same-ID `503`/`204` provider retry suppression, one Eve turn, one accepted reply, both provider typing transitions, scoped release, and one handset reply. Visible handset typing remains unproved. See the [accepted Preview receipt](../../verification/photon-preview-accepted-2026-07-23.md).                                                      |
-| Stage dual-provider Production     | Completed | Pushed source `2e798f7722d46bd8f1ba34ca75b14cebcdb2e30b` produced READY immutable candidate `dpl_GtD9GPLZda5S2fqdCyUQCwkPbbKG` with clean bindings, exact provider inventories, both signed routes, passed staged preflight, and the explicit stable domain unchanged. See the [stage receipt](../../verification/channel-production-staged-2026-07-23.md).                                                                                                                                    |
-| Promote and prove Production       | Completed | Accepted deployment `dpl_GtD9GPLZda5S2fqdCyUQCwkPbbKG` now owns the stable domain. Separate Photon and Sendblue handset journeys each produced one Eve reply; exact real provider identities redelivered as duplicate `204` with zero second external response; both typing transitions were provider-accepted; Photon visible typing was observed while Sendblue visible typing remains unproved. See the [Production receipt](../../verification/channel-production-accepted-2026-07-23.md). |
-| Reconcile docs and final audit     | Completed | The final five-pass audit accepted ownership/call graphs, Effect/Schema/Layer quality, provider and full repository proof, docs/authority/rollback routing, and adversarial legacy/secret/drift scans. It corrected the post-promotion preflight wording, archived this plan, and retained Sendblue visible typing plus Photon retry-origin limitations in the ledger.                                                                                                                         |
+| Task                               | Status    | Acceptance receipt                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ---------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Reopen SPEC and plan               | Completed | PRD review and writer phases specified all promotion owners and gates; every repository check passed with no live mutation                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| Build promotion contracts          | Completed | Free managed-shared contracts, fail-closed preflight, current docs/governance, 20 Photon tests, 16 preflight tests, and full verification passed                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| Reconcile Photon and prove Preview | Completed | Pushed source `daab3e04ef4a7ae043904893a6ae9ee05d79a83e` and READY deployment `dpl_HL8XcE9GRRYtQBUSaujhebzdrKK4` proved signed ingress, same-ID `503`/`204` provider retry suppression, one Eve turn, one accepted reply, both provider typing transitions, scoped release, and one handset reply. Visible handset typing remains unproved. See the [accepted Preview receipt (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/verification/photon-preview-accepted-2026-07-23.md).                                                      |
+| Stage dual-provider Production     | Completed | Pushed source `2e798f7722d46bd8f1ba34ca75b14cebcdb2e30b` produced READY immutable candidate `dpl_GtD9GPLZda5S2fqdCyUQCwkPbbKG` with clean bindings, exact provider inventories, both signed routes, passed staged preflight, and the explicit stable domain unchanged. See the [stage receipt (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/verification/channel-production-staged-2026-07-23.md).                                                                                                                                    |
+| Promote and prove Production       | Completed | Accepted deployment `dpl_GtD9GPLZda5S2fqdCyUQCwkPbbKG` now owns the stable domain. Separate Photon and Sendblue handset journeys each produced one Eve reply; exact real provider identities redelivered as duplicate `204` with zero second external response; both typing transitions were provider-accepted; Photon visible typing was observed while Sendblue visible typing remains unproved. See the [Production receipt (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/verification/channel-production-accepted-2026-07-23.md). |
+| Reconcile docs and final audit     | Completed | The final five-pass audit accepted ownership/call graphs, Effect/Schema/Layer quality, provider and full repository proof, docs/authority/rollback routing, and adversarial legacy/secret/drift scans. It corrected the post-promotion preflight wording, archived this plan, and retained Sendblue visible typing plus Photon retry-origin limitations in the ledger.                                                                                                                                                                                                                        |
 
 ### Final docs-maintainer impact ledger
 
@@ -303,7 +303,7 @@ that no line or billing mutation occurred, but its Business-upgrade conclusion
 is superseded. Task 2 is reopened to replace the preflight, management,
 authority, runbook, journey, and proof contracts. Task 3 resumes only after
 those corrected contracts pass. See the retained
-[`Photon resource reconciliation receipt`](../../verification/photon-resource-reconciliation-2026-07-21.md).
+[`Photon resource reconciliation receipt` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/verification/photon-resource-reconciliation-2026-07-21.md).
 
 ### Corrected-contract docs-maintainer accounting
 
@@ -427,7 +427,7 @@ The message-first attempt then threw during its single send with no acceptance
 identity. Because that outcome is uncertain, it was not retried. The exact
 Preview webhook and bypass remain active pending handset or provider-supported
 readback. The retained
-[`partial Preview receipt`](../../verification/photon-preview-2026-07-21.md)
+[`partial Preview receipt` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/verification/photon-preview-2026-07-21.md)
 owns the proof/non-claim boundary.
 
 - **Change required:** active task evidence, this execution record, verification
@@ -485,7 +485,7 @@ owns the proof/non-claim boundary.
 Each task records focused commands plus:
 
 ```bash
-bun run check:boundaries
+bun run check
 bun run check:effect-setup
 bun run check:skills
 bun run verification

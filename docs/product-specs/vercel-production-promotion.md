@@ -29,7 +29,7 @@ duplicate delivery.
 
 The canonical corrective requirements and accepted implementation task live in
 [`sendblue-eve-channel.md`](./sendblue-eve-channel.md) and
-[`sendblue-eve-channel.tasks.json`](./sendblue-eve-channel.tasks.json). The
+[`sendblue-eve-channel.tasks.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/product-specs/sendblue-eve-channel.tasks.json). The
 required corrective end state is one active receive webhook on the shared
 account/line, targeting the stable Production host. Preview configuration and
 immutable proof may remain historical, but Preview provider ingress and its

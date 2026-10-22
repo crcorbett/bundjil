@@ -511,7 +511,7 @@ bun run --filter @bundjil/agent check-types
 bun run --filter @bundjil/agent test
 bun run --filter @bundjil/agent build
 bun run --filter @bundjil/agent preflight:production
-bun run check:boundaries
+bun run check
 bun run check:effect-setup
 
 bun run check:authority

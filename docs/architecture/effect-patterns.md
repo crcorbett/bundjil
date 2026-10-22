@@ -272,7 +272,7 @@ native-class error checks, unsafe casts, public raw causes, duplicated DTOs,
 and generic wrapper/helper modules are forbidden.
 
 If a third-party signature unavoidably requires a primitive, register the exact
-adapter symbol in `tooling/boundary-exceptions.ts`. Do not widen a public
+adapter symbol in `lint/boundary-exceptions.ts`. Do not widen a public
 service contract or add a cast to satisfy it. Follow
 `development-workflows:effect-client-wrapper` when creating or reviewing the
 wrapper.
@@ -423,7 +423,7 @@ removing or adding a matching occurrence fails lint as stale or unexplained.
 Package/app typechecks and the configured Effect language service are also
 required.
 
-`bun run check:boundaries` also rejects raw Promise coordination in owned
+`bun run check` also rejects raw Promise coordination in owned
 production source. A framework callback may return one Promise at its exact
 host edge, but parallelism, racing, interruption, and failure composition stay
 inside the application-owned Effect runtime.
@@ -573,7 +573,7 @@ implementation pattern.
 
 ## Boundary Provenance Audit
 
-`bun run check:boundaries` is the root TypeScript compiler-API audit for
+`bun run check` is the root TypeScript compiler-API audit for
 handwritten app/package production source and operator scripts. It checks
 exported boundary signatures and named adapters for raw primitives, primitive
 semantic config, synchronous codecs, direct JSON, raw fetch/response readers,
@@ -581,12 +581,12 @@ and unsafe boundary assertions. Diagnostics name the file, line, rule, symbol,
 and codec-based remediation.
 
 Third-party or framework constraints belong only in
-`tooling/boundary-exceptions.ts`. Every entry names one exact file and symbol,
+`lint/boundary-exceptions.ts`. Every entry names one exact file and symbol,
 its owner, boundary kind, canonical codec/service, admitted syntax, and reason.
 The audit fails stale entries, so a change must remove an entry when its exact
 external/framework constraint no longer exists rather than leave an obsolete
 baseline behind. Do not add counts, line-number allowlists, globs, or directory
-exemptions. `bun run test:boundaries` owns positive and negative source fixtures
+exemptions. `bun run test:lint` owns positive and negative source fixtures
 for the audit.
 
 ## Implementation review

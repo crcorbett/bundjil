@@ -24,7 +24,7 @@ not project source.
 
 After `bun install`, inspect the installed Eve package at `node_modules/eve`.
 For this repo, installed `node_modules/eve/docs` is the authoritative Eve docs
-source because it matches the committed `eve@0.20.0` package. Use it before
+source because it matches the committed `eve@0.29.5` package. Use it before
 copying patterns from the local Eve source checkout or the personal-agent
 template.
 
@@ -49,7 +49,7 @@ Useful installed paths:
   constants used by `eve dev`.
 
 The installed CLI help and runtime constants say `eve dev` defaults to `$PORT`,
-then `2000` for `eve@0.20.0`. The packaged CLI markdown still says `3000` in
+then `2000` for `eve@0.29.5`. The packaged CLI markdown still says `3000` in
 its option table, so use CLI help and
 `node_modules/eve/dist/src/internal/nitro/host/ports.d.ts` for the current port.
 

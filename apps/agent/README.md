@@ -122,7 +122,7 @@ before running fixtures; generated artifacts remain ignored local preflight.
 - Photon provider-only operation:
   [`runbooks/photon.md`](runbooks/photon.md).
 - Dated Photon lifecycle evidence:
-  [`docs/verification/photon-provider-proof-2026-07-21.md`](../../docs/verification/photon-provider-proof-2026-07-21.md).
+  [`docs/verification/photon-provider-proof-2026-07-21.md` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/verification/photon-provider-proof-2026-07-21.md).
 - Historical Eve, Executor, legacy Sendblue, and model-provider rollout
   provenance: [`docs/product-specs/`](../../docs/product-specs/index.md) and
   [`docs/exec-plans/completed/`](../../docs/exec-plans/completed/README.md).
@@ -132,7 +132,7 @@ before running fixtures; generated artifacts remain ignored local preflight.
   and an explicit authority envelope before consequential steps.
 - Critical journeys, proof packets, bounded command receipts, and retained
   evidence are owned by
-  [`docs/verification/`](../../docs/verification/README.md). External systems
+  [`docs/verification/` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/verification/README.md). External systems
   remain authoritative for current state; a packet proves only its exact
   candidate, target, authority, observation, and stated postcondition.
 

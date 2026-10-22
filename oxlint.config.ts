@@ -25,7 +25,7 @@ export default defineConfig({
     ".claude/**",
     ".cursor/**",
     "lint/fixtures/**",
-    "tooling/codec-provenance.fixture.ts",
+    "lint/codec-provenance.fixture.ts",
     "tools/oxlint/anti-slop/**",
   ],
   jsPlugins: [
@@ -64,7 +64,6 @@ export default defineConfig({
         "apps/codex-proxy/src/env.ts",
         "packages/codex/src/provider/contracts.ts",
         "packages/photon/src/client.ts",
-        "tooling/authority-policy.ts",
       ],
       rules: {
         "anti-slop/no-unknown-parameters": "off",
@@ -76,7 +75,6 @@ export default defineConfig({
       files: [
         "packages/codex/src/provider/contracts.ts",
         "packages/photon/src/client.ts",
-        "tooling/authority-policy.ts",
       ],
       rules: {
         "anti-slop/no-runtime-typeof": "off",
@@ -85,7 +83,7 @@ export default defineConfig({
     {
       // The SDK failure observer owns a deliberately opaque provider value;
       // the authority parser owns a deliberately open YAML mapping.
-      files: ["packages/photon/src/client.ts", "tooling/authority-policy.ts"],
+      files: ["packages/photon/src/client.ts"],
       rules: {
         "anti-slop/no-known-value-widening": "off",
       },
@@ -100,12 +98,6 @@ export default defineConfig({
       files: ["packages/photon/src/client.ts"],
       rules: {
         "anti-slop/no-unknown-returns": "off",
-      },
-    },
-    {
-      files: ["tooling/authority-policy.ts"],
-      rules: {
-        "anti-slop/no-unsafe-dictionary-type": "off",
       },
     },
     {

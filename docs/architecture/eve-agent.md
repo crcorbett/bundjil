@@ -13,7 +13,7 @@ This document owns the durable source-backed topology and invariants of the
 Eve app. It does not assert a current Vercel deployment, provider connection,
 webhook registration, credential binding, or handset outcome. External systems
 own those facts at readback time. The dated reconciliation and its limitation
-are in [`HGI-301-eve-reconciliation.json`](../documentation-audit/HGI-301-eve-reconciliation.json).
+are in [`HGI-301-eve-reconciliation.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/documentation-audit/HGI-301-eve-reconciliation.json).
 
 ## Durable topology
 
@@ -72,7 +72,7 @@ As of the installed Eve `0.29.5`, that enhancement prerequisite is unavailable.
 resolver receives `event: unknown` and a session-level context, not a stable
 turn, step, or attempt identity. The documented stream `meta.id` exists only
 after durable emission and cannot be repurposed as a pre-egress resolver input.
-The [dated local receipt](../evidence/verification/packets/codex-terra-eve-correlation-blocked-2026-08-09.json)
+The [dated local receipt (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/codex-terra-eve-correlation-blocked-2026-08-09.json)
 retains this limitation. Do not add a fallback bridge from message contents,
 telemetry, internal Eve source, process state, proxy-only counters, or a
 standalone receipt that cannot meet the required correlation contract.
@@ -333,7 +333,7 @@ The configured routes, webhook targets, deployment protection, environment
 bindings, provider resources, and delivery results are deliberately absent.
 Use [`apps/agent/runbooks/`](../../apps/agent/runbooks/README.md) for exact
 operations, [`docs/operations/authority-model.md`](../operations/authority-model.md)
-for the authority contract, and [`docs/verification/`](../verification/README.md)
+for the authority contract, and [`docs/verification/` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/verification/README.md)
 for bounded journey packets.
 
 Any Channel promotion requires fresh Vercel, provider, storage, and deployment

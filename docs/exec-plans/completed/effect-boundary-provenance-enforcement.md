@@ -32,18 +32,18 @@
 ### Parent Audit Pass 1 - Ownership And Call Graph
 
 - Status: Completed
-- Evidence: Root `tooling/boundary-audit.ts` owns the compiler-API check and
+- Evidence: Root `lint/boundary-audit.ts` owns the compiler-API check and
   imports only TypeScript plus the root registry; it never imports app/package
-  runtime modules. `tooling/boundary-exceptions.ts` records only exact
+  runtime modules. `lint/boundary-exceptions.ts` records only exact
   file/symbol/occurrence/rule adapter entries. Production source and operator scripts flow
-  through `bun run check:boundaries`; fixture source flows through
-  `bun run test:boundaries`.
+  through `bun run check`; fixture source flows through
+  `bun run test:lint`.
 
 ### Parent Audit Pass 2 - Effect And Implementation Quality
 
 - Status: Completed
-- Evidence: Reviewed `tooling/boundary-audit.ts` and
-  `tooling/boundary-exceptions.ts`: no runtime behavior or provider wiring
+- Evidence: Reviewed `lint/boundary-audit.ts` and
+  `lint/boundary-exceptions.ts`: no runtime behavior or provider wiring
   changed, no package/helper layer was added, and exception matching is exact
   on file, symbol, occurrence, and rule. The audit uses a TypeScript `Program`
   and type checker for public signatures and codec Type/Encoded provenance; its
@@ -54,9 +54,9 @@
 ### Parent Audit Pass 3 - Verification And Evidence
 
 - Status: Completed
-- Evidence: `bun run test:boundaries` passed 22 positive/negative fixture,
+- Evidence: `bun run test:lint` passed 22 positive/negative fixture,
   occurrence, codec-side, and stale/duplicate-exception tests;
-  `bun run check:boundaries`, `tsc --project tooling/tsconfig.json`, Ultracite,
+  `bun run check`, `tsc --project tooling/tsconfig.json`, Ultracite,
   Knip, all seven workspace typechecks, and 223 existing package/app tests
   passed. `bun --env-file=apps/agent/.env.preview.local run verification`
   passed. No live or browser proof is required because runtime output did not

@@ -3,11 +3,9 @@
   "include": [
     "../../tooling/schemas/bounded-receipt.schema.json",
     "../../tooling/schemas/authority-envelope.schema.json",
-    "../../tooling/schemas/control-record.schema.json",
     "../../alchemy.run.ts",
     "../../alchemy.preview.run.ts",
     "../../alchemy.stable.run.ts",
-    "../../docs/standards/alchemy-infrastructure-drift.control.json",
     "./scripts/**/*.ts",
     "./schemas/**/*.json",
     "./src/**/*.ts",
