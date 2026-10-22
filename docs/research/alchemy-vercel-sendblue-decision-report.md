@@ -1225,7 +1225,7 @@ Repository checks:
 
 ```bash
 git status --short
-bun run check:boundaries
+bun run check
 bun run check:effect-setup
 bun run check:skills
 bun run verification
@@ -1248,7 +1248,7 @@ implementation slice. Until then, the only documented repository gates are the
 existing root checks:
 
 ```bash
-bun run check:boundaries
+bun run check
 bun run check:effect-setup
 bun run check:skills
 bun run verification

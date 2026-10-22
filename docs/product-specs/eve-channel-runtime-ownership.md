@@ -604,7 +604,7 @@ Every code task must separately verify:
 - correct Fiber, Scope, Layer, Service, and ManagedRuntime ownership;
 - Effect language-server diagnostics for every changed TypeScript file;
 - zero unexplained boundary findings and zero stale exact exceptions;
-- focused tests plus `bun run check:boundaries`,
+- focused tests plus `bun run check`,
   `bun run check:effect-setup`, `bun run check:docs`,
   `bun run check:authority`,
   `bun run check:controls`, `bun run check:verification`; and

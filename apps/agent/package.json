@@ -15,7 +15,8 @@
     "build": "eve build",
     "check-types": "tsc --noEmit",
     "preflight:production": "bun scripts/production-preflight.ts",
-    "test": "eve build && VERCEL=1 eve build && vitest run"
+    "test": "vitest run",
+    "build:vercel": "VERCEL=1 eve build"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^3.0.5",

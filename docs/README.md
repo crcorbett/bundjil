@@ -1,85 +1,26 @@
----
-document_type: documentation-router
-lifecycle: current
-authority: canonical
-owner: bundjil-documentation-owner
-last_reviewed: 2026-08-01
-review_trigger: any docs class, root route, SPEC, plan, runbook, proof, research, provider, app, package, or lifecycle change
----
-
 # Bundjil documentation
 
-This is the sole maintainer-document lifecycle and truth-layer router.
-`README.md` is the public repository entry point; `AGENTS.md` is the terse
-task map; `docs/architecture/README.md` owns current durable architecture.
+Start with the owner of the code being changed. Keep instructions beside their
+owner and update them when behaviour changes. Do not create audit ledgers,
+approval inventories or receipt-only PRs for ordinary changes.
 
-## Truth layers
+- [Architecture](architecture/README.md): apps, packages and shared contracts.
+- [Code rules](architecture/effect-patterns.md), [package boundaries](architecture/repo-structure.md) and [React composition](architecture/frontend-composition.md).
+- [Checks](architecture/testing-and-quality.md): lint, unused code, types, tests and builds.
+- [Current work](product-specs/index.md) and [active plans](exec-plans/active/README.md).
+- [Agent](../apps/agent/README.md) and [proxy](../apps/codex-proxy/README.md): purpose, commands and public contracts.
+- [Agent operations](../apps/agent/runbooks/README.md) and [proxy operations](../apps/codex-proxy/runbooks/README.md): deployment, recovery and credential handling.
+- [Authority](operations/authority-model.md): permission and deployment safeguards.
+- [Credentials and environments](operations/doppler-environment-inventory.md).
+- [Development skills](skills.md) and [reference repositories](reference-repositories.md).
 
-Use the strongest applicable owner and link rather than copy:
+Code and configuration describe intended behaviour. External readback describes
+what is running at that time. A passed local test does not prove a deployment or
+message delivery. Keep release results in the PR or task, with the source commit,
+checks, deployment IDs, limitations and rollback targets.
 
-1. External systems own their current external state at readback time.
-2. Code, configuration, Schemas, package exports, workflows, and generated
-   sources own executable state.
-3. Current architecture and enforced standards own durable boundaries.
-4. Target-owned runbooks own repeatable consequential operations.
-5. Dated proof/evidence owns one artifact/environment/authority observation,
-   its limitations, and its rollback identity.
-6. Active SPEC/tasks and execution plans own current implementation intent.
-
-A deployment ID, readiness assertion, webhook observation, provider response,
-or completed plan is not standing current truth. Repository proof cannot grant
-authority for a later provider action.
-
-## Metadata and lifecycle
-
-New or materially revised maintainer docs separate `document_type`,
-`lifecycle`, `authority`, and `owner`. Current durable docs also record
-`last_reviewed` and `review_trigger`; superseded/tombstone docs record a
-successor and reason.
-
-Lifecycle values are `proposed`, `current`, `implemented`,
-`superseded`, `historical`, `evidence`, `reference`, `failed`,
-`inconclusive`, `tombstone`, and `archived`. Authority values are
-`canonical`, `supporting`, `generated`, and `external`.
-
-## Routes
-
-| Need                               | Owner                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Use                                                                                                                                                 |
-| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Current architecture               | [`architecture/README.md`](architecture/README.md)                                                                                                                                                                                                                                                                                                                                                                                                                         | Durable architecture route. Root `ARCHITECTURE.md` is a tombstone; the retained mixed atlas is historical.                                          |
-| Effect and code rules              | [`architecture/effect-patterns.md`](architecture/effect-patterns.md), [`architecture/repo-structure.md`](architecture/repo-structure.md), [`architecture/frontend-composition.md`](architecture/frontend-composition.md)                                                                                                                                                                                                                                                   | Current enforced design rules.                                                                                                                      |
-| Verification commands              | [`architecture/testing-and-quality.md`](architecture/testing-and-quality.md)                                                                                                                                                                                                                                                                                                                                                                                               | Current local checks; not release/provider proof.                                                                                                   |
-| Current intent                     | [`product-specs/index.md`](product-specs/index.md) and [`exec-plans/active/README.md`](exec-plans/active/README.md)                                                                                                                                                                                                                                                                                                                                                        | Only genuinely active SPEC/tasks and plans; a deferred external boundary is not active intent.                                                      |
-| Completed plans and ledgers        | [`exec-plans/completed/README.md`](exec-plans/completed/README.md) and the implemented inventory in [`product-specs/index.md`](product-specs/index.md)                                                                                                                                                                                                                                                                                                                     | Retained provenance, never default policy.                                                                                                          |
-| Research and local references      | [`research/README.md`](research/README.md) and [`reference-repositories.md`](reference-repositories.md)                                                                                                                                                                                                                                                                                                                                                                    | Supporting context; revalidate mutable upstreams.                                                                                                   |
-| Agent app                          | [`../apps/agent/README.md`](../apps/agent/README.md)                                                                                                                                                                                                                                                                                                                                                                                                                       | App boundary and current public commands; no provider actuality or operator procedure.                                                              |
-| Codex proxy app                    | [`../apps/codex-proxy/README.md`](../apps/codex-proxy/README.md)                                                                                                                                                                                                                                                                                                                                                                                                           | App boundary and current public commands; no provider actuality or operator procedure.                                                              |
-| Package contracts                  | [`../packages/channel/README.md`](../packages/channel/README.md), [`../packages/photon/README.md`](../packages/photon/README.md), [`../packages/sendblue/README.md`](../packages/sendblue/README.md), [`../packages/eve/README.md`](../packages/eve/README.md), [`../packages/codex/README.md`](../packages/codex/README.md), [`../packages/store/README.md`](../packages/store/README.md), [`../packages/infrastructure/README.md`](../packages/infrastructure/README.md) | Package purpose, exports, and public commands.                                                                                                      |
-| Target-owned runbooks              | [`../apps/agent/runbooks/`](../apps/agent/runbooks/README.md) and [`../apps/codex-proxy/runbooks/`](../apps/codex-proxy/runbooks/README.md)                                                                                                                                                                                                                                                                                                                                | Exact app operations with preconditions, identity, target, authority gate, sequential steps, evidence, rollback, revocation, stop, and escalation.  |
-| Durable authority rationale        | [`operations/authority-model.md`](operations/authority-model.md) and [`operations/authority-register.json`](operations/authority-register.json)                                                                                                                                                                                                                                                                                                                            | Capability/observation/policy/authority separation plus machine-checked static envelopes; exact procedures remain app-owned.                        |
-| Workflow automation authority      | [`operations/automation-register.md`](operations/automation-register.md), [`operations/github-actions-lock.json`](operations/github-actions-lock.json), and `.github/workflows/**`                                                                                                                                                                                                                                                                                         | Admission, immutable action identity, convergence, stopping, rollback, and HGI-309 external-readback gates.                                         |
-| Environment and credential custody | [`operations/doppler-environment-inventory.md`](operations/doppler-environment-inventory.md)                                                                                                                                                                                                                                                                                                                                                                               | Source-to-consumer inventory, Doppler decisions, current owners, migration state, cleanup boundary, and clear provider non-claims.                  |
-| Controls and automation admission  | [`standards/controls.md`](standards/controls.md)                                                                                                                                                                                                                                                                                                                                                                                                                           | Failure owners, fixtures, false-positive/carrying cost, feedback promotion, loop states, metrics, retirement, and report-only freshness.            |
-| Critical journeys and proof        | [`verification/README.md`](verification/README.md)                                                                                                                                                                                                                                                                                                                                                                                                                         | Canonical journeys, proof packet schemas/templates, bounded receipts, evidence lifecycle, and clear local/Preview/Production/external claim limits. |
-| Harness epochs and effectiveness   | [`verification/harness-epochs.md`](verification/harness-epochs.md) and [`verification/effectiveness.md`](verification/effectiveness.md)                                                                                                                                                                                                                                                                                                                                    | Worker/tool/runtime/skill epoch identity, fresh scenarios, four clocks, accepted outcomes, intervention lifecycle, and requalification triggers.    |
-| Retained proof evidence            | [`evidence/README.md`](evidence/README.md)                                                                                                                                                                                                                                                                                                                                                                                                                                 | Exact-path sanitized packets and detail; outside default context and never standing provider truth.                                                 |
-| Audit/accounting                   | [`documentation-audit/README.md`](documentation-audit/README.md)                                                                                                                                                                                                                                                                                                                                                                                                           | Dated evidence and inventories, not policy.                                                                                                         |
-
-Failed/inconclusive work retains provenance, last successful step, observed
-state, escalation, resume trigger, recovery, limitations, and non-claims
-outside default current routes. Do not delete or move completed history,
-research, or raw evidence without an approved retention manifest.
-
-## Maintenance
-
-Every material PRD or ordinary slice invokes the repository-local
-`development-workflows:docs-maintainer`, then decides `Change required`, `Preserve`, or `N/A` for
-docs, READMEs, architecture, public/generated references, runbooks,
-proof/evidence, skills, lint/config/CI, and active SPEC/tasks. Update the
-earliest durable owner and necessary pointers in the same slice. Counts prove
-accounting only; semantic, consumer, runtime, and provider claims require
-boundary-matched evidence. Scheduled/background maintenance remains
-report-only unless attached implementation authority names the exact paths;
-policy publication requires separate approval and readback.
-
-Shared development workflows: [latest plugin and repository profiles](skills.md).
+Old audit records, proof packets and task ledgers remain in Git history. Links
+to a fixed historical commit are background only, never current instructions or
+permission. Keep useful operating steps, design decisions and recovery details
+in current docs. Update the relevant README or runbook in the same change; no
+separate documentation approval process is required.

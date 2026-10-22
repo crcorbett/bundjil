@@ -125,7 +125,7 @@ Baseline: `cb10720e1eb43396f4b3351143c11002a2e96cf8`.
   Layer, Service, Fiber, Scope/lifecycle primitives and forbidden runners,
   casts, manual transforms, native-class or switch policy, generic helpers,
   observers, `forkDetach`, and `MemoMap`; `bun run check:effect-setup`;
-  `bun run check:boundaries`; and the agent typecheck.
+  `bun run check`; and the agent typecheck.
 - Findings: the production slice directly uses `ManagedRuntime.runFork`,
   `Fiber.await`, and `Effect.runPromise`; expected ingress errors remain in the
   outer `catchTags` pipeline; request-local dispatch stays at the framework
@@ -170,7 +170,7 @@ test/channel-vertical.test.ts`.
   discovery roots; the shared Eve edge; and this active plan.
 - Commands: the corrected 6-test runtime/config focus; the 22-test
   boundary/lifecycle focus; Channel, Sendblue, Photon, and agent typecheck,
-  test, and build matrices; `bun run test:boundaries`; `bun run check`;
+  test, and build matrices; `bun run test:lint`; `bun run check`;
   `bun run test:lint`; `bun run knip`; all direct Effect, boundary, docs,
   skills, authority, controls, verification, and HGI-307 gates; and
   `git diff --check`. Agent build commands used only the documented synthetic

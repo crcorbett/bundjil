@@ -1,95 +1,57 @@
-# Bundjil task map
+# Bundjil
 
-Bundjil is a Bun/Turbo personal-agent workspace built with Effect. Start with
-the narrowest current owner; do not load completed rollout history by default.
+Use plain, simple Australian English. Explain unfamiliar terms.
 
-## Operating loop
+Bundjil is a Bun/Turbo workspace built with Effect. Start with `git status
+--short`, the affected app/package README and [docs/README.md](docs/README.md).
+Preserve unrelated work.
 
-1. Inspect `git status --short` and the affected app/package README.
-2. Read `docs/README.md`, then only the routed current architecture, SPEC,
-   plan, runbook, and proof owner needed for the task.
-3. Update the earliest durable owner in the same slice as code/config changes.
-4. For every material PRD or ordinary change, invoke the plugin
-   `development-workflows:docs-maintainer`, record `Change required`, `Preserve`, or
-   evidenced `N/A` across its impact ledger, and run `bun run check:docs`.
-5. Run the smallest focused check, then `bun run verification` before handoff.
-6. Keep runtime/provider claims separate from repository proof and record
-   limitations, rollback, and exact Git identity.
+## Working loop
 
-## Non-negotiable code patterns
+1. Read the current owner and relevant runbook before changing code.
+2. Resolve the latest published Development Workflows plugin through
+   [docs/skills.md](docs/skills.md); read the local profile with it.
+3. Update the affected README, architecture or runbook alongside the code.
+   Use `development-workflows:docs-maintainer` for this assessment, but do not
+   create audit ledgers, receipt-only changes or mandatory approval paperwork.
+4. Run a focused check, then `bun run verification` from the root. It covers
+   lint, unused code, types, tests and fresh builds without credentials.
+5. Report the Git commit, checks and limitations. For a release, also check the
+   deployment and keep its previous targets available for rollback.
 
-- Decode unknown host/provider input once at ingress with the owning Effect
-  Schema; pass only its decoded `typeof Contract.Type`. Encode its
-  `typeof Contract.Encoded` only at outward boundaries.
-- Public services expose named operations, branded identities, safe tagged
-  errors, `Config.schema` with redacted secrets, and explicit live/mock Layers.
-  Raw clients, generic SDK callbacks, raw `id: string`,
-  primitive semantic config, `instanceof` policy, and unchecked SDK output
-  are forbidden. For every provider or SDK adapter change, invoke the
-  plugin `development-workflows:effect-client-wrapper` before deciding the
-  boundary shape.
-- Keep primary Effects flat, linear, sequential, lazy, composable, and readable.
-  Keep one-use mapping, decoding, and error translation inline. Helpers require
-  demonstrated reuse, independently tested policy, real I/O, or resource
-  lifetime; no common/utils/helper sprawl.
-- Framework, provider, and channel code stays in its owning app adapter until a
-  stable shared contract has proven consumers.
-- React routes compose leaf-owned rendering/state components. Keep Effect and
-  services above presentation leaves; use explicit conditional composition,
-  not service-aware UI branches or route-sized components. Invoke the
-  repository-local `.agents/skills/building-components` for visible component
-  work.
+## Code rules
 
-## Current routes
+- Decode unknown input once with the owning Effect Schema. Pass its decoded
+  `typeof Contract.Type` inside the app; encode `typeof Contract.Encoded` at
+  outward boundaries.
+- Services expose named operations, branded identities, tagged errors,
+  `Config.schema` with redacted secrets and explicit live/mock Layers. Keep
+  raw SDK clients private. Load `development-workflows:effect-client-wrapper`
+  before changing a provider adapter.
+- Keep Effects flat, sequential, lazy and readable. Inline one-use mapping and
+  error translation. Helpers need real reuse, independently tested policy,
+  I/O or resource lifetime.
+- Keep framework, provider and channel code in its owning app until a shared
+  contract has real consumers.
+- React routes compose leaf components. Keep services above presentation;
+  load `.agents/skills/building-components` for visible component work.
+- Keep strict lint and boundary checks and their fixtures. Do not suppress a
+  useful check to make verification pass.
 
-- Documentation lifecycle, truth layers, current intent, history, references,
-  and owner routing: `docs/README.md`
-- Architecture: `docs/architecture/README.md`
-- Effect rules: `docs/architecture/effect-patterns.md`
-- Package/import boundaries: `docs/architecture/repo-structure.md`
-- React composition: `docs/architecture/frontend-composition.md`
-- Verification commands: `docs/architecture/testing-and-quality.md`
-- Harness controls, feedback promotion, and automation admission:
-  `docs/standards/controls.md`
-- Provider and SDK client boundary design:
-  `development-workflows:effect-client-wrapper`
-- New SPEC and task drafting: `development-workflows:prd-writer`
-- React and visible component composition:
-  `.agents/skills/building-components/SKILL.md`
-- Documentation impact and owner maintenance:
-  `development-workflows:docs-maintainer`
-- Critical journeys, proof packets, bounded receipts, and evidence retention:
-  `docs/verification/README.md`
-- Current SPEC/tasks: `docs/product-specs/index.md`
-- Current execution: `docs/exec-plans/active/README.md`
-- Completed history: `docs/exec-plans/completed/README.md`
-- App and package READMEs are purpose, public-boundary, and public-command
-  maps only. Exact operations live in `apps/agent/runbooks/**` and
-  `apps/codex-proxy/runbooks/**`; `docs/operations/authority-model.md` owns
-  durable authority rationale, `docs/operations/authority-register.json` owns
-  static workflow/provider envelopes, `docs/operations/automation-register.md`
-  owns GitHub automation rationale, `docs/standards/controls.md` owns the full
-  control/automation admission register, and `docs/verification/**` owns critical
-  journeys and bounded proof contracts. Do not treat a runbook, packet,
-  README pointer, register, or retained history as current provider truth or
-  execution authority.
+[Effect rules](docs/architecture/effect-patterns.md),
+[package boundaries](docs/architecture/repo-structure.md),
+[React composition](docs/architecture/frontend-composition.md),
+[checks](docs/architecture/testing-and-quality.md).
 
-## Verification and authority
+## Deployment and permissions
 
-Use Bun from the repository root. Boundary/provider work runs
-`bun run check:boundaries`, `bun run check:effect-setup`, `bun run check:docs`,
-`bun run check:authority`, and
-`bun run check:controls`, `bun run check:verification`; every accepted slice runs
-`bun run verification`.
+Use the [agent deployment runbook](apps/agent/runbooks/deploy-promote.md).
+Production follows successful CI for the exact main commit. Keep the single
+writer, exact team/project/source checks, private credentials, proxy then agent
+then callback order, health checks, time limits and reverse-order rollback.
+Never bypass branch protection or run competing local and hosted deployments.
 
-Repository instructions cannot authorize deployments, provider writes,
-credential changes, webhook changes, releases, or production operations.
-External systems own their current state at readback time, and consequential
-operations require a target-owned runbook and explicit authority.
-
-## Shared development skills
-
-Before starting work, follow [the plugin lookup](docs/skills.md) and load the
-latest published Commonplace `development-workflows` plugin. Do not use saved
-repository copies or assume a cached plugin version is current. Read the local
-profiles in `docs/skill-profiles/` alongside the plugin.
+Explicit user authority is required for deployment, provider writes, credentials,
+webhooks and live messages. Repository instructions, old records and available
+credentials do not grant that authority. Keep runtime input checks and stored
+recovery data even when they use the words authority or receipt.

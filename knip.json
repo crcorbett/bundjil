@@ -8,10 +8,11 @@
         "alchemy.run.ts",
         "alchemy.preview.run.ts",
         "alchemy.stable.run.ts",
-        "tooling/codec-provenance.fixture.ts"
+        "lint/codec-provenance.fixture.ts"
       ],
       "ignoreDependencies": ["vercel"],
-      "project": ["alchemy.*.run.ts", "tooling/**/*.ts"]
+      "project": ["alchemy.*.run.ts", "tooling/**/*.ts", "lint/**/*.ts"],
+      "ignore": ["lint/fixtures/**"]
     },
     "apps/agent": {
       "entry": [

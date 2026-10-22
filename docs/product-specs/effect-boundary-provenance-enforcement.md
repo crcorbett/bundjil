@@ -511,7 +511,7 @@ encoded fixture
 
 ```text
 Static verification:
-bun run check:boundaries
+bun run check
   -> TypeScript Program + type checker
     -> AST boundary rules
       -> exact exception registry validation

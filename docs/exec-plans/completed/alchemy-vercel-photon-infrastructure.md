@@ -3075,7 +3075,7 @@ Docs-maintainer integration ledger:
 | SPEC, tasks, plan, receipts and archive       | Change required | This addendum, task result and dated documentation-inventory correction own the combined source state without rewriting either terminal audit.  |
 
 The revision-bound
-[integration receipt](../../documentation-audit/alchemy-main-integration-inventory-correction-2026-08-01.json)
+[integration receipt (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/documentation-audit/alchemy-main-integration-inventory-correction-2026-08-01.json)
 binds final merge `4fc8ba1750524581c281ad97351bf0b1e6e29631` to ordered
 parents `f30172290a83bd7ce39dedf9ce57ef88883867d6` and
 `a270116f30aeb20d2087484c4f3fd4051f442897`. Its

@@ -887,7 +887,7 @@ token, GitHub secret, ruleset, deployment, alias, environment value, provider
 route or message was created or changed.
 
 The fixed blocked packet is
-[`automatic-production-personal-vercel-identity-blocked-2026-08-13.json`](../../evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json).
+[`automatic-production-personal-vercel-identity-blocked-2026-08-13.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json).
 It binds exact repository candidate `763199f07b6f2f0569442546e6ea7ef695c49a74`,
 the two workflow digests, external identity readback, unchanged postconditions,
 resume trigger, rollback and non-claims. The separate personal Cloudflare R2

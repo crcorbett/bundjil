@@ -314,9 +314,9 @@ automatic Production had not started.
 ## Evidence owners
 
 - Custody and external readback: the dated
-  [accepted callback and channel packet](../../evidence/verification/packets/automatic-production-callback-channels-accepted-2026-08-28.json)
+  [accepted callback and channel packet (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/automatic-production-callback-channels-accepted-2026-08-28.json)
   and its exact detail own the latest accepted hosted observations. The
-  separate [inconclusive drift packet](../../evidence/verification/packets/automatic-production-personal-vercel-drift-inconclusive-2026-08-21.json)
+  separate [inconclusive drift packet (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/automatic-production-personal-vercel-drift-inconclusive-2026-08-21.json)
   retains the eight write-only limitations.
 - Repository desired state: the canonical SPEC, task ledger, authority
   register, automation registers, runbook and verification router.

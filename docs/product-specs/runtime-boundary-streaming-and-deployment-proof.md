@@ -158,7 +158,7 @@ completion, alias/source/config identity and prior READY rollback deployments.
 One exact Personal Sendblue iMessage journey proves `RECEIVED` ingress,
 `DELIVERED` egress, the matching handset reply and separate provider-accepted
 typing start/stop transitions. The dated
-[`runtime-boundary-streaming-production-accepted-2026-08-10.md`](../verification/runtime-boundary-streaming-production-accepted-2026-08-10.md)
+[`runtime-boundary-streaming-production-accepted-2026-08-10.md` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/verification/runtime-boundary-streaming-production-accepted-2026-08-10.md)
 packet owns the sanitized receipts.
 
 Photon CLI authentication expired before final readback and the provider still
@@ -208,7 +208,7 @@ Rejected alternatives:
 | Fixture                            | Lifecycle          | Owner and compatibility/negative coverage                                                                                                                                                           |
 | ---------------------------------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Agent Build Output manifest oracle | Update             | `apps/agent/test/sendblue-build-route.test.ts`; retain exact route/dependency assertions and reject the obsolete path from a clean output state.                                                    |
-| Boundary provenance fixtures       | Update             | `tooling/boundary-audit.test.ts`; retain existing rules, add accepted raw HTTP signature and generic callback negatives, and keep framework entrypoint positives.                                   |
+| Boundary provenance fixtures       | Update             | `lint/boundary-audit.test.ts`; retain existing rules, add accepted raw HTTP signature and generic callback negatives, and keep framework entrypoint positives.                                      |
 | Codex HTTP substitutions           | Retire and replace | Retire `CodexResponsesFetchMock`; use test-owned Effect `HttpClient` Layers while preserving auth/header/status/network assertions.                                                                 |
 | Incremental SSE fixtures           | Create             | `packages/codex/test/codex-direct-provider.test.ts` and `apps/codex-proxy/test/proxy-handler.test.ts`; cover fragmentation, slow first byte, cancellation, oversize, failure, text, and tool calls. |
 | Agent model config fixture         | Update             | `apps/agent/test/model-provider.test.ts`; preserve model/auth/base-path behavior and add invalid owner-Schema cases without a production callback seam.                                             |

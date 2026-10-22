@@ -23,14 +23,14 @@ completed plan current intent.
   historical-ledger field classification, concise README scope, accounting,
   independent acceptance, full verification, and pushed Git identity are
   recorded in
-  [`HGI-300-validation.json`](../../documentation-audit/HGI-300-validation.json).
+  [`HGI-300-validation.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/documentation-audit/HGI-300-validation.json).
 - **HGI-301 — completed:** the accepted Eve architecture distinguishes durable
   source topology from mutable provider state, and the dated reconciliation
   receipt records the unavailable provider readback rather than a production
   inference. Current implementation guidance is risk-based; tool data,
   policy, and approval are explicitly separate; executable semantic fixtures
   and exact Git identity are recorded in
-  [`HGI-301-validation.json`](../../documentation-audit/HGI-301-validation.json).
+  [`HGI-301-validation.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/documentation-audit/HGI-301-validation.json).
 - **HGI-308 — completed:** local decision records defer
   the Eve Production claim, accept app-owned runbook ownership, retain
   occurrence-based boundary exceptions pending equivalent fixtures, establish
@@ -39,49 +39,49 @@ completed plan current intent.
   convergence, and effectiveness proof were unavailable; HGI-306 owns any
   future restoration and automation-admission evidence. Acceptance and exact
   Git identity are recorded in
-  [`HGI-308-validation.json`](../../documentation-audit/HGI-308-validation.json);
+  [`HGI-308-validation.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/documentation-audit/HGI-308-validation.json);
   the records do not establish provider state or operation authority.
 - **HGI-302 — completed:** bounded documentation and skill-mirror controls now
   emit bounded JSON diagnostics, reject semantic current-owner contradictions,
   inspect every local skill example, validate YAML metadata through Effect
   Schema, preserve the accepted occurrence-control equivalence bar, and keep
   the required mirrors complete. Acceptance and publication evidence is in
-  [`HGI-302-validation.json`](../../documentation-audit/HGI-302-validation.json).
+  [`HGI-302-validation.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/documentation-audit/HGI-302-validation.json).
 - **HGI-310 — completed:** the portable local docs-maintainer route, repository
   profile, mirror, PRD and ordinary-change integration, structured negative
   fixtures, six addressable fresh-context scenarios, clean-clone validation,
   and strict correction/re-acceptance are recorded in
-  [`HGI-310-validation.json`](../../documentation-audit/HGI-310-validation.json).
+  [`HGI-310-validation.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/documentation-audit/HGI-310-validation.json).
 - **HGI-303 — completed:** ten target-owned app runbooks and the durable
   authority model now route local, deployment, Executor, Sendblue, proxy auth,
   proof, reauthentication, incident, rollback, and revocation work. Structural
   policy checks, six dry-run receipts, full repository verification, fresh-context
   acceptance, and pushed semantic identity are recorded in
-  [`HGI-303-validation.json`](../../documentation-audit/HGI-303-validation.json).
+  [`HGI-303-validation.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/documentation-audit/HGI-303-validation.json).
 - **HGI-304 — completed:** CI, release-PR, and interactive-Claude desired
   source is bounded; ungoverned automatic review is retired; complete provider
   and interaction authority envelopes, immutable action ownership, emergency
   containment, executable negative controls, six fresh scenarios, full
   verification, and pushed Git identity are recorded in
-  [`HGI-304-validation.json`](../../documentation-audit/HGI-304-validation.json).
+  [`HGI-304-validation.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/documentation-audit/HGI-304-validation.json).
 - **HGI-305 — completed:** ten critical journeys, five proof-packet kinds,
   immutable evidence lifecycle, bounded Preview and Production-preflight
   receipts, false-success fixtures, honest deferred/inconclusive routes,
   accepted local proof, and fresh-context evidence are recorded in
-  [`HGI-305-validation.json`](../../documentation-audit/HGI-305-validation.json).
+  [`HGI-305-validation.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/documentation-audit/HGI-305-validation.json).
 - **HGI-306 — completed:** the routed control standard, eight typed controls,
   eleven fixture-backed automation/provider-loop states, measured
   occurrence-registry retention, report-only freshness candidate, feedback
   promotion, outcome/attention metrics, full verification, fresh-context
   acceptance, and semantic Git readback are recorded in
-  [`HGI-306-validation.json`](../../documentation-audit/HGI-306-validation.json).
+  [`HGI-306-validation.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/documentation-audit/HGI-306-validation.json).
 - **HGI-307 — completed:** one typed evaluation epoch binds the exact worker
   context, tools, runtimes, skills, base, twelve fresh scenarios, retained
   reports, four separate clocks, intervention decisions, nine impact surfaces,
   and exact docs/README inventories. Fresh review corrected the Sendblue
   acceptance boundary and direct local-skill routing; the stricter gate, full
   verification, semantic commit, push, and remote readback are recorded in
-  [`HGI-307-validation.json`](../../documentation-audit/HGI-307-validation.json).
+  [`HGI-307-validation.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/documentation-audit/HGI-307-validation.json).
 - **HGI-309 — deferred:** no provider qualification is admitted until a named
   owner separately approves one exact target operation with authority,
   rollback, and current readback. This retained deferred boundary does not
@@ -93,7 +93,7 @@ All repository-local HGI-300 through HGI-310 work is accepted. HGI-309 is a
 separately owned deferred provider-qualification boundary, not current
 implementation intent. This plan therefore moved from the active route to
 completed history on 2026-07-22. The correction evidence is retained at
-[`HGI-309-lifecycle-correction-validation.json`](../../documentation-audit/HGI-309-lifecycle-correction-validation.json).
+[`HGI-309-lifecycle-correction-validation.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/documentation-audit/HGI-309-lifecycle-correction-validation.json).
 It proves only the repository route and local checks; it does not approve,
 read, or change a provider.
 
@@ -110,5 +110,5 @@ Parent acceptance reproduced corpus/link receipts, passed held-out retrieval,
 Those checks do not prove provider/runtime/production state.
 
 HGI-301's source trace and `observedAt` limitation are retained in
-[`HGI-301-eve-reconciliation.json`](../../documentation-audit/HGI-301-eve-reconciliation.json).
+[`HGI-301-eve-reconciliation.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/documentation-audit/HGI-301-eve-reconciliation.json).
 It does not create a runbook, provider authority, or verification owner.

@@ -28,7 +28,7 @@ journeys proved signed ingress, one Eve result, one external response,
 exact-identity duplicate suppression, and both provider typing transitions.
 Both replies reached the handset; Photon visible typing was observed while
 Sendblue visible typing remains unproved. The dated
-[`channel-production-accepted-2026-07-23.md`](../verification/channel-production-accepted-2026-07-23.md)
+[`channel-production-accepted-2026-07-23.md` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/verification/channel-production-accepted-2026-07-23.md)
 receipt owns that external truth. This completed SPEC and its task ledger are
 historical intent/provenance, not standing authority or current provider truth.
 
@@ -753,7 +753,7 @@ domain and retain previous deployment/config references for rollback.
   value is copied or recovered. No `BUNDJIL_SENDBLUE_*`, unprefixed `KV_*`,
   copied replay credential, or old replay data is read, imported, or used as
   fallback.
-- `bun run check:boundaries`, `bun run check:effect-setup`,
+- `bun run check`, `bun run check:effect-setup`,
   focused package/app checks, negative legacy-pattern
   scans, `bun run verification`, and `git diff --check` pass.
 

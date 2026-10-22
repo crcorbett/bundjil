@@ -137,7 +137,7 @@ Retain source/deployment/config identity, sanitized Vercel readback, stored
 profile booleans, authority receipt, bounded receipt and detail digest,
 `observedAt`, true exit status, correlation/receipt phase, limitations, and
 non-claims in the matching
-[`docs/verification`](../../../docs/verification/README.md) Preview packet.
+[`docs/verification` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/verification/README.md) Preview packet.
 The packet must not be upgraded beyond the external readback it actually
 contains.
 

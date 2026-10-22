@@ -73,14 +73,14 @@ actuality.
 
 HGI-301 reconciles the current Eve architecture to source-backed topology and
 invariants. Its dated read-only reconciliation is addressable at
-[`HGI-301-eve-reconciliation.json`](../documentation-audit/HGI-301-eve-reconciliation.json);
+[`HGI-301-eve-reconciliation.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/documentation-audit/HGI-301-eve-reconciliation.json);
 it records that provider readback was unavailable in this implementation
 environment and therefore makes no production claim. Its semantic contradiction
 fixtures are executable acceptance evidence and remain available for HGI-302's
 broader future docs control.
 
 HGI-308 has accepted decision evidence at
-[`HGI-308-validation.json`](../documentation-audit/HGI-308-validation.json)
+[`HGI-308-validation.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/documentation-audit/HGI-308-validation.json)
 and its five schema-valid decision records. It defers the Eve Production claim,
 accepts app-owned runbooks and target-specific fallback readbacks, retains
 occurrence-based boundary exceptions pending equivalent fixtures, and accepts
@@ -138,8 +138,8 @@ On 2026-07-22, this accepted SPEC and its plan moved from the current/active
 routes to implemented/completed provenance. The move corrects an active-route
 contradiction: a deferred external-authority boundary is not active repository
 work. The retained correction candidate and local validation are
-[`HGI-309-lifecycle-correction-candidate.json`](../documentation-audit/HGI-309-lifecycle-correction-candidate.json)
+[`HGI-309-lifecycle-correction-candidate.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/documentation-audit/HGI-309-lifecycle-correction-candidate.json)
 and
-[`HGI-309-lifecycle-correction-validation.json`](../documentation-audit/HGI-309-lifecycle-correction-validation.json).
+[`HGI-309-lifecycle-correction-validation.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/documentation-audit/HGI-309-lifecycle-correction-validation.json).
 They preserve HGI-309's owner, approval, rollback, and current-readback
 requirements without treating any local verification as provider proof.

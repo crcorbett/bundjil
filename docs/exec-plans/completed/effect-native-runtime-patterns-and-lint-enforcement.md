@@ -825,7 +825,7 @@ honest terminal `deferred` disposition. Fresh Executor Personal identity
 readback found its sole Vercel connection authenticated as the account Cooper
 explicitly excluded, so token creation stopped before mutation. The bounded
 packet is
-[`automatic-production-personal-vercel-identity-blocked-2026-08-13.json`](../../evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json).
+[`automatic-production-personal-vercel-identity-blocked-2026-08-13.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json).
 
 This satisfies the terminal-audit dependency as a non-accepted terminal state,
 not as hosted proof. The audit must preserve explicit non-claims for hosted

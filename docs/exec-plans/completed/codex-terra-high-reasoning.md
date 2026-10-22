@@ -113,7 +113,7 @@ rejected. Production remains out of scope.
 The implementation order is deliberately narrow:
 
 1. `eve-supported-provider-correlation` is deferred after the blocked
-   [`codex-terra-eve-correlation-blocked-2026-08-09.json`](../../evidence/verification/packets/codex-terra-eve-correlation-blocked-2026-08-09.json).
+   [`codex-terra-eve-correlation-blocked-2026-08-09.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/codex-terra-eve-correlation-blocked-2026-08-09.json).
    `runtimeContext`, the post-emission stream `meta.id`, and internal
    `InstrumentationAttemptScope` are not a public pre-egress correlation seam.
 2. `proxy-atomic-attempt-receipt` is deferred and did not start without
@@ -153,7 +153,7 @@ second-request absence.
 ## Preview receipts
 
 The bounded result is
-[`codex-terra-preview-blocked-2026-08-03.json`](../../evidence/verification/packets/codex-terra-preview-blocked-2026-08-03.json).
+[`codex-terra-preview-blocked-2026-08-03.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/codex-terra-preview-blocked-2026-08-03.json).
 It records the exact Preview deployment IDs, safe configuration metadata,
 protected Eve model/context readback, and the blocked proxy readiness predicate.
 It does not establish Codex subscription acceptance. A successor authority
@@ -162,23 +162,23 @@ and proof-only Vercel protection path; it must then rerun the proxy proof and
 minimal Eve session/replay under a new packet identity.
 
 The successor
-[`codex-terra-preview-isolation-blocked-2026-08-04.json`](../../evidence/verification/packets/codex-terra-preview-isolation-blocked-2026-08-04.json)
+[`codex-terra-preview-isolation-blocked-2026-08-04.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/codex-terra-preview-isolation-blocked-2026-08-04.json)
 confirms that no Preview-only writable REST store is currently bound. It makes
 no OAuth, deployment, proxy, Eve, or Production claim.
 
 The further successor
-[`codex-terra-preview-upstash-billing-blocked-2026-08-04.json`](../../evidence/verification/packets/codex-terra-preview-upstash-billing-blocked-2026-08-04.json)
+[`codex-terra-preview-upstash-billing-blocked-2026-08-04.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/codex-terra-preview-upstash-billing-blocked-2026-08-04.json)
 records the Marketplace direct-store rejection without creating a billing
 relationship. It is historical only after the approved shared-store decision.
 
 The current successor
-[`codex-terra-preview-shared-upstash-binding-2026-08-04.json`](../../evidence/verification/packets/codex-terra-preview-shared-upstash-binding-2026-08-04.json)
+[`codex-terra-preview-shared-upstash-binding-2026-08-04.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/codex-terra-preview-shared-upstash-binding-2026-08-04.json)
 records the approved sensitive REST binding and its metadata readback. It
 does not prove reachability, OAuth, an encrypted profile, a deployment, SSE,
 or Eve replay.
 
 The upgraded Preview successor
-[`codex-terra-preview-live-eve-upgraded-2026-08-04.json`](../../evidence/verification/packets/codex-terra-preview-live-eve-upgraded-2026-08-04.json)
+[`codex-terra-preview-live-eve-upgraded-2026-08-04.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/codex-terra-preview-live-eve-upgraded-2026-08-04.json)
 records the Ready Eve `0.29.5` deployment, exact Terra/1050000 info, protected
 session completion, identical `startIndex=0` replay event counts, and the
 accessible Agent Runs metadata. It keeps the task blocked because the current

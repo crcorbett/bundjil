@@ -40,11 +40,9 @@ current architecture—not this overview.
 - [Current architecture](./docs/architecture/README.md)
 - [Current SPEC/tasks](./docs/product-specs/index.md)
 - [Current execution plans](./docs/exec-plans/active/README.md)
-- [Critical journeys and proof packets](./docs/verification/README.md)
 - [Completed history](./docs/exec-plans/completed/README.md)
 - [Target-owned agent runbooks](./apps/agent/runbooks/README.md)
-- [Bounded verification evidence](./docs/verification/README.md)
-- [App and package READMEs](./docs/README.md#routes) for local public commands
+- [App and package READMEs](./docs/README.md) for local public commands
   and boundaries
 
 Deployment revisions, readiness, webhook topology, provider observations,
@@ -68,24 +66,11 @@ for setup, publication and backfill commands.
 ## Getting started
 
 ```bash
-bun install
-bun run build
-bun run test
-bun run check:boundaries
-bun run check:effect-setup
-
-bun run check:authority
-bun run check:controls
-bun run check:verification
+bun install --frozen-lockfile
 bun run verification
 ```
 
-Use Bun from the repository root. Read the affected app/package README and
-`docs/architecture/testing-and-quality.md` before changing a boundary. New
-apps, channels, provider integrations, or durable package boundaries require an
-approved SPEC and execution plan.
-
-Install and authenticate the Doppler CLI before running `bun run verification`.
-That friendly command always selects `bundjil/dev`, whose two inputs are the
-documented synthetic Executor fixtures. Hosted CI stays credential-free and
-calls the internal verification command with those same non-secret values.
+Use Bun from the repository root. Verification covers lint, unused code, types,
+tests and builds with synthetic Executor settings. It needs no Doppler login or
+live credentials. See [checks](docs/architecture/testing-and-quality.md) for
+focused commands and [operations](apps/agent/runbooks/README.md) for deployment.

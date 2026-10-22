@@ -28,7 +28,7 @@ Proxy health reported `live` with `high` reasoning. Protected Eve reported
 reached `message.completed` and `session.waiting` without failure. One bounded
 Photon journey and one bounded Sendblue journey each showed delivery, visible
 typing and one complete reply. The accepted packet is
-[`automatic-production-callback-channels-accepted-2026-08-28.json`](../evidence/verification/packets/automatic-production-callback-channels-accepted-2026-08-28.json).
+[`automatic-production-callback-channels-accepted-2026-08-28.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/automatic-production-callback-channels-accepted-2026-08-28.json).
 
 Two limits remain recorded rather than hidden. Vercel cannot expose the prior
 values for eight changed write-only settings, so the zero-write drift report
@@ -290,7 +290,7 @@ access boundary even though `cooper.corbett@tilt.legal` is the account's
 primary contact address. Fresh team/project readback, not email-domain
 classification, is the pre-mutation identity control.
 The dated read-only receipt is
-[`automatic-production-personal-vercel-access-qualified-2026-08-20.json`](../evidence/verification/packets/automatic-production-personal-vercel-access-qualified-2026-08-20.json).
+[`automatic-production-personal-vercel-access-qualified-2026-08-20.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/automatic-production-personal-vercel-access-qualified-2026-08-20.json).
 
 The authenticated Vercel dashboard now exposes a project selector for access
 tokens after `Cooper Corbett's projects` is selected. That direct UI readback
@@ -699,7 +699,7 @@ scope. That was too strict: an email address identifies a user contact, not the
 Vercel teams and projects available to the connection.
 
 The blocked packet at
-[`automatic-production-personal-vercel-identity-blocked-2026-08-13.json`](../evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json)
+[`automatic-production-personal-vercel-identity-blocked-2026-08-13.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/automatic-production-personal-vercel-identity-blocked-2026-08-13.json)
 still owns the attempted work, unchanged postconditions, rollback and
 non-claims for that date. Its identity-classification conclusion is superseded
 by the 2026-08-20 readback, which returned only Personal team
@@ -758,7 +758,7 @@ and an always-run receipt readback that fails when the receipt is absent. The
 authority audit has independent negative fixtures for both the bad argument
 order and missing receipt check. A corrected hosted run is still required
 before accepting drift. The rejected run is retained in
-[`automatic-production-personal-vercel-drift-false-green-2026-08-21.json`](../evidence/verification/packets/automatic-production-personal-vercel-drift-false-green-2026-08-21.json).
+[`automatic-production-personal-vercel-drift-false-green-2026-08-21.json` (historical)](https://github.com/crcorbett/bundjil/blob/334f93c1c696fef2911fa564b4dcd83f43c7754c/docs/evidence/verification/packets/automatic-production-personal-vercel-drift-false-green-2026-08-21.json).
 
 Follow-up custody review found a second false assumption: `gh secret set
 --body -` stores a literal hyphen; stdin is used only when `--body` is omitted.

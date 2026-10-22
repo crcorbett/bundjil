@@ -31,18 +31,19 @@ packages/
 
 docs/
   architecture/       Durable architecture and repo standards.
-  product-specs/      Specs and task ledgers; completed records keep provenance.
+  product-specs/      Product design; old task ledgers remain in Git history.
   exec-plans/active/  Plans for work that is actually in progress.
   exec-plans/completed/  Accepted and superseded execution evidence.
-  runbooks/           Target-owned consequential operations.
-  verification/       Dated bounded proof receipts.
+  operations/         Credential and permission guidance.
 
 lint/
   oxlint-plugin.ts        Repository-owned structural lint rules.
+  boundary-audit.ts       Type-aware contract checks.
+  boundary-exceptions.ts  Exact external/framework adapter exceptions.
 
 tooling/
-  boundary-audit.ts       Root compiler-API boundary provenance audit.
-  boundary-exceptions.ts  Exact external/framework adapter exception registry.
+  workflows.test.ts       Tests of actual CI and deployment configuration.
+  schemas/               Inputs still consumed by infrastructure commands.
 
 .agents/skills/       Repo-owned agent skills aligned to Bundjil architecture.
 .claude/              Symlinked Claude skill/config surface.
