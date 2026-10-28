@@ -17,7 +17,8 @@ const PreviewConfigurationDriftFailureReason = Schema.Literals([
   "preconditionFailed",
   "readbackFailed",
 ]);
-class PreviewConfigurationDriftError extends Schema.TaggedErrorClass<PreviewConfigurationDriftError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+class PreviewConfigurationDriftError extends Schema.TaggedError<PreviewConfigurationDriftError>()(
   "PreviewConfigurationDriftError",
   { reason: PreviewConfigurationDriftFailureReason }
 ) {}

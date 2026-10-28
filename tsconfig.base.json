@@ -15,7 +15,8 @@
           "processEnvInEffect": "error",
           "schemaSyncInEffect": "error",
           "unknownInEffectCatch": "error",
-          "unsafeEffectTypeAssertion": "error"
+          "unsafeEffectTypeAssertion": "error",
+          "unstableApiUsage": "suggestion"
         }
       }
     ],

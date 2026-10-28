@@ -70,12 +70,14 @@ const VercelPreviewConfigurationErrorFields = {
   message: VercelPreviewConfigurationErrorMessage,
 };
 
-export class VercelPreviewConfigurationReadError extends Schema.TaggedErrorClass<VercelPreviewConfigurationReadError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class VercelPreviewConfigurationReadError extends Schema.TaggedError<VercelPreviewConfigurationReadError>()(
   "VercelPreviewConfigurationReadError",
   VercelPreviewConfigurationErrorFields
 ) {}
 
-export class VercelPreviewConfigurationWriteError extends Schema.TaggedErrorClass<VercelPreviewConfigurationWriteError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class VercelPreviewConfigurationWriteError extends Schema.TaggedError<VercelPreviewConfigurationWriteError>()(
   "VercelPreviewConfigurationWriteError",
   VercelPreviewConfigurationErrorFields
 ) {}

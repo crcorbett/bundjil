@@ -1,6 +1,6 @@
 import { assert, it as effectIt } from "@effect/vitest";
 import { Context, Effect, Layer, Option } from "effect";
-import { HttpClient, HttpClientResponse } from "effect/unstable/http";
+import { HttpClient, HttpClientResponse } from "effect/http";
 import { describe, it } from "vitest";
 
 import * as Codex from "../src/index.js";

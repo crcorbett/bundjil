@@ -57,7 +57,8 @@ export type PhotonWebhookBindingFailureMessage =
 export type PhotonWebhookBindingFailureMessageEncoded =
   typeof PhotonWebhookBindingFailureMessage.Encoded;
 
-export class PhotonWebhookBindingWriteError extends Schema.TaggedErrorClass<PhotonWebhookBindingWriteError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class PhotonWebhookBindingWriteError extends Schema.TaggedError<PhotonWebhookBindingWriteError>()(
   "PhotonWebhookBindingWriteError",
   {
     operation: PhotonWebhookBindingOperation,

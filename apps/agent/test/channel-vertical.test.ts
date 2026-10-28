@@ -22,8 +22,14 @@ import {
   Schema,
   pipe,
 } from "effect";
-import type { RouteHandlerArgs, Session } from "eve/channels";
+import type {
+  ChannelEventContext,
+  ChannelSource,
+  RouteHandlerArgs,
+} from "eve/channels";
+import { emptySessionView } from "eve/events";
 
+import { makeChannelEveEvents } from "../agent/lib/channel/eve.js";
 import {
   Channel,
   ChannelAdapterState,
@@ -51,6 +57,10 @@ import type {
   ChannelAdapterStateEncoded,
   ChannelHandoffObservation,
 } from "../agent/lib/channel/schemas.js";
+import {
+  makeChannelDelivery,
+  makeChannelRouteArgs,
+} from "./channel-fixtures.js";
 
 const dispositionLogger = (messages: globalThis.Array<unknown>) =>
   Logger.make(({ message }) => {
@@ -134,32 +144,12 @@ const makeObservedRuntime = <R, E>(
     Layer.mergeAll(layer, Logger.layer([dispositionLogger(messages)]))
   );
 
-const makeSession = (): Session => ({
-  cancel: () => Promise.resolve({ status: "no_active_turn" as const }),
-  continuationToken: "channel:v1:photon:conversation-1",
-  getEventStream: () => Promise.resolve(new ReadableStream()),
-  getStreamTailIndex: () => Promise.resolve(-1),
-  id: "session-1",
-});
+const makeSession = () => makeChannelDelivery("session-1");
 
 const makeRouteArgs = (
-  send: RouteHandlerArgs<ChannelAdapterStateEncoded>["send"],
+  send: ChannelSource<ChannelAdapterStateEncoded>["send"],
   waitUntil: RouteHandlerArgs<ChannelAdapterStateEncoded>["waitUntil"]
-): RouteHandlerArgs<ChannelAdapterStateEncoded> => ({
-  cancel: () => Promise.resolve({ status: "no_active_turn" as const }),
-  clear: () => Promise.resolve({ status: "no_active_session" as const }),
-  compact: () => Promise.resolve({ status: "no_active_session" as const }),
-  getSession: makeSession,
-  params: {},
-  receive: () => Promise.resolve(makeSession()),
-  reset: () => Promise.resolve({ status: "no_active_session" as const }),
-  requestIp: null,
-  resolveActiveSession: (): ReturnType<
-    RouteHandlerArgs<ChannelAdapterStateEncoded>["resolveActiveSession"]
-  > => Promise.resolve<undefined>(globalThis.undefined),
-  send,
-  waitUntil,
-});
+) => makeChannelRouteArgs({ send, waitUntil });
 
 it.effect("runs the same clean app journey from both provider Layers", () =>
   Effect.gen(function* testProviderSubstitution() {
@@ -655,7 +645,7 @@ it.effect(
             ["ChannelWebhookDisposition", testCase.expected],
           ]);
           const encodedMessages = yield* Schema.encodeEffect(
-            Schema.UnknownFromJsonString
+            Schema.fromJsonString(Schema.Unknown)
           )(messages);
           assert.strictEqual(
             encodedMessages.includes("participant-leak-sentinel"),
@@ -813,4 +803,96 @@ it.effect("derives stable routing without importing the legacy provider", () =>
 
     assert.strictEqual(tokens[0], tokens[1]);
   })
+);
+
+it.effect(
+  "delivers Eve reply facts once per line and index while ignoring narration",
+  () =>
+    Effect.scoped(
+      Effect.gen(function* testEveReplyFacts() {
+        const fixture = yield* fixtures;
+        const runtime = ManagedRuntime.make(yield* channelLayer);
+        yield* Effect.addFinalizer(() => runtime.disposeEffect);
+        const state = yield* Schema.encodeEffect(ChannelAdapterState)({
+          snapshot: { _tag: "V1", conversation: fixture.message.conversation },
+        });
+        const context: ChannelEventContext<{
+          readonly sessionId: string;
+          readonly state: typeof state;
+        }> = {
+          channel: { sessionId: "session-1", state },
+          position: { line: 7, index: 0 },
+          view: emptySessionView(),
+          session: {
+            id: "session-1",
+            auth: { current: null, initiator: null },
+            turn: { id: "turn-1", sequence: 0 },
+          },
+          getSandbox: () =>
+            Promise.reject(
+              new Error("The event fixture does not use a sandbox.")
+            ),
+        };
+        const completed = makeChannelEveEvents(runtime)["content.completed"];
+        if (completed === undefined) {
+          return yield* Effect.die("The Eve reply handler is required.");
+        }
+        const event = {
+          type: "content.completed",
+          scope: { turnId: "turn-1" },
+          data: {
+            kind: "text",
+            phase: "reply",
+            partId: "part-1",
+            runId: "run-1",
+            value: " reply ",
+          },
+        } as const;
+        yield* Effect.promise(() => Promise.resolve(completed(event, context)));
+        yield* Effect.promise(() => Promise.resolve(completed(event, context)));
+        yield* Effect.promise(() =>
+          Promise.resolve(
+            completed(
+              { ...event, data: { ...event.data, partId: "part-2" } },
+              { ...context, position: { line: 7, index: 1 } }
+            )
+          )
+        );
+        yield* Effect.promise(() =>
+          Promise.resolve(
+            completed(
+              { ...event, data: { ...event.data, phase: "narration" } },
+              { ...context, position: { line: 7, index: 2 } }
+            )
+          )
+        );
+        const outcomes = yield* Effect.promise(() =>
+          runtime.runPromise(
+            Effect.gen(function* inspectReplyClaims() {
+              const channel = yield* Channel;
+              return yield* Effect.forEach([0, 1, 2], (eventIndex) =>
+                channel.handleEvent({
+                  _tag: "OutboundTextReady",
+                  conversation: fixture.message.conversation,
+                  coordinates: {
+                    ...fixture.coordinates,
+                    sequence: 7,
+                    eventIndex,
+                  },
+                  text: ChannelOutboundText.make("reply"),
+                })
+              );
+            })
+          )
+        ).pipe(
+          Effect.map((results) => results.map((result) => result.outcome._tag))
+        );
+        assert.deepStrictEqual(outcomes, [
+          "Duplicate",
+          "Duplicate",
+          "SendAccepted",
+        ]);
+        return yield* Effect.void;
+      })
+    )
 );

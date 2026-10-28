@@ -6,7 +6,8 @@ import {
   CodexProfileStorageOperation,
 } from "../error-contracts.js";
 
-export class CodexProfileStorageError extends Schema.TaggedErrorClass<CodexProfileStorageError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class CodexProfileStorageError extends Schema.TaggedError<CodexProfileStorageError>()(
   "CodexProfileStorageError",
   {
     operation: CodexProfileStorageOperation,

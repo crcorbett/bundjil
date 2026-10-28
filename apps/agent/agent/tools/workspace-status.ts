@@ -16,7 +16,7 @@ const workspaceStatusTool = defineTool({
     "Report deterministic Bundjil workspace status from the app-owned Effect operation.",
   inputSchema: workspaceStatusInputSchema,
   outputSchema: workspaceStatusOutputSchema,
-  execute(input) {
+  execute(input): Promise<WorkspaceStatusSuccess> {
     return Effect.runPromise(
       getWorkspaceStatus(input).pipe(Effect.provide(WorkspaceOperationsLive))
     );

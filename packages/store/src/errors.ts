@@ -5,7 +5,8 @@ import {
   AtomicKeyValueStoreOperation,
 } from "./schemas.js";
 
-export class AtomicKeyValueStoreError extends Schema.TaggedErrorClass<AtomicKeyValueStoreError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class AtomicKeyValueStoreError extends Schema.TaggedError<AtomicKeyValueStoreError>()(
   "AtomicKeyValueStoreError",
   {
     operation: AtomicKeyValueStoreOperation,

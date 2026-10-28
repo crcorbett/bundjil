@@ -5,7 +5,8 @@ import {
   OpenAICompatibleProxyOperation,
 } from "../error-contracts.js";
 
-export class OpenAICompatibleProxyAuthError extends Schema.TaggedErrorClass<OpenAICompatibleProxyAuthError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class OpenAICompatibleProxyAuthError extends Schema.TaggedError<OpenAICompatibleProxyAuthError>()(
   "OpenAICompatibleProxyAuthError",
   {
     operation: OpenAICompatibleProxyOperation,

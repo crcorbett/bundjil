@@ -47,6 +47,21 @@ credential, raw error or stack. That bounded result identifies the failed
 control step; GitHub logs and Vercel readback remain the operational evidence
 owners.
 
+## Alchemy and state
+
+The stack uses Alchemy `2.0.0-beta.84` with Effect `4.0.6`. Provider packages are
+now separate from the core. The existing R2 bucket and `bundjil/v1` key prefix
+stay authoritative. The R2 adapter uses the Distilled S3 object client and
+Alchemy's native bucket-state engine for encoding and per-stage conditional
+leases. Credentials carry the explicit `auto` region. It requires the existing
+bucket and does not apply AWS-only versioning, encryption or ownership settings.
+SDK debug logging is suppressed while state is accessed. Saved rows retain
+their existing resource identities and removal policies.
+
+The existing `*-sync` script names now invoke native `alchemy drift --config`;
+`infrastructure:preview-repair` passes the explicit `--repair` flag. These
+operations retain their existing read-only versus repair authority boundaries.
+
 ## Supported commands
 
 Run package checks from the repository root:
@@ -170,13 +185,13 @@ The drift report keeps returned deployment observations strict across every
 typed field. If Vercel no longer returns an accepted historical deployment,
 the report records unavailable history without claiming drift, deletion,
 retention or repair authority. An accepted write-only environment baseline is
-continuous when native sync is unchanged and present provider revision
-metadata is available. A native-sync drift may also be accepted when the
+continuous when native drift detection is unchanged and present provider revision
+metadata is available. A native-drift drift may also be accepted when the
 desired plan is still no-op and the manifest records both `ObservedUnknown`
 and the exact current provider update timestamp admitted from the two-read
 inventory. A missing or different timestamp remains inconclusive; the value
 itself is never proved.
-If native sync cannot complete, the operator log may expose only the closed
+If native drift detection cannot complete, the operator log may expose only the closed
 typed provider-read error name and reason alongside the safe phase. It never
 emits the error message, request, response, URL, headers, provider payload or
 credential.

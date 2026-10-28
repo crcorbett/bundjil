@@ -2,7 +2,8 @@ import { Schema } from "effect";
 
 import { ChannelFailureFields } from "./failure-fields.js";
 
-export class ChannelUnsupportedOperationError extends Schema.TaggedErrorClass<ChannelUnsupportedOperationError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class ChannelUnsupportedOperationError extends Schema.TaggedError<ChannelUnsupportedOperationError>()(
   "ChannelUnsupportedOperationError",
   ChannelFailureFields
 ) {}

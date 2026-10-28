@@ -5,7 +5,8 @@ import {
   CodexResponsesStreamOperation,
 } from "../error-contracts.js";
 
-export class CodexResponsesStreamError extends Schema.TaggedErrorClass<CodexResponsesStreamError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class CodexResponsesStreamError extends Schema.TaggedError<CodexResponsesStreamError>()(
   "CodexResponsesStreamError",
   {
     operation: CodexResponsesStreamOperation,

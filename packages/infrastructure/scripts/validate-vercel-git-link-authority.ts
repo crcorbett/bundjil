@@ -40,7 +40,8 @@ const VercelGitLinkAuthorityCommandFailureReason = Schema.Literals([
   "fileContractInvalid",
   "policyInvalid",
 ]);
-class VercelGitLinkAuthorityCommandError extends Schema.TaggedErrorClass<VercelGitLinkAuthorityCommandError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+class VercelGitLinkAuthorityCommandError extends Schema.TaggedError<VercelGitLinkAuthorityCommandError>()(
   "VercelGitLinkAuthorityCommandError",
   { reason: VercelGitLinkAuthorityCommandFailureReason }
 ) {}

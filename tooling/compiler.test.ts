@@ -49,7 +49,7 @@ describe("installed TypeScript 7 with Effect diagnostics", () => {
       encoding: "utf-8",
     });
     expect(result.status).toBe(0);
-    expect(result.stdout.trim()).toBe("Version 7.0.2+effect-tsgo.0.38.0");
+    expect(result.stdout.trim()).toBe("Version 7.0.2+effect-tsgo.0.62.0");
   });
 
   it("accepts a valid Effect program", () => {

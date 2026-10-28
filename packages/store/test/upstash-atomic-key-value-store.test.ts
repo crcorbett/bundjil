@@ -1,6 +1,6 @@
 import { assert, it } from "@effect/vitest";
 import { Array, Effect, Redacted, Schema, pipe } from "effect";
-import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
+import * as KeyValueStore from "effect/persistence/KeyValueStore";
 
 import {
   AtomicKeyValueStore,
@@ -334,7 +334,7 @@ it.effect("maps rejected eval provider failures to safe atomic errors", () => {
     const atomic = yield* AtomicKeyValueStore;
     const error = yield* atomic.transact(transaction).pipe(Effect.flip);
     const rendered = yield* Schema.encodeUnknownEffect(
-      Schema.UnknownFromJsonString
+      Schema.fromJsonString(Schema.Unknown)
     )(error);
     assert.strictEqual(error.operation, "transact");
     assert.strictEqual(rendered.includes(privateProviderMarker), false);
@@ -372,7 +372,7 @@ it.effect(
       const atomic = yield* AtomicKeyValueStore;
       const error = yield* atomic.transact(transaction).pipe(Effect.flip);
       const rendered = yield* Schema.encodeUnknownEffect(
-        Schema.UnknownFromJsonString
+        Schema.fromJsonString(Schema.Unknown)
       )(error);
       assert.strictEqual(error.operation, "transact");
       assert.strictEqual(rendered.includes(marker), false);

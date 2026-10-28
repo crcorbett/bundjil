@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 
 import { Clock, Config, Context, Effect, HashSet, Layer, Schema } from "effect";
-import { HttpClient } from "effect/unstable/http";
+import { HttpClient } from "effect/http";
 
 /* oxlint-disable max-classes-per-file -- The owner service and its operation-specific safe error share one bounded contract file. */
 import {
@@ -101,7 +101,8 @@ export type PhotonCandidateInventoryFailureMessage =
 export type PhotonCandidateInventoryFailureMessageEncoded =
   typeof PhotonCandidateInventoryFailureMessage.Encoded;
 
-export class PhotonCandidateInventoryError extends Schema.TaggedErrorClass<PhotonCandidateInventoryError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class PhotonCandidateInventoryError extends Schema.TaggedError<PhotonCandidateInventoryError>()(
   "PhotonCandidateInventoryError",
   {
     operation: PhotonCandidateInventoryOperation,

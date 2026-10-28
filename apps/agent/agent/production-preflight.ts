@@ -467,7 +467,8 @@ export const ProductionPreflightDetail = Schema.Struct({
 
 export type ProductionPreflightDetail = typeof ProductionPreflightDetail.Type;
 
-export class ProductionPreflightError extends Schema.TaggedErrorClass<ProductionPreflightError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class ProductionPreflightError extends Schema.TaggedError<ProductionPreflightError>()(
   "ProductionPreflightError",
   {
     failureCode: ProductionPreflightFailureCode,

@@ -30,7 +30,7 @@ const profileIdConfig = Config.schema(
   "BUNDJIL_CODEX_PROFILE_ID"
 ).pipe(Config.withDefault("default"));
 
-const callbackTimeoutConfig = Config.duration(
+const callbackTimeoutConfig = Config.Duration(
   "BUNDJIL_CODEX_LOGIN_CALLBACK_TIMEOUT"
 ).pipe(Config.withDefault(Duration.minutes(5)));
 

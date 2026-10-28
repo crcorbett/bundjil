@@ -3,7 +3,7 @@ import {
   AtomicKeyValueStoreTransaction,
 } from "@bundjil/store";
 import { Clock, Effect, Layer, Match, Option, Random, Schema } from "effect";
-import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
+import * as KeyValueStore from "effect/persistence/KeyValueStore";
 
 import type { CodexOAuthSubjectHash } from "../auth/credentials.js";
 import { CodexOAuthProfileCipher } from "../profiles/cipher.js";

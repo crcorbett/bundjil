@@ -5,7 +5,8 @@ import {
   WorkspaceSchemaErrorMessage,
 } from "./contracts.js";
 
-export class WorkspaceSchemaError extends Schema.TaggedErrorClass<WorkspaceSchemaError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class WorkspaceSchemaError extends Schema.TaggedError<WorkspaceSchemaError>()(
   "WorkspaceSchemaError",
   {
     boundary: WorkspaceSchemaBoundary,

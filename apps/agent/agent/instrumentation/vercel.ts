@@ -1,11 +1,14 @@
 import { registerOTel } from "@vercel/otel";
 import { defineInstrumentation } from "eve/instrumentation";
 
-import { agentConfig } from "./config.js";
+import { agentConfig } from "../config.js";
 
 export default defineInstrumentation({
-  recordInputs: false,
-  recordOutputs: false,
+  tracePolicy: () => ({
+    emit: true,
+    recordInputs: false,
+    recordOutputs: false,
+  }),
   setup: ({ agentName }) => {
     registerOTel({
       instrumentationConfig: {

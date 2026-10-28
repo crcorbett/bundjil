@@ -25,7 +25,7 @@ proof.
 ## Preconditions
 
 - Record a clean source revision with `git status --short`, `git rev-parse
-HEAD`, and a readback of `origin/main`.
+  HEAD`, and a readback of `origin/main`.
 - Authenticate the intended Vercel principal and record its identity source and
   scope. Verify the local link before every operation. Both Bundjil projects
   already own an app Root Directory, so link the repository root to the exact
@@ -35,7 +35,7 @@ HEAD`, and a readback of `origin/main`.
   local environment file before continuing.
 - Record an addressable approval for one stage, target, source SHA, operation,
   duration, and rollback. The snapshot literal `operationAuthority:
-"external-receipt-required"` is an explicit non-grant; attach the real
+  "external-receipt-required"` is an explicit non-grant; attach the real
   approval receipt outside the local preflight.
 - Use authenticated read-only Vercel metadata to identify project, environment,
   stable domain, Deployment Protection, variable names/types/targets, current
@@ -119,7 +119,7 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    name. Remove any link-generated local environment file before proceeding.
 
    Inspect each candidate with `vercel inspect "$DEPLOYMENT_URL" --scope
-"$BUNDJIL_VERCEL_SCOPE"`. Sanitize provider output into the snapshot; do not
+   "$BUNDJIL_VERCEL_SCOPE"`. Sanitize provider output into the snapshot; do not
    copy raw output into evergreen documentation.
 
 3. For an Eve durability candidate, retain the locally generated Build Output
@@ -132,7 +132,7 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    Missing function detail, project setting, plan, candidate deployment, or
    measurement makes the packet inconclusive.
 
-   Eve `0.29.5` directly creates Nitro and exposes no Bundjil-facing
+   Eve `0.84.1` directly creates Nitro and exposes no Bundjil-facing
    `vercel.functions` input. Preserve the generated Workflow flow's
    `maxDuration: "max"` and queue trigger. Do not use the Sandbox idle timeout
    as a function value, guess a `vercel.json` glob for generated `__server`,
@@ -196,7 +196,7 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    non-secret Photon callback alias, and separate project bindings. It reads
    current proxy, public agent and callback targets, then stages both candidates
    using `vercel deploy --prod
---skip-domain`, validates each immutable project/SHA/READY identity, and
+   --skip-domain`, validates each immutable project/SHA/READY identity, and
    re-reads `origin/main` before any promote. A stale candidate is an explicit
    no-op. It promotes proxy, public agent, then the callback alias, validates
    each target and probes proxy health. Any uncertain or partial failure
@@ -292,6 +292,29 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    `channel-inventory-ready` fails closed. Retire the original callback only
    after promotion, signed provider traffic, retry-horizon drain, and exact
    surviving-callback readback.
+
+## Explicit local release
+
+When the user explicitly requests a local release, merge through the normal PR
+with its required `verify` check. Include `[skip ci]` in the merge commit message
+for that release so a main-push CI run cannot start a competing Production
+writer. Do not disable workflows or change branch protection. Confirm there is
+no queued or active Production deployment before starting locally.
+
+Use a clean checkout of the exact merged SHA and `bun install --frozen-lockfile`.
+Run `bun run verification` on the final source; an identical merged tree and
+lockfile can reuse that result. Put the pinned Bun, Node and repository binaries
+on `PATH`. Load only `bundjil/prd` through its existing config-scoped Doppler
+credential, and supply `BUNDJIL_PRODUCTION_SOURCE_SHA` plus the exact existing
+`BUNDJIL_PRODUCTION_AGENT_CALLBACK_ALIAS` from current readback. Run the existing
+`production:deploy:internal` entrypoint locally. Its project/source checks,
+proxy-agent-callback order, deadlines and reverse-order rollback still apply.
+Never print the fetched values or write them into the checkout.
+
+Read back both immutable deployments and all three stable targets, and check
+proxy health plus anonymous-request rejection. Keep the prior deployment IDs
+in the PR or task for rollback. Local release results do not establish an
+outbound message or handset-delivery journey.
 
 ## Evidence and postcondition
 

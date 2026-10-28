@@ -8,14 +8,11 @@ import {
   Redacted,
   Result,
   Schema,
+  SchemaIssue,
   Stream,
 } from "effect";
+import { HttpClient, HttpClientError, HttpClientResponse } from "effect/http";
 import { TestClock } from "effect/testing";
-import {
-  HttpClient,
-  HttpClientError,
-  HttpClientResponse,
-} from "effect/unstable/http";
 
 import {
   CodexResponsesProof,
@@ -47,7 +44,7 @@ import {
 } from "../src/provider/http-client.js";
 
 const encodeUnknownJson = Schema.encodeUnknownSync(
-  Schema.UnknownFromJsonString
+  Schema.fromJsonString(Schema.Unknown)
 );
 
 const renderForLeakCheck = (value: unknown) =>
@@ -362,7 +359,7 @@ effectIt.effect(
       assert.isTrue(Result.isFailure(makeResult));
       if (Result.isFailure(makeResult)) {
         assert.include(
-          String(makeResult.failure),
+          SchemaIssue.makeFormatterDefault()(makeResult.failure),
           '["request"]["tools"][0]["parameters"]'
         );
       }

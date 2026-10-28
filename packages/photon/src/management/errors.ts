@@ -19,32 +19,38 @@ const PhotonManagementReadErrorFields = {
   message: PhotonManagementReadErrorMessage,
 };
 
-export class PhotonProjectsReadError extends Schema.TaggedErrorClass<PhotonProjectsReadError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class PhotonProjectsReadError extends Schema.TaggedError<PhotonProjectsReadError>()(
   "PhotonProjectsReadError",
   PhotonManagementReadErrorFields
 ) {}
 
-export class PhotonPlatformsReadError extends Schema.TaggedErrorClass<PhotonPlatformsReadError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class PhotonPlatformsReadError extends Schema.TaggedError<PhotonPlatformsReadError>()(
   "PhotonPlatformsReadError",
   PhotonManagementReadErrorFields
 ) {}
 
-export class PhotonSharedUsersReadError extends Schema.TaggedErrorClass<PhotonSharedUsersReadError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class PhotonSharedUsersReadError extends Schema.TaggedError<PhotonSharedUsersReadError>()(
   "PhotonSharedUsersReadError",
   PhotonManagementReadErrorFields
 ) {}
 
-export class PhotonWebhooksReadError extends Schema.TaggedErrorClass<PhotonWebhooksReadError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class PhotonWebhooksReadError extends Schema.TaggedError<PhotonWebhooksReadError>()(
   "PhotonWebhooksReadError",
   PhotonManagementReadErrorFields
 ) {}
 
-export class PhotonLinesReadError extends Schema.TaggedErrorClass<PhotonLinesReadError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class PhotonLinesReadError extends Schema.TaggedError<PhotonLinesReadError>()(
   "PhotonLinesReadError",
   PhotonManagementReadErrorFields
 ) {}
 
-export class PhotonBillingReadError extends Schema.TaggedErrorClass<PhotonBillingReadError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class PhotonBillingReadError extends Schema.TaggedError<PhotonBillingReadError>()(
   "PhotonBillingReadError",
   PhotonManagementReadErrorFields
 ) {}

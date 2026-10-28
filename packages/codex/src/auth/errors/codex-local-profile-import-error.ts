@@ -5,7 +5,8 @@ import {
   CodexLocalProfileImportOperation,
 } from "../error-contracts.js";
 
-export class CodexLocalProfileImportError extends Schema.TaggedErrorClass<CodexLocalProfileImportError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class CodexLocalProfileImportError extends Schema.TaggedError<CodexLocalProfileImportError>()(
   "CodexLocalProfileImportError",
   {
     operation: CodexLocalProfileImportOperation,

@@ -211,6 +211,9 @@ export const ChannelOutboundCoordinates = Schema.Struct({
   sessionId: EveSessionId,
   turnId: EveTurnId,
   sequence: Schema.Int.pipe(Schema.check(Schema.isGreaterThanOrEqualTo(0))),
+  eventIndex: Schema.optional(
+    Schema.Int.pipe(Schema.check(Schema.isGreaterThanOrEqualTo(0)))
+  ),
 });
 export type ChannelOutboundCoordinates = typeof ChannelOutboundCoordinates.Type;
 

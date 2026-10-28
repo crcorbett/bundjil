@@ -22,7 +22,7 @@ import {
   Schema,
   Stream,
 } from "effect";
-import { HttpClient, HttpClientRequest } from "effect/unstable/http";
+import { HttpClient, HttpClientRequest } from "effect/http";
 
 import {
   CodexProxyErrorResponse,
@@ -190,7 +190,7 @@ class PreviewProofFailure extends Data.TaggedError("PreviewProofFailure")<{
   readonly result?: typeof PreviewProofResult.Type;
 }> {}
 
-const previewUrlConfig = Config.url("BUNDJIL_CODEX_PROXY_PREVIEW_URL");
+const previewUrlConfig = Config.URL("BUNDJIL_CODEX_PROXY_PREVIEW_URL");
 const internalTokenConfig = Config.schema(
   OpenAICompatibleProxyInternalToken,
   "BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN"

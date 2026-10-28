@@ -7,7 +7,8 @@ import {
 import { CodexOAuthProfileCommitOperation } from "../contracts.js";
 import { CodexProfileErrorMessage } from "../error-contracts.js";
 
-export class CodexOAuthProfileCommitConflict extends Schema.TaggedErrorClass<CodexOAuthProfileCommitConflict>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class CodexOAuthProfileCommitConflict extends Schema.TaggedError<CodexOAuthProfileCommitConflict>()(
   "CodexOAuthProfileCommitConflict",
   {
     operation: CodexOAuthProfileCommitOperation,

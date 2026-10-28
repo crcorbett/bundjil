@@ -68,7 +68,8 @@ export type VercelPreviewConfigurationAuthorityFailureReason =
 export type VercelPreviewConfigurationAuthorityFailureReasonEncoded =
   typeof VercelPreviewConfigurationAuthorityFailureReason.Encoded;
 
-export class VercelPreviewConfigurationAuthorityError extends Schema.TaggedErrorClass<VercelPreviewConfigurationAuthorityError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class VercelPreviewConfigurationAuthorityError extends Schema.TaggedError<VercelPreviewConfigurationAuthorityError>()(
   "VercelPreviewConfigurationAuthorityError",
   { reason: VercelPreviewConfigurationAuthorityFailureReason }
 ) {}

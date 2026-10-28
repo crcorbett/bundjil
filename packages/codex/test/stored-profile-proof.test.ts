@@ -1,7 +1,7 @@
 import { assert, it } from "@effect/vitest";
 import { Effect, Layer, Schema } from "effect";
+import * as KeyValueStore from "effect/persistence/KeyValueStore";
 import { TestClock } from "effect/testing";
-import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
 import {
   CodexOAuthProfileCipherConfig,

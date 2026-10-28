@@ -8,7 +8,7 @@ import {
   Redacted,
   Schema,
 } from "effect";
-import { HttpClient, HttpClientResponse } from "effect/unstable/http";
+import { HttpClient, HttpClientResponse } from "effect/http";
 
 import {
   DiscoverVercelProject,
@@ -521,7 +521,9 @@ it.effect(
             let deploymentCursor: string | null = null;
             for (const [key, value] of request.urlParams) {
               if (key === "until") {
-                deploymentCursor = value;
+                deploymentCursor = Redacted.isRedacted(value)
+                  ? Redacted.value(value)
+                  : value;
               }
             }
             deploymentCursors.push(deploymentCursor);

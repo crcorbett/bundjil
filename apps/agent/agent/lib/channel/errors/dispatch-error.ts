@@ -1,6 +1,7 @@
 import { Schema } from "effect";
 
-export class EveChannelDispatchError extends Schema.TaggedErrorClass<EveChannelDispatchError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class EveChannelDispatchError extends Schema.TaggedError<EveChannelDispatchError>()(
   "EveChannelDispatchError",
   {
     reason: Schema.Literals([

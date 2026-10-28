@@ -28,10 +28,7 @@ import {
 } from "./schemas.js";
 import type { CodexProxyRuntimeConfig as CodexProxyRuntimeConfigType } from "./schemas.js";
 
-export {
-  type CodexProxyDevServerConfig as CodexProxyDevServerConfigType,
-  type CodexProxyRuntimeConfig as CodexProxyRuntimeConfigType,
-} from "./schemas.js";
+export { type CodexProxyRuntimeConfig as CodexProxyRuntimeConfigType } from "./schemas.js";
 const proxyModeConfig = Config.schema(
   CodexProxyMode,
   "BUNDJIL_CODEX_PROXY_MODE"
@@ -88,7 +85,7 @@ const vercelRuntimeMarkerConfig = Config.option(
   Config.schema(CodexProxyVercelRuntimeMarker, "VERCEL")
 );
 
-const portConfig = Config.port("PORT").pipe(Config.withDefault(8787));
+const portConfig = Config.Port("PORT").pipe(Config.withDefault(8787));
 
 const decodeCodexOAuthSubject = (input: unknown) =>
   CodexOAuthSubject.pipe(Schema.decodeUnknownEffect)(input).pipe(

@@ -6,7 +6,8 @@ import {
   CodexProviderErrorMessage,
 } from "../error-contracts.js";
 
-export class CodexHttpStatusError extends Schema.TaggedErrorClass<CodexHttpStatusError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class CodexHttpStatusError extends Schema.TaggedError<CodexHttpStatusError>()(
   "CodexHttpStatusError",
   {
     operation: CodexHttpClientOperation,

@@ -13,9 +13,9 @@ import {
   Sink,
   Stream,
 } from "effect";
+import { ChildProcessSpawner } from "effect/process";
+import type { ChildProcess } from "effect/process";
 import { TestClock } from "effect/testing";
-import { ChildProcessSpawner } from "effect/unstable/process";
-import type { ChildProcess } from "effect/unstable/process";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -142,7 +142,9 @@ describe("automatic Production deployment", () => {
 
   it("decodes the current Vercel project target without an embedded projectId", async () => {
     const commands: ChildProcess.Command[] = [];
-    const stdout = Schema.encodeUnknownSync(Schema.UnknownFromJsonString)({
+    const stdout = Schema.encodeUnknownSync(
+      Schema.fromJsonString(Schema.Unknown)
+    )({
       id: "prj_agent",
       targets: {
         production: {
@@ -204,12 +206,12 @@ describe("automatic Production deployment", () => {
       commands.push(command);
       const args = command._tag === "StandardCommand" ? command.args : [];
       const output = args.some((argument) => argument.includes("/v4/aliases/"))
-        ? Schema.encodeUnknownSync(Schema.UnknownFromJsonString)({
+        ? Schema.encodeUnknownSync(Schema.fromJsonString(Schema.Unknown))({
             alias: "bundjil-agent-personal.vercel.app",
             deploymentId: "dpl_agent_previous",
             projectId: "prj_agent",
           })
-        : Schema.encodeUnknownSync(Schema.UnknownFromJsonString)({
+        : Schema.encodeUnknownSync(Schema.fromJsonString(Schema.Unknown))({
             id: "dpl_agent_previous",
             meta: { gitCommitSha: previousSha },
             projectId: "prj_agent",
@@ -256,7 +258,7 @@ describe("automatic Production deployment", () => {
       if (args.includes("POST")) {
         return Effect.succeed(
           processHandle(
-            Schema.encodeUnknownSync(Schema.UnknownFromJsonString)({
+            Schema.encodeUnknownSync(Schema.fromJsonString(Schema.Unknown))({
               alias: "bundjil-agent-personal.vercel.app",
               uid: "alias_assignment",
             })
@@ -266,7 +268,7 @@ describe("automatic Production deployment", () => {
       if (args.some((argument) => argument.includes("/v4/aliases/"))) {
         return Effect.succeed(
           processHandle(
-            Schema.encodeUnknownSync(Schema.UnknownFromJsonString)({
+            Schema.encodeUnknownSync(Schema.fromJsonString(Schema.Unknown))({
               alias: "bundjil-agent-personal.vercel.app",
               deploymentId: "dpl_agent_candidate",
               projectId: "prj_agent",
@@ -277,7 +279,7 @@ describe("automatic Production deployment", () => {
       }
       return Effect.succeed(
         processHandle(
-          Schema.encodeUnknownSync(Schema.UnknownFromJsonString)({
+          Schema.encodeUnknownSync(Schema.fromJsonString(Schema.Unknown))({
             id: "dpl_agent_candidate",
             meta: { gitCommitSha: candidateSha },
             projectId: "prj_agent",
@@ -412,7 +414,9 @@ describe("automatic Production deployment", () => {
       commands.push(command);
       return Effect.succeed(
         processHandle(
-          Schema.encodeUnknownSync(Schema.UnknownFromJsonString)(response)
+          Schema.encodeUnknownSync(Schema.fromJsonString(Schema.Unknown))(
+            response
+          )
         )
       );
     });
@@ -442,13 +446,13 @@ describe("automatic Production deployment", () => {
       commands.push(command);
       const args = command._tag === "StandardCommand" ? command.args : [];
       const output = args.includes("deploy")
-        ? Schema.encodeUnknownSync(Schema.UnknownFromJsonString)({
+        ? Schema.encodeUnknownSync(Schema.fromJsonString(Schema.Unknown))({
             id: "dpl_proxy_candidate",
             readyState: "READY",
             target: "production",
             url: "https://bundjil-proxy-candidate.vercel.app",
           })
-        : Schema.encodeUnknownSync(Schema.UnknownFromJsonString)({
+        : Schema.encodeUnknownSync(Schema.fromJsonString(Schema.Unknown))({
             id: "dpl_proxy_candidate",
             meta: { gitCommitSha: candidateSha },
             projectId: "prj_proxy",
@@ -517,7 +521,7 @@ describe("automatic Production deployment", () => {
       }
       return Effect.succeed(
         processHandle(
-          Schema.encodeUnknownSync(Schema.UnknownFromJsonString)({
+          Schema.encodeUnknownSync(Schema.fromJsonString(Schema.Unknown))({
             id: "prj_proxy",
             targets: {
               production: {

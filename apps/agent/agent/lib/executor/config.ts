@@ -8,7 +8,8 @@ export const ExecutorConfigOperation = Schema.Literals([
 export const ExecutorElicitationMode = Schema.Literals(["model", "browser"]);
 export const ExecutorConfigDiagnostic = Schema.NonEmptyString;
 
-export class ExecutorConfigError extends Schema.TaggedErrorClass<ExecutorConfigError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class ExecutorConfigError extends Schema.TaggedError<ExecutorConfigError>()(
   "ExecutorConfigError",
   {
     message: ExecutorConfigDiagnostic,

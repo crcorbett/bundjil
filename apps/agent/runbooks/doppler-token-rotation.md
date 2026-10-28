@@ -41,7 +41,7 @@ provider configuration change, or secret-value export.
    its own config and a denied read of the other config. Stop if either check
    fails. Keep the token available for retry until GitHub confirms the write.
 3. Pipe the value to `gh secret set DOPPLER_TOKEN --repo crcorbett/bundjil
---env <exact-environment>` on standard input. Read back the GitHub secret's
+   --env <exact-environment>` on standard input. Read back the GitHub secret's
    name and `updated_at`. Unset the shell value immediately after the write.
 4. Read back Doppler service-token metadata: token name, config, read-only
    access, and expiry. Never record a token value or a full credential-bearing

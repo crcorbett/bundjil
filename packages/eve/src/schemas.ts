@@ -5,11 +5,6 @@ import {
   BundjilWorkspaceName,
 } from "./workspace-status.js";
 
-export {
-  BundjilPackageName,
-  BundjilWorkspaceName,
-} from "./workspace-status.js";
-
 export const BundjilWorkspaceStatusQuestion = Schema.NonEmptyString;
 export type BundjilWorkspaceStatusQuestion =
   typeof BundjilWorkspaceStatusQuestion.Type;

@@ -262,7 +262,8 @@ export const AdoptionManifestBuildMessage = Schema.NonEmptyString.pipe(
 export type AdoptionManifestBuildMessage =
   typeof AdoptionManifestBuildMessage.Type;
 
-export class AdoptionManifestBuildError extends Schema.TaggedErrorClass<AdoptionManifestBuildError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class AdoptionManifestBuildError extends Schema.TaggedError<AdoptionManifestBuildError>()(
   "AdoptionManifestBuildError",
   {
     reason: Schema.Literals([

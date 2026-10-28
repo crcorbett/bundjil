@@ -13,7 +13,8 @@ export const CodexProxySchemaBoundary = Schema.Literals([
 
 export type CodexProxySchemaBoundary = typeof CodexProxySchemaBoundary.Type;
 
-export class CodexProxyRouteError extends Schema.TaggedErrorClass<CodexProxyRouteError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class CodexProxyRouteError extends Schema.TaggedError<CodexProxyRouteError>()(
   "CodexProxyRouteError",
   {
     boundary: Schema.optional(CodexProxySchemaBoundary),

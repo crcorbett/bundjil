@@ -116,7 +116,7 @@ describe("boundary provenance audit", () => {
     ],
     [
       "public-http-transport",
-      'import type { HttpClientRequest, HttpClientResponse } from "effect/unstable/http"; export interface Provider { readonly send: (request: HttpClientRequest.HttpClientRequest) => Promise<HttpClientResponse.HttpClientResponse>; }',
+      'import type { HttpClientRequest, HttpClientResponse } from "effect/http"; export interface Provider { readonly send: (request: HttpClientRequest.HttpClientRequest) => Promise<HttpClientResponse.HttpClientResponse>; }',
     ],
     [
       "raw-response-text",
@@ -133,11 +133,11 @@ describe("boundary provenance audit", () => {
     ],
     [
       "public-raw-cause",
-      "export class ProviderError extends Schema.TaggedErrorClass<ProviderError>()('ProviderError', { cause: Schema.Defect() }) {}",
+      "export class ProviderError extends Schema.TaggedError<ProviderError>()('ProviderError', { cause: Schema.Defect() }) {}",
     ],
     [
       "public-raw-cause",
-      "export class ProviderError extends Schema.TaggedErrorClass<ProviderError>()('ProviderError', { cause: Schema.optional(Schema.Defect()) }) {}",
+      "export class ProviderError extends Schema.TaggedError<ProviderError>()('ProviderError', { cause: Schema.optional(Schema.Defect()) }) {}",
     ],
     [
       "public-raw-cause",
@@ -242,8 +242,8 @@ describe("boundary provenance audit", () => {
       "export const Account = Schema.TaggedStruct('Account', { id: Schema.String });",
     ],
     [
-      "TaggedErrorClass",
-      "export class AccountError extends Schema.TaggedErrorClass<AccountError>()('AccountError', { message: Schema.NonEmptyString }) {}",
+      "TaggedError",
+      "export class AccountError extends Schema.TaggedError<AccountError>()('AccountError', { message: Schema.NonEmptyString }) {}",
     ],
   ])("rejects inline string fields in exported Schema.%s", (_name, source) => {
     const { cwd, file } = fixture(source);
@@ -257,7 +257,7 @@ describe("boundary provenance audit", () => {
   it("rejects an inline string hidden in a shared tagged-error field object", () => {
     const { cwd, file } = fixture(`
       const ProviderErrorFields = { message: Schema.NonEmptyString };
-      export class ProviderError extends Schema.TaggedErrorClass<ProviderError>()(
+      export class ProviderError extends Schema.TaggedError<ProviderError>()(
         "ProviderError",
         ProviderErrorFields
       ) {}
@@ -273,7 +273,7 @@ describe("boundary provenance audit", () => {
     const { cwd, file } = fixture(
       `
         import { ProviderErrorFields } from "./fields.js";
-        export class ProviderError extends Schema.TaggedErrorClass<ProviderError>()(
+        export class ProviderError extends Schema.TaggedError<ProviderError>()(
           "ProviderError",
           ProviderErrorFields
         ) {}

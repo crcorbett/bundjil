@@ -8,7 +8,8 @@ import {
   CodexProfileErrorMessage,
 } from "../error-contracts.js";
 
-export class CodexOAuthRefreshLockError extends Schema.TaggedErrorClass<CodexOAuthRefreshLockError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class CodexOAuthRefreshLockError extends Schema.TaggedError<CodexOAuthRefreshLockError>()(
   "CodexOAuthRefreshLockError",
   {
     operation: CodexOAuthRefreshLockOperation,

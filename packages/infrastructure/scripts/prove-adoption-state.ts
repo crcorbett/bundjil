@@ -112,7 +112,8 @@ const AdoptionProofBlockedReason = Schema.Literals([
   "remote-state-resource-missing",
   "unclassified",
 ]);
-class AdoptionProofError extends Schema.TaggedErrorClass<AdoptionProofError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+class AdoptionProofError extends Schema.TaggedError<AdoptionProofError>()(
   "AdoptionProofError",
   { reason: AdoptionProofBlockedReason }
 ) {}

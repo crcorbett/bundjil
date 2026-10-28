@@ -5,8 +5,8 @@
 import { expect } from "bun:test";
 
 import { adopt } from "alchemy/AdoptPolicy";
+import { detect, repair } from "alchemy/Drift";
 import { destroy } from "alchemy/RemovalPolicy";
-import { sync } from "alchemy/Sync";
 import * as Test from "alchemy/Test/Bun";
 import { Effect, Exit, Layer, Record, Schema } from "effect";
 
@@ -98,7 +98,7 @@ test.provider(
         (resource) => resource.action
       );
       expect(actions).toContain("create");
-      expect(actions).toContain("update");
+      expect(actions).toContain("adopted");
 
       const deployed = yield* stack.deploy(desiredStack);
       expect(deployed.feedback.enabled).toBe(true);
@@ -124,28 +124,27 @@ test.provider(
         projectId: fixture.feedback.projectId,
         enabled: false,
       });
-      const drift = yield* sync(
-        { name: stack.name, stage: "preview" },
-        { dryRun: true }
-      ).pipe(Effect.provide(stack.state));
+      const drift = yield* detect({ name: stack.name, stage: "preview" }).pipe(
+        Effect.provide(stack.state)
+      );
       expect(
         Record.values(drift.resources).some(
           (resource) => resource.action === "drifted"
         )
       ).toBe(true);
-      const repaired = yield* sync(
-        { name: stack.name, stage: "preview" },
-        { dryRun: false }
-      ).pipe(Effect.provide(stack.state));
+      const repaired = yield* repair({
+        name: stack.name,
+        stage: "preview",
+      }).pipe(Effect.provide(stack.state));
       expect(
         Record.values(repaired.resources).some(
           (resource) => resource.action === "repaired"
         )
       ).toBe(true);
-      const unchanged = yield* sync(
-        { name: stack.name, stage: "preview" },
-        { dryRun: true }
-      ).pipe(Effect.provide(stack.state));
+      const unchanged = yield* detect({
+        name: stack.name,
+        stage: "preview",
+      }).pipe(Effect.provide(stack.state));
       expect(
         Record.values(unchanged.resources).every(
           (resource) => resource.action === "unchanged"
@@ -188,10 +187,10 @@ test.provider(
         enabled: false,
       });
       yield* control.setFailureMode("timeoutAfterWrite");
-      const recovered = yield* sync(
-        { name: stack.name, stage: "preview" },
-        { dryRun: false }
-      ).pipe(Effect.provide(stack.state));
+      const recovered = yield* repair({
+        name: stack.name,
+        stage: "preview",
+      }).pipe(Effect.provide(stack.state));
       expect(
         Record.values(recovered.resources).some(
           (resource) => resource.action === "repaired"
@@ -206,10 +205,10 @@ test.provider(
       });
       yield* control.setFailureMode("timeoutAfterWriteEventualConsistency");
       const observationsBefore = yield* control.observationCount;
-      const bounded = yield* sync(
-        { name: stack.name, stage: "preview" },
-        { dryRun: false }
-      ).pipe(Effect.provide(stack.state), Effect.exit);
+      const bounded = yield* repair({
+        name: stack.name,
+        stage: "preview",
+      }).pipe(Effect.provide(stack.state), Effect.exit);
       expect(Exit.isFailure(bounded)).toBe(true);
       expect((yield* control.observationCount).count).toBe(
         observationsBefore.count + 7

@@ -2,7 +2,8 @@ import { Schema } from "effect";
 
 import { ChannelFailureFields } from "./failure-fields.js";
 
-export class ChannelWebhookAuthenticationError extends Schema.TaggedErrorClass<ChannelWebhookAuthenticationError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class ChannelWebhookAuthenticationError extends Schema.TaggedError<ChannelWebhookAuthenticationError>()(
   "ChannelWebhookAuthenticationError",
   ChannelFailureFields
 ) {}

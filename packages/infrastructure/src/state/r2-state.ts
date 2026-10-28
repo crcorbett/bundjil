@@ -4,10 +4,11 @@ import {
   Region as AwsRegion,
 } from "@distilled.cloud/aws";
 import * as BunHttpClient from "@effect/platform-bun/BunHttpClient";
-import { AWSEnvironment, makeS3State } from "alchemy/AWS";
 import { State } from "alchemy/State";
-import { Config, Effect, Layer, Redacted, Schema } from "effect";
-import type { HttpClient } from "effect/unstable/http/HttpClient";
+import { Config, Effect, Layer, Schema, Scope } from "effect";
+import type { HttpClient } from "effect/http/HttpClient";
+
+import { makeAlchemyR2State } from "./r2-objects.js";
 
 export const AlchemyR2AccountId = Schema.String.pipe(
   Schema.check(Schema.isPattern(/^[a-f0-9]{32}$/u)),
@@ -50,7 +51,8 @@ export const AlchemyR2StateFailureReason = Schema.Literals([
   "configurationInvalid",
   "initializationFailed",
 ]);
-export class AlchemyR2StateError extends Schema.TaggedErrorClass<AlchemyR2StateError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class AlchemyR2StateError extends Schema.TaggedError<AlchemyR2StateError>()(
   "AlchemyR2StateError",
   { reason: AlchemyR2StateFailureReason }
 ) {}
@@ -99,33 +101,22 @@ export const loadAlchemyR2StateConfig = Effect.gen(
 const layerForAlchemyR2StateConfig = (config: AlchemyR2StateConfig) => {
   const endpoint =
     `https://${config.accountId}.r2.cloudflarestorage.com` as const;
-  const credentials = AwsCredentials.fromCredentials({
-    accessKeyId: Redacted.value(config.accessKeyId),
-    secretAccessKey: Redacted.value(config.secretAccessKey),
-  });
+  const credentials = AwsCredentials.fromCredentials(
+    {
+      accessKeyId: config.accessKeyId,
+      secretAccessKey: config.secretAccessKey,
+    },
+    "auto"
+  );
   const region = Layer.succeed(AwsRegion.Region, Effect.succeed("auto"));
   const providerEndpoint = Layer.succeed(
     AwsEndpoint.Endpoint,
     Effect.succeed(endpoint)
   );
-  const environment = Layer.effect(
-    AWSEnvironment,
-    AwsCredentials.Credentials.pipe(
-      Effect.map((credentialEffect) =>
-        Effect.succeed({
-          accountId: config.accountId,
-          region: "auto",
-          credentials: credentialEffect,
-          endpoint,
-        })
-      )
-    )
-  ).pipe(Layer.provide(credentials));
   const dependencies = Layer.mergeAll(
     credentials,
     region,
     providerEndpoint,
-    environment,
     BunHttpClient.layer
   );
 
@@ -136,14 +127,14 @@ const layerForAlchemyR2StateConfig = (config: AlchemyR2StateConfig) => {
         | AwsCredentials.Credentials
         | AwsEndpoint.Endpoint
         | AwsRegion.Region
-        | AWSEnvironment
         | HttpClient
       >();
+      const scope = yield* Effect.scope;
       return yield* Effect.cached(
-        makeS3State({
-          bucketName: config.bucketName,
-          prefix: config.prefix,
-        }).pipe(Effect.provideContext(context))
+        makeAlchemyR2State(config).pipe(
+          Scope.provide(scope),
+          Effect.provideContext(context)
+        )
       );
     })
   ).pipe(

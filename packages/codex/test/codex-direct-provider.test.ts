@@ -8,7 +8,7 @@ import {
   Schema,
   Stream,
 } from "effect";
-import { HttpClient, HttpClientResponse } from "effect/unstable/http";
+import { HttpClient, HttpClientResponse } from "effect/http";
 
 import {
   CodexSubscriptionProfile,
@@ -49,7 +49,7 @@ import {
 } from "../src/testing/index.js";
 
 const encodeUnknownJson = Schema.encodeUnknownSync(
-  Schema.UnknownFromJsonString
+  Schema.fromJsonString(Schema.Unknown)
 );
 
 const renderForLeakCheck = (value: unknown) =>

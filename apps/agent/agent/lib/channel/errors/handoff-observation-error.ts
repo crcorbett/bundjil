@@ -1,6 +1,7 @@
 import { Schema } from "effect";
 
-export class ChannelHandoffObservationError extends Schema.TaggedErrorClass<ChannelHandoffObservationError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class ChannelHandoffObservationError extends Schema.TaggedError<ChannelHandoffObservationError>()(
   "ChannelHandoffObservationError",
   {
     operation: Schema.Literals(["initialize", "fingerprint", "observe"]),

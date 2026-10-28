@@ -77,7 +77,8 @@ const InfrastructureInventoryCommandFailureReason = Schema.Literals([
   "inventoryModeRequired",
   "receiptIncompatible",
 ]);
-class InfrastructureInventoryCommandError extends Schema.TaggedErrorClass<InfrastructureInventoryCommandError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+class InfrastructureInventoryCommandError extends Schema.TaggedError<InfrastructureInventoryCommandError>()(
   "InfrastructureInventoryCommandError",
   { reason: InfrastructureInventoryCommandFailureReason }
 ) {}

@@ -27,7 +27,7 @@ import {
 } from "../src/testing/index.js";
 
 const encodeUnknownJson = Schema.encodeUnknownSync(
-  Schema.UnknownFromJsonString
+  Schema.fromJsonString(Schema.Unknown)
 );
 
 const renderForLeakCheck = (value: unknown) =>
@@ -117,7 +117,9 @@ const makeLegacyEncryptedProfileV1 = (
   config: typeof CodexOAuthProfileCipherConfig.Type
 ) =>
   Effect.gen(function* makeLegacyEncryptedProfileV1Operation() {
-    const plaintext = yield* Schema.encodeEffect(Schema.UnknownFromJsonString)({
+    const plaintext = yield* Schema.encodeEffect(
+      Schema.fromJsonString(Schema.Unknown)
+    )({
       subject,
       accessToken: "legacy-access-token-secret",
       refreshToken: "legacy-refresh-token-secret",

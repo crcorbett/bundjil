@@ -160,7 +160,7 @@ Parent audit:
 1. Ownership and call graph: `@bundjil/codex-oauth` owns only the package
    contract. The target call graph is
    `OpenAICompatibleProxy -> CodexDirectProvider -> CodexOAuthService /
-CodexRequestMapper / CodexHttpClient / CodexStreamMapper`.
+   CodexRequestMapper / CodexHttpClient / CodexStreamMapper`.
 2. Effect implementation quality: services use `Context.Service`, `Layer`,
    schema-derived types, redacted internal tokens and upstream stream bodies,
    named `Effect.fn` operations, and flat `Effect.gen` composition. No

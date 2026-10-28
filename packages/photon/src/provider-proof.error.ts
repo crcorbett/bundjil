@@ -24,7 +24,8 @@ const PhotonProviderProofReason = Schema.Literals([
   "topologyNotRestored",
 ]);
 
-export class PhotonProviderProofError extends Schema.TaggedErrorClass<PhotonProviderProofError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class PhotonProviderProofError extends Schema.TaggedError<PhotonProviderProofError>()(
   "PhotonProviderProofError",
   {
     operation: PhotonProviderProofOperation,

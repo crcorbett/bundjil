@@ -81,27 +81,29 @@ export const makeChannelEveEvents = <E>(
     );
 
   return {
-    "authorization.completed"(event, channel) {
-      return event.outcome === "authorized"
+    "interaction.opened"(_event, { channel }) {
+      return presence(channel.state, "stop");
+    },
+    "interaction.settled"(event, { channel }) {
+      return event.data.outcome === "accepted"
         ? presence(channel.state, "start")
-        : Promise.resolve();
+        : presence(channel.state, "stop");
     },
-    "authorization.required"(_event, channel) {
-      return presence(channel.state, "stop");
-    },
-    "input.requested"(_event, channel) {
-      return presence(channel.state, "stop");
-    },
-    "message.completed"(event, channel, context) {
+    "content.completed"(event, context) {
+      const { channel } = context;
+      if (
+        event.data.kind !== "text" ||
+        event.data.phase !== "reply" ||
+        !Schema.is(Schema.String)(event.data.value) ||
+        event.data.value.trim().length === 0 ||
+        event.scope?.turnId === undefined
+      ) {
+        return Promise.resolve();
+      }
+      const text = event.data.value.trim();
+      const { turnId } = event.scope;
       return channelRuntime.runPromise(
-        Effect.gen(function* handleCompletedChannelMessage() {
-          if (
-            event.finishReason === "tool-calls" ||
-            event.message === null ||
-            event.message.trim().length === 0
-          ) {
-            return;
-          }
+        Effect.gen(function* handleCompletedChannelContent() {
           const service = yield* Channel;
           const decodedState = yield* Schema.decodeEffect(ChannelAdapterState)(
             channel.state
@@ -110,11 +112,12 @@ export const makeChannelEveEvents = <E>(
             _tag: "OutboundTextReady",
             conversation: decodedState.snapshot.conversation,
             coordinates: {
-              sequence: event.sequence,
+              sequence: context.position.line,
+              eventIndex: context.position.index,
               sessionId: context.session.id,
-              turnId: event.turnId,
+              turnId,
             },
-            text: event.message.trim(),
+            text,
           });
           const result = yield* service.handleEvent(outbound);
           const encoded = yield* Schema.encodeEffect(ChannelAdapterState)({
@@ -124,22 +127,20 @@ export const makeChannelEveEvents = <E>(
         })
       );
     },
-    "session.completed"(_event, channel) {
-      return settleSession(channel.state, channel.sessionId, "completed");
+    "session.ended"(event, { channel }) {
+      return settleSession(
+        channel.state,
+        channel.sessionId,
+        event.data.outcome
+      );
     },
-    "session.failed"(_event, channel) {
-      return settleSession(channel.state, channel.sessionId, "failed");
-    },
-    "session.waiting"(_event, channel) {
+    "turn.paused"(_event, { channel }) {
       return presence(channel.state, "stop");
     },
-    "turn.completed"(_event, channel) {
+    "turn.settled"(_event, { channel }) {
       return presence(channel.state, "stop");
     },
-    "turn.failed"(_event, channel) {
-      return presence(channel.state, "stop");
-    },
-    "turn.started"(_event, channel) {
+    "turn.started"(_event, { channel }) {
       return presence(channel.state, "start");
     },
   };
@@ -151,12 +152,12 @@ export const createChannelEveChannel = <E>(
   proofPolicy: ChannelWebhookProofPolicy
 ) =>
   defineChannel<ChannelMutableAdapterStateEncoded, ChannelEveContext>({
-    context(state, session) {
-      return { sessionId: session.id, state };
+    context(state, context) {
+      return { sessionId: context.session.id, state };
     },
     events: makeChannelEveEvents(channelRuntime),
     routes: [
-      POST(webhookPath, async (request, { send }) => {
+      POST(webhookPath, async (request, { from }) => {
         const result = await channelRuntime.runPromise(
           Effect.gen(function* handleChannelWebhook() {
             const query = yield* Schema.decodeUnknownEffect(
@@ -232,7 +233,7 @@ export const createChannelEveChannel = <E>(
                   Effect.andThen(settlement)
                 );
               }),
-              Effect.provide(EveChannelDispatchEve(send)),
+              Effect.provide(EveChannelDispatchEve(from)),
               Effect.catchTag("EveChannelDispatchError", (error) =>
                 Match.value(error.reason).pipe(
                   Match.when("rejected", () =>

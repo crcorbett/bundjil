@@ -6,7 +6,8 @@ import {
   CodexAuthTokenName,
 } from "../error-contracts.js";
 
-export class CodexOAuthTokenMissing extends Schema.TaggedErrorClass<CodexOAuthTokenMissing>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class CodexOAuthTokenMissing extends Schema.TaggedError<CodexOAuthTokenMissing>()(
   "CodexOAuthTokenMissing",
   {
     profileId: CodexOAuthProfileId,

@@ -5,7 +5,8 @@ import {
   UpstashKeyValueStoreErrorMessage,
 } from "../error-contracts.js";
 
-export class UpstashKeyValueStoreConfigError extends Schema.TaggedErrorClass<UpstashKeyValueStoreConfigError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class UpstashKeyValueStoreConfigError extends Schema.TaggedError<UpstashKeyValueStoreConfigError>()(
   "UpstashKeyValueStoreConfigError",
   {
     boundary: UpstashKeyValueStoreConfigBoundary,

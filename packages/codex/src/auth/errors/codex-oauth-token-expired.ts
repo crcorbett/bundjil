@@ -6,7 +6,8 @@ import {
   CodexAuthErrorMessage,
 } from "../error-contracts.js";
 
-export class CodexOAuthTokenExpired extends Schema.TaggedErrorClass<CodexOAuthTokenExpired>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class CodexOAuthTokenExpired extends Schema.TaggedError<CodexOAuthTokenExpired>()(
   "CodexOAuthTokenExpired",
   {
     profileId: CodexOAuthProfileId,

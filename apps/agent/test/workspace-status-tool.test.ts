@@ -28,9 +28,7 @@ const unusedToolContext: ToolContext = {
   callId: "test-call",
   toolName: "workspace_status",
   getSandbox: () => Promise.reject(new Error("Sandbox is not used.")),
-  getSkill: () => {
-    throw new Error("Skills are not used.");
-  },
+  messages: [],
   getToken: () => Promise.reject(new Error("Auth is not used.")),
   requireAuth: () => {
     throw new Error("Auth is not used.");
@@ -48,7 +46,7 @@ it.effect("executes the Eve tool through the live Effect named operation", () =>
           unusedToolContext
         )
       )
-    );
+    ).pipe(Effect.flatMap(Schema.decodeUnknownEffect(WorkspaceStatusSuccess)));
 
     assert.strictEqual(status.workspaceName, "bundjil");
     assert.strictEqual(
@@ -94,7 +92,7 @@ it.effect(
         {
           issues: [
             {
-              message: 'Expected a value with a length of at least 1, got ""',
+              message: "Expected a value with a length of at least 1",
               path: ["question"],
             },
           ],
