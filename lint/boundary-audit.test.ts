@@ -7,14 +7,12 @@ import { afterEach, describe, expect, it } from "vitest";
 import { auditBoundaryProvenance } from "./boundary-audit.js";
 import type { BoundaryException } from "./boundary-exceptions.js";
 
-const { dirname, join } = nodePath;
-
 const directories: string[] = [];
 const fixture = (source: string, relativePath = "fixture.ts") => {
-  const cwd = mkdtempSync(join(tmpdir(), "bundjil-boundary-audit-"));
+  const cwd = mkdtempSync(nodePath.join(tmpdir(), "bundjil-boundary-audit-"));
   directories.push(cwd);
-  const file = join(cwd, relativePath);
-  mkdirSync(dirname(file), { recursive: true });
+  const file = nodePath.join(cwd, relativePath);
+  mkdirSync(nodePath.dirname(file), { recursive: true });
   writeFileSync(file, source);
   return { cwd, file };
 };
@@ -41,7 +39,7 @@ describe("boundary provenance audit", () => {
       export interface Accounts { readonly find: (id: AccountId) => Promise<AccountId>; }
     `);
     writeFileSync(
-      join(cwd, "contract.ts"),
+      nodePath.join(cwd, "contract.ts"),
       `
         export declare const AccountId: { readonly Type: string & { readonly AccountId: unique symbol } };
         export type AccountId = typeof AccountId.Type;
@@ -281,7 +279,7 @@ describe("boundary provenance audit", () => {
       "packages/example/error.ts"
     );
     writeFileSync(
-      join(cwd, "packages/example/fields.ts"),
+      nodePath.join(cwd, "packages/example/fields.ts"),
       "export const ProviderErrorFields = { message: Schema.NonEmptyString };"
     );
     expect(
@@ -359,7 +357,7 @@ describe("boundary provenance audit", () => {
 
   it("detects typed codec misuse with real Effect Schema sides", () => {
     const cwd = process.cwd();
-    const file = join(cwd, "lint/codec-provenance.fixture.ts");
+    const file = nodePath.join(cwd, "lint/codec-provenance.fixture.ts");
     const diagnostics = auditBoundaryProvenance({ cwd, files: [file] });
     expect(diagnostics.map((diagnostic) => diagnostic.rule)).toStrictEqual([
       "codec-provenance",

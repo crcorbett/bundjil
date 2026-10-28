@@ -14,8 +14,6 @@ import {
   VercelTeamId,
 } from "./schemas.js";
 
-const { isAbsolute } = nodePath;
-
 export const VercelPreviewConfigurationPhase = Schema.Literals([
   "desired",
   "rollback",
@@ -31,7 +29,7 @@ export const VercelPreviewConfigurationAuthorityPath = Schema.String.pipe(
       value.length > 0 &&
       value.length <= 240 &&
       /^[A-Za-z0-9._/-]+$/u.test(value) &&
-      !isAbsolute(value) &&
+      !nodePath.isAbsolute(value) &&
       !value.split("/").includes("..")
         ? undefined
         : "The Preview configuration authority path must be safe and repository-relative."

@@ -197,12 +197,16 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    current proxy, public agent and callback targets, then stages both candidates
    using `vercel deploy --prod
    --skip-domain`, validates each immutable project/SHA/READY identity, and
-   re-reads `origin/main` before any promote. A stale candidate is an explicit
+   checks the protected immutable agent URL with project-scoped `vercel curl`.
+   It must return the application's anonymous 401 JSON response before any
+   public target moves. It re-reads `origin/main` before any promote. A stale candidate is an explicit
    no-op. It promotes proxy, public agent, then the callback alias, validates
    each target, checks the agent callback returns its anonymous 401 JSON response,
    and probes proxy health. Any uncertain or partial failure
    restores callback, agent and proxy in reverse order as applicable and
-   verifies each restored target. If both public apps already match `main` but
+   verifies each restored target. Restoring an application promotes its prior
+   deployment through the same project-scoped API, restoring public aliases
+   as well as the project target. If both public apps already match `main` but
    the callback is stale, it re-reads `main` and moves only the callback. An
    already-current SHA is an idempotent no-op only when all three targets
    match. The repository-wide queue never
@@ -213,7 +217,7 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    callback, agent and proxy restoration has its own four-minute deadline
    inside a 45-minute deployment step. The seven workflow step limits total 59
    minutes inside the exact 60-minute job limit. The maximum pre-mutation,
-   mutation and three-restoration path is 42 minutes. A timeout follows the same
+   mutation and three-restoration path is 44 minutes. A timeout follows the same
    readback and rollback path as any other unsuccessful Effect exit. Rollback
    attempts every eligible restoration even when an earlier restoration fails,
    then reports the combined rollback failure.

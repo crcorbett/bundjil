@@ -128,7 +128,7 @@ const verifySignature = (
       .digest();
     const provided = Buffer.from(signature.slice(3), "hex");
     return expected.byteLength === provided.byteLength
-      ? timingSafeEqual(expected, provided)
+      ? timingSafeEqual(Uint8Array.from(expected), Uint8Array.from(provided))
       : false;
   });
 

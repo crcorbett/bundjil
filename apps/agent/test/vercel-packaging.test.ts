@@ -1,5 +1,8 @@
 import { spawnSync } from "node:child_process";
-import { readFile } from "node:fs/promises";
+import { cp, mkdtemp, readFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import nodePath from "node:path";
+import { pathToFileURL } from "node:url";
 
 import { Effect, Schema } from "effect";
 import { describe, expect, it } from "vitest";
@@ -74,37 +77,58 @@ const FunctionConfig = Schema.Struct({
 });
 
 describe("Vercel packaging", () => {
-  it("boots the generated server with the Vercel runtime enabled", () => {
-    const child = spawnSync(
-      process.execPath,
-      [
-        "--input-type=module",
-        "--eval",
-        "await import(process.argv[1]);",
-        new URL("functions/__server.func/index.mjs", generatedOutputDirectory)
-          .href,
-      ],
-      {
-        cwd: appDirectory,
-        encoding: "utf-8",
-        env: {
-          NODE_ENV: "production",
-          VERCEL: "1",
-          BUNDJIL_EXECUTOR_MCP_URL:
-            "https://executor.sh/mcp/toolkits/bundjil-ci?elicitation_mode=model",
-          BUNDJIL_EXECUTOR_API_KEY: "executor-ci-synthetic-key",
-        },
-        timeout: 10_000,
-      }
-    );
-
-    expect(child.error).toBeUndefined();
-    if (child.status !== 0) {
-      throw new Error(
-        `The generated Vercel server failed to boot: ${child.stderr}`
+  it.each(["gateway", "codex-proxy"])(
+    "boots a standalone Vercel function with %s",
+    async (provider) => {
+      const directory = await mkdtemp(
+        nodePath.join(tmpdir(), "bundjil-vercel-function-")
       );
-    }
-  });
+      try {
+        await cp(
+          new URL("functions/__server.func/", generatedOutputDirectory),
+          directory,
+          {
+            recursive: true,
+            dereference: true,
+          }
+        );
+        const child = spawnSync(
+          process.execPath,
+          [
+            "--input-type=module",
+            "--eval",
+            "await import(process.argv[1]);",
+            pathToFileURL(nodePath.join(directory, "index.mjs")).href,
+          ],
+          {
+            cwd: directory,
+            encoding: "utf-8",
+            env: {
+              NODE_ENV: "production",
+              VERCEL: "1",
+              BUNDJIL_EXECUTOR_MCP_URL:
+                "https://executor.sh/mcp/toolkits/bundjil-ci?elicitation_mode=model",
+              BUNDJIL_EXECUTOR_API_KEY: "executor-ci-synthetic-key",
+              BUNDJIL_AGENT_MODEL_PROVIDER: provider,
+              BUNDJIL_CODEX_PROXY_BASE_URL: "https://proxy.example.test/v1",
+              BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN: "synthetic-proxy-token",
+            },
+            timeout: 10_000,
+          }
+        );
+
+        expect(child.error).toBeUndefined();
+        if (child.status !== 0) {
+          throw new Error(
+            `The generated Vercel server failed to boot: ${child.stderr}`
+          );
+        }
+      } finally {
+        await rm(directory, { recursive: true, force: true });
+      }
+    },
+    20_000
+  );
 
   it("pins the lock-resolved Eve lifecycle owner", async () => {
     const packageConfig = await Effect.runPromise(

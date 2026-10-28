@@ -16,8 +16,6 @@ import {
 import authorityEnvelopeSchema from "../../../tooling/schemas/authority-envelope.schema.json" with { type: "json" };
 import vercelGitLinkAuthorityPolicy from "../schemas/vercel-git-link-authority.schema.json" with { type: "json" };
 
-const { isAbsolute } = nodePath;
-
 declare const process: {
   exitCode: number | undefined;
 };
@@ -28,7 +26,7 @@ const VercelGitLinkAuthorityPath = Schema.String.pipe(
       value.length > 0 &&
       value.length <= 240 &&
       /^[A-Za-z0-9._/-]+$/u.test(value) &&
-      !isAbsolute(value) &&
+      !nodePath.isAbsolute(value) &&
       !value.split("/").includes("..")
         ? undefined
         : "The Vercel Git-link authority path must be safe and repository-relative."

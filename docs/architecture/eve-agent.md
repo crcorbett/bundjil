@@ -88,7 +88,8 @@ standalone receipt that cannot meet the required correlation contract.
   origin and disables AI SDK input/output capture. Eve registers the single
   global pipeline. Keep `@opentelemetry/api` external in hosted builds so its
   Node exports retain their package identity alongside Eve's compiled API.
-  The generated Vercel server is boot-tested with production runtime markers.
+  A standalone copy of the generated Vercel server is boot-tested with
+  production runtime markers for both model providers.
   The trace exists for the operator's restricted observability only; Bundjil
   never retains raw session/turn IDs,
   prompts, responses, tokens, tools, or reasoning in a repository receipt.

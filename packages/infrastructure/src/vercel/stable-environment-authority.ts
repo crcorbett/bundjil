@@ -9,15 +9,13 @@ import productionStableEnvironmentAuthorityPolicy from "../../schemas/production
 import stableEnvironmentAuthorityPolicy from "../../schemas/stable-vercel-environment-authority.schema.json" with { type: "json" };
 import { InfrastructureStage } from "../schemas.js";
 
-const { isAbsolute } = nodePath;
-
 export const VercelStableEnvironmentAuthorityPath = Schema.String.pipe(
   Schema.check(
     Schema.makeFilter((value) =>
       value.length > 0 &&
       value.length <= 240 &&
       /^[A-Za-z0-9._/-]+$/u.test(value) &&
-      !isAbsolute(value) &&
+      !nodePath.isAbsolute(value) &&
       !value.split("/").includes("..")
         ? undefined
         : "The stable environment authority path must be safe and repository-relative."

@@ -21,8 +21,6 @@ import {
 import { InfrastructureInventoryArtifactJson } from "../src/inventory.js";
 import { AlchemyLogicalResourceId } from "../src/schemas.js";
 
-const { dirname, isAbsolute } = nodePath;
-
 declare const process: {
   exitCode: number | undefined;
 };
@@ -33,7 +31,7 @@ const ReadmissionArtifactPath = Schema.String.pipe(
       value.length > 0 &&
       value.length <= 240 &&
       /^[A-Za-z0-9._/-]+$/u.test(value) &&
-      !isAbsolute(value) &&
+      !nodePath.isAbsolute(value) &&
       !value.split("/").includes("..")
         ? undefined
         : "Re-admission artifact path must be a safe repository-relative path."
@@ -125,7 +123,7 @@ const reAdmitManifest = Effect.gen(function* reAdmitManifestOperation() {
   });
   const manifestText =
     yield* Schema.encodeEffect(AdoptionManifestJson)(manifest);
-  yield* fileSystem.makeDirectory(dirname(outputPath), {
+  yield* fileSystem.makeDirectory(nodePath.dirname(outputPath), {
     recursive: true,
     mode: 0o700,
   });

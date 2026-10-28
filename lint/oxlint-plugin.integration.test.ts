@@ -6,8 +6,6 @@ import { describe, expect, it } from "vitest";
 
 import { deterministicEffectNativeVitestFixture } from "../packages/codex/test/fixtures/effect-native-vitest-positive.js";
 
-const { resolve } = nodePath;
-
 const runFixture = (fixture: string) => {
   const child = spawnSync(
     "bunx",
@@ -83,11 +81,11 @@ describe("installed Bundjil Oxlint plugin", () => {
     const genericProbe = "packages/channel/src/.anti-slop-lint-probe.ts";
     const effectProbe = "packages/codex/src/.anti-slop-effect-lint-probe.ts";
     writeFileSync(
-      resolve(genericProbe),
+      nodePath.resolve(genericProbe),
       'const inspect = (value: unknown) => typeof value === "string";\nvoid inspect;\n'
     );
     writeFileSync(
-      resolve(effectProbe),
+      nodePath.resolve(effectProbe),
       'import { makeCodexOAuthHttpClient } from "./auth/http-client.js";\nvoid makeCodexOAuthHttpClient;\n'
     );
 
@@ -102,8 +100,8 @@ describe("installed Bundjil Oxlint plugin", () => {
         "anti-slop-effect(no-service-constructor-imports)"
       );
     } finally {
-      rmSync(resolve(genericProbe), { force: true });
-      rmSync(resolve(effectProbe), { force: true });
+      rmSync(nodePath.resolve(genericProbe), { force: true });
+      rmSync(nodePath.resolve(effectProbe), { force: true });
     }
   });
 
@@ -111,12 +109,18 @@ describe("installed Bundjil Oxlint plugin", () => {
     const negativeProbe = "packages/channel/src/.package-boundary-negative.ts";
     const positiveProbe = "packages/channel/src/.package-boundary-positive.ts";
     writeFileSync(
-      resolve(negativeProbe),
-      readFileSync(resolve("lint/fixtures/package-negative.ts.txt"), "utf-8")
+      nodePath.resolve(negativeProbe),
+      readFileSync(
+        nodePath.resolve("lint/fixtures/package-negative.ts.txt"),
+        "utf-8"
+      )
     );
     writeFileSync(
-      resolve(positiveProbe),
-      readFileSync(resolve("lint/fixtures/package-positive.ts"), "utf-8")
+      nodePath.resolve(positiveProbe),
+      readFileSync(
+        nodePath.resolve("lint/fixtures/package-positive.ts"),
+        "utf-8"
+      )
     );
 
     try {
@@ -131,8 +135,8 @@ describe("installed Bundjil Oxlint plugin", () => {
         "package(no-cross-package-source-imports)"
       );
     } finally {
-      rmSync(resolve(negativeProbe), { force: true });
-      rmSync(resolve(positiveProbe), { force: true });
+      rmSync(nodePath.resolve(negativeProbe), { force: true });
+      rmSync(nodePath.resolve(positiveProbe), { force: true });
     }
   });
 
@@ -140,11 +144,11 @@ describe("installed Bundjil Oxlint plugin", () => {
     const typescriptProbe = "packages/channel/src/.namespace-lint-probe.ts";
     const javascriptProbe = "packages/channel/src/.duplicate-lint-probe.js";
     writeFileSync(
-      resolve(typescriptProbe),
+      nodePath.resolve(typescriptProbe),
       "const OwnerContract = { value: true };\ntype OwnerContract = typeof OwnerContract;\nvoid OwnerContract;\n"
     );
     writeFileSync(
-      resolve(javascriptProbe),
+      nodePath.resolve(javascriptProbe),
       "const duplicate = 1;\nconst duplicate = 2;\nvoid duplicate;\n"
     );
 
@@ -158,14 +162,14 @@ describe("installed Bundjil Oxlint plugin", () => {
         "Identifier `duplicate` has already been declared"
       );
     } finally {
-      rmSync(resolve(typescriptProbe), { force: true });
-      rmSync(resolve(javascriptProbe), { force: true });
+      rmSync(nodePath.resolve(typescriptProbe), { force: true });
+      rmSync(nodePath.resolve(javascriptProbe), { force: true });
     }
   });
 
   it("applies ambient-time enforcement to owned tooling", () => {
     const probe = "tooling/.ambient-time-lint-probe.ts";
-    writeFileSync(resolve(probe), "new Date();\n");
+    writeFileSync(nodePath.resolve(probe), "new Date();\n");
 
     try {
       const child = spawnSync(
@@ -178,7 +182,7 @@ describe("installed Bundjil Oxlint plugin", () => {
         "bundjil(no-ambient-time-in-effect)"
       );
     } finally {
-      rmSync(resolve(probe), { force: true });
+      rmSync(nodePath.resolve(probe), { force: true });
     }
   });
 
@@ -186,7 +190,7 @@ describe("installed Bundjil Oxlint plugin", () => {
     const probe =
       "packages/infrastructure/scripts/.primitive-failure-lint-probe.ts";
     writeFileSync(
-      resolve(probe),
+      nodePath.resolve(probe),
       'import { Effect } from "effect";\nEffect.fail("primitive");\n'
     );
 
@@ -201,14 +205,17 @@ describe("installed Bundjil Oxlint plugin", () => {
         "bundjil(no-primitive-effect-failure)"
       );
     } finally {
-      rmSync(resolve(probe), { force: true });
+      rmSync(nodePath.resolve(probe), { force: true });
     }
   });
 
   it("applies native-collection review to owned package scripts", () => {
     const probe =
       "packages/infrastructure/scripts/.native-collection-lint-probe.ts";
-    writeFileSync(resolve(probe), 'const values = new Set(["value"]);\n');
+    writeFileSync(
+      nodePath.resolve(probe),
+      'const values = new Set(["value"]);\n'
+    );
 
     try {
       const child = spawnSync(
@@ -221,7 +228,7 @@ describe("installed Bundjil Oxlint plugin", () => {
         "bundjil(no-unregistered-native-collection)"
       );
     } finally {
-      rmSync(resolve(probe), { force: true });
+      rmSync(nodePath.resolve(probe), { force: true });
     }
   });
 });

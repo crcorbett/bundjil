@@ -7,8 +7,6 @@ import ts from "typescript-compiler-api";
 import { boundaryExceptions } from "./boundary-exceptions.js";
 import type { BoundaryException, BoundaryRule } from "./boundary-exceptions.js";
 
-const { relative, resolve, sep } = nodePath;
-
 export type BoundaryDiagnostic = Readonly<{
   file: string;
   line: number;
@@ -26,14 +24,14 @@ type AuditOptions = Readonly<{
 
 const productionFile = (file: string) =>
   /\.(?:[cm]?ts|tsx)$/u.test(file) &&
-  !file.includes(`${sep}test${sep}`) &&
+  !file.includes(`${nodePath.sep}test${nodePath.sep}`) &&
   !file.endsWith(".test.ts") &&
-  !file.includes(`${sep}node_modules${sep}`) &&
-  !file.includes(`${sep}dist${sep}`);
+  !file.includes(`${nodePath.sep}node_modules${nodePath.sep}`) &&
+  !file.includes(`${nodePath.sep}dist${nodePath.sep}`);
 
 const sourceFiles = (directory: string): readonly string[] =>
   readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
-    const path = resolve(directory, entry.name);
+    const path = nodePath.resolve(directory, entry.name);
     if (entry.isDirectory()) {
       return sourceFiles(path);
     }
@@ -42,11 +40,11 @@ const sourceFiles = (directory: string): readonly string[] =>
 
 const rootSourceFiles = (cwd: string) =>
   ["apps", "packages"]
-    .flatMap((directory) => sourceFiles(resolve(cwd, directory)))
+    .flatMap((directory) => sourceFiles(nodePath.resolve(cwd, directory)))
     .filter(
       (file) =>
-        !file.includes(`${sep}.eve${sep}`) &&
-        !file.includes(`${sep}.local${sep}`)
+        !file.includes(`${nodePath.sep}.eve${nodePath.sep}`) &&
+        !file.includes(`${nodePath.sep}.local${nodePath.sep}`)
     );
 
 const nodeSymbol = (node: ts.Node) => {
@@ -302,7 +300,9 @@ const isDataTaggedErrorClass = (node: ts.ClassDeclaration) =>
 const isOperatorRawCause = (node: ts.PropertySignature) => {
   if (
     node.type?.kind !== ts.SyntaxKind.UnknownKeyword ||
-    !node.getSourceFile().fileName.includes(`${sep}scripts${sep}`)
+    !node
+      .getSourceFile()
+      .fileName.includes(`${nodePath.sep}scripts${nodePath.sep}`)
   ) {
     return false;
   }
@@ -697,7 +697,7 @@ export const auditBoundaryProvenance = (
 
   const report = (node: ts.Node, rule: BoundaryRule, message: string) => {
     const sourceFile = node.getSourceFile();
-    const file = relative(options.cwd, sourceFile.fileName);
+    const file = nodePath.relative(options.cwd, sourceFile.fileName);
     const symbol = nodeSymbol(node);
     const baseOccurrence = occurrence(node);
     const occurrenceKey = `${file}\u0000${symbol}\u0000${rule}\u0000${baseOccurrence}`;

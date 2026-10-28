@@ -42,8 +42,6 @@ import {
 } from "../src/state/r2-state.js";
 import { VercelAccessToken } from "../src/vercel/index.js";
 
-const { dirname, isAbsolute } = nodePath;
-
 declare const process: {
   exitCode: number | undefined;
 };
@@ -54,7 +52,7 @@ const AdoptionProofPath = Schema.String.pipe(
       value.length > 0 &&
       value.length <= 240 &&
       /^[A-Za-z0-9._/-]+$/u.test(value) &&
-      !isAbsolute(value) &&
+      !nodePath.isAbsolute(value) &&
       !value.split("/").includes("..")
         ? undefined
         : "Adoption proof paths must be safe repository-relative paths."
@@ -518,7 +516,7 @@ const runAdoptionStateProof = Effect.gen(
 
     const fileSystem = yield* FileSystem.FileSystem;
     yield* fileSystem
-      .makeDirectory(dirname(receiptPath), {
+      .makeDirectory(nodePath.dirname(receiptPath), {
         recursive: true,
         mode: 0o700,
       })

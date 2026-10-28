@@ -24,6 +24,13 @@ settings or the operator's intended build settings. CI runs the same
 uses `eve build --skip-sandbox-prewarm`: it verifies routing and function
 metadata without Vercel credentials. That output is not deployable; the normal
 production build prepares real sandbox templates with the host's identity.
+The generated function is copied outside the workspace and booted in production
+mode for both model providers, so the check cannot resolve missing runtime
+files from workspace dependencies.
+
+Keep Bun's native lockfile format at version 2. Vercel uses that format to
+select Bun 1.4 for installation while the functions retain Node 24; an older
+lockfile can select Bun 1.3 despite the repository's package-manager pin.
 
 ## Compiler
 
