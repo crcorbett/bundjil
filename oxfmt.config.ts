@@ -7,6 +7,8 @@ export default defineConfig({
   proseWrap: "preserve",
   ignorePatterns: [
     ...(ultracite.ignorePatterns ?? []),
+    ".agents/**",
+    ".claude/**",
     "tools/oxlint/anti-slop/**",
   ],
 });

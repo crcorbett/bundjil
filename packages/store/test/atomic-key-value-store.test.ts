@@ -1,7 +1,7 @@
 import { assert, it } from "@effect/vitest";
 import { Array, Duration, Effect, Schema } from "effect";
+import * as KeyValueStore from "effect/persistence/KeyValueStore";
 import * as TestClock from "effect/testing/TestClock";
-import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
 
 import {
   AtomicKeyValueStore,

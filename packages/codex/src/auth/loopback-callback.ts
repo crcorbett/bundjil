@@ -12,11 +12,8 @@ import {
   Result,
   Schema,
 } from "effect";
-import {
-  HttpServer,
-  HttpServerRequest,
-  HttpServerResponse,
-} from "effect/unstable/http";
+import type { HttpServerError } from "effect/http";
+import { HttpServer, HttpServerRequest, HttpServerResponse } from "effect/http";
 
 import {
   CodexOAuthAuthorizationCallback,
@@ -141,9 +138,18 @@ const bindConflictError = new CodexSubscriptionAuthError({
 });
 
 const mapExpectedBindConflict = <A>(
-  effect: Effect.Effect<A, never, Scope.Scope>
+  effect: Effect.Effect<A, HttpServerError.ServeError, Scope.Scope>
 ) =>
   effect.pipe(
+    Effect.catchTag("ServeError", () =>
+      Effect.fail(
+        new CodexSubscriptionAuthError({
+          operation: "bindCallback",
+          reason: "invalidCallback",
+          message: "Unable to serve the Codex callback.",
+        })
+      )
+    ),
     Effect.catchCause((cause) =>
       Result.match(Cause.findDefect(cause), {
         onFailure: () => Effect.failCause(cause),

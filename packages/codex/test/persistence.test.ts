@@ -11,7 +11,7 @@ import {
   Schema,
   pipe,
 } from "effect";
-import * as KeyValueStore from "effect/unstable/persistence/KeyValueStore";
+import * as KeyValueStore from "effect/persistence/KeyValueStore";
 
 import {
   CodexAccessTokenImportProfile,
@@ -106,7 +106,7 @@ const cipherConfig = Schema.decodeUnknownEffect(CodexOAuthProfileCipherConfig)({
 });
 
 const encodeUnknownJson = Schema.encodeUnknownSync(
-  Schema.UnknownFromJsonString
+  Schema.fromJsonString(Schema.Unknown)
 );
 
 it.effect("preserves Codex Upstash config names, aliases, and redaction", () =>

@@ -21,7 +21,8 @@ export const PhotonSdkTransportStatus = Schema.Int.check(
 );
 export type PhotonSdkTransportStatus = typeof PhotonSdkTransportStatus.Type;
 
-export class PhotonSdkObservedFailure extends Schema.TaggedErrorClass<PhotonSdkObservedFailure>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class PhotonSdkObservedFailure extends Schema.TaggedError<PhotonSdkObservedFailure>()(
   "PhotonSdkObservedFailure",
   {
     operation: PhotonSdkOperation,

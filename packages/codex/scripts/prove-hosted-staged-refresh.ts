@@ -11,7 +11,7 @@ import {
   Redacted,
   Schema,
 } from "effect";
-import { HttpClient, HttpClientRequest } from "effect/unstable/http";
+import { HttpClient, HttpClientRequest } from "effect/http";
 
 import { CodexSubscriptionAuthError } from "../src/auth/errors.js";
 import {
@@ -39,7 +39,7 @@ declare const process: {
   exitCode: number | undefined;
 };
 
-const previewUrlConfig = Config.url("BUNDJIL_CODEX_PROXY_PREVIEW_URL");
+const previewUrlConfig = Config.URL("BUNDJIL_CODEX_PROXY_PREVIEW_URL");
 const internalTokenConfig = Config.schema(
   OpenAICompatibleProxyInternalToken,
   "BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN"

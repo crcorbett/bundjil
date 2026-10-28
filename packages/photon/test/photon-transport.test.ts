@@ -891,9 +891,9 @@ it.effect("contains hostile SDK success accessors", () =>
     const outcome = yield* client
       .sendMessage(fixture.conversation.participantId, fixture.text)
       .pipe(Effect.result);
-    const encoded = yield* Schema.encodeEffect(Schema.UnknownFromJsonString)(
-      outcome
-    );
+    const encoded = yield* Schema.encodeEffect(
+      Schema.fromJsonString(Schema.Unknown)
+    )(outcome);
 
     assert.isTrue(Result.isFailure(outcome));
     if (Result.isFailure(outcome)) {

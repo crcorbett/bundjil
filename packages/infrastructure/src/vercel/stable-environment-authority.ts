@@ -42,7 +42,8 @@ export type VercelStableEnvironmentAuthorityFailureReason =
 export type VercelStableEnvironmentAuthorityFailureReasonEncoded =
   typeof VercelStableEnvironmentAuthorityFailureReason.Encoded;
 
-export class VercelStableEnvironmentAuthorityError extends Schema.TaggedErrorClass<VercelStableEnvironmentAuthorityError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class VercelStableEnvironmentAuthorityError extends Schema.TaggedError<VercelStableEnvironmentAuthorityError>()(
   "VercelStableEnvironmentAuthorityError",
   { reason: VercelStableEnvironmentAuthorityFailureReason }
 ) {}

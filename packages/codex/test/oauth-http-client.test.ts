@@ -1,7 +1,7 @@
 import { assert, it } from "@effect/vitest";
 import { Deferred, Effect, Fiber, Layer, Redacted, Schema } from "effect";
+import { HttpClient } from "effect/http";
 import { TestClock } from "effect/testing";
-import { HttpClient } from "effect/unstable/http";
 
 import { CodexOAuthRedirectUri } from "../src/auth/credentials.js";
 import {

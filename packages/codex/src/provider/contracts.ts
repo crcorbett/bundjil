@@ -291,17 +291,17 @@ const canonicalizeCodexJsonValue = Option.liftThrowable((input: unknown) =>
   canonicalizeCodexJsonValueAtDepth(input, 0)
 );
 
-const canonicalCodexJsonIssue = (input: unknown) =>
-  new SchemaIssue.InvalidValue(Option.some(input), {
+const canonicalCodexJsonIssue = () =>
+  new SchemaIssue.InvalidValue({
     message: "Expected canonical bounded JSON",
   });
 
 const decodeCanonicalCodexJson = (input: unknown) =>
   Option.match(canonicalizeCodexJsonValue(input), {
-    onNone: () => Effect.fail(canonicalCodexJsonIssue(input)),
+    onNone: () => Effect.fail(canonicalCodexJsonIssue()),
     onSome: (value) =>
       value === undefined
-        ? Effect.fail(canonicalCodexJsonIssue(input))
+        ? Effect.fail(canonicalCodexJsonIssue())
         : Effect.succeed(value),
   });
 
@@ -366,8 +366,8 @@ const CodexJsonValueDeclaration = Schema.declare<unknown>(
 
 export const CodexJsonValue = Schema.Unknown.pipe(
   Schema.decodeTo(CodexJsonValueDeclaration, {
-    decode: SchemaGetter.transformOrFail(decodeCanonicalCodexJson),
-    encode: SchemaGetter.transformOrFail(decodeCanonicalCodexJson),
+    decode: SchemaGetter.transformEffect(decodeCanonicalCodexJson),
+    encode: SchemaGetter.transformEffect(decodeCanonicalCodexJson),
   }),
   Schema.brand("CodexJsonValue")
 );
@@ -384,7 +384,7 @@ const decodeCodexFunctionParameters = (input: unknown) =>
       return value;
     }
     return yield* Effect.fail(
-      new SchemaIssue.InvalidValue(Option.some(input), {
+      new SchemaIssue.InvalidValue({
         message: "Expected a canonical bounded JSON object",
       })
     );
@@ -402,8 +402,8 @@ const CodexFunctionParametersDeclaration = Schema.declare<unknown>(
 
 export const CodexFunctionParameters = Schema.Unknown.pipe(
   Schema.decodeTo(CodexFunctionParametersDeclaration, {
-    decode: SchemaGetter.transformOrFail(decodeCodexFunctionParameters),
-    encode: SchemaGetter.transformOrFail(decodeCodexFunctionParameters),
+    decode: SchemaGetter.transformEffect(decodeCodexFunctionParameters),
+    encode: SchemaGetter.transformEffect(decodeCodexFunctionParameters),
   }),
   Schema.brand("CodexFunctionParameters")
 );
@@ -572,7 +572,7 @@ export const CodexResponsesPostInput = Schema.Struct({
   accessToken: CodexOAuthAccessToken,
   accountId: Schema.optional(CodexOAuthAccountId),
   request: CodexResponsesRequest,
-}).pipe(Schema.redact);
+}).annotate({ parseOptions: { reportInput: false } });
 
 export type CodexResponsesPostInput = typeof CodexResponsesPostInput.Type;
 
@@ -797,7 +797,7 @@ export const CodexResponsesProofInput = Schema.Struct({
   accountId: Schema.optional(CodexOAuthAccountId),
   model: CodexResponsesModelId,
   prompt: CodexResponsesNonEmptyContent,
-}).pipe(Schema.redact);
+}).annotate({ parseOptions: { reportInput: false } });
 
 export type CodexResponsesProofInput = typeof CodexResponsesProofInput.Type;
 

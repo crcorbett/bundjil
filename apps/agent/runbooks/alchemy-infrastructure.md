@@ -42,6 +42,15 @@ fixed authority, an immutable callback candidate, and captured rollback
 identities. A missing approved user is a stop; never substitute either user
 from the shared project.
 
+Alchemy beta.84 moved provider integrations out of the core and renamed the
+old resource sync operation to `drift`. Existing repository `*-sync` commands
+remain available and run the read-only native drift command. The R2 adapter
+uses native bucket-state encoding and conditional leases over the existing S3
+object endpoint. It does not use AWS state provisioning, whose bucket settings
+are incompatible with R2. Never change the bucket, prefix or stage to work
+around a missing state record. A lease is scoped to the command; an interrupted
+process leaves it to expire before another writer can acquire it.
+
 ## Preconditions and authority gate
 
 Before resolving a credential, record and validate one task-scoped authority
@@ -182,13 +191,13 @@ Photon projects, manifests, or physical identities.
    ```sh
    bun alchemy deploy --stage preview --adopt --yes
    bun alchemy plan --stage preview
-   bun alchemy sync --stage preview --dry-run
-   bun alchemy sync --stage preview --dry-run
+   bun alchemy drift --stage preview --no-input
+   bun alchemy drift --stage preview --no-input
 
    bun alchemy deploy --stage prod --adopt --yes
    bun alchemy plan --stage prod
-   bun alchemy sync --stage prod --dry-run
-   bun alchemy sync --stage prod --dry-run
+   bun alchemy drift --stage prod --no-input
+   bun alchemy drift --stage prod --no-input
    ```
 
 5. Require the post-adoption plan to be all no-op and both sync dry-runs to be
@@ -419,7 +428,7 @@ verification gates must pass before the first write.
 ## Report-only drift and monitoring
 
 The report-only path wraps the same stable stack, stage-owned R2 state, native
-desired plan, and native Alchemy `sync --dry-run`. It does not own repair.
+desired plan, and native Alchemy `drift`. It does not own repair.
 Before every run:
 
 1. Validate the static read-only policy envelope against both the fixed harness
@@ -496,8 +505,8 @@ Before every run:
    Ignore custom targets; never relabel one as Preview or Production.
    Vercel sensitive environment values are write-only at this boundary. A row
    with an `ObservedUnknown` accepted manifest baseline may classify
-   `unknownSecretRevision` as accepted when native sync returns `unchanged`
-   with present provider revision metadata. A drifted native-sync row may also
+   `unknownSecretRevision` as accepted when native drift detection returns `unchanged`
+   with present provider revision metadata. A drifted native-drift row may also
    be accepted only when the desired plan remains no-op and the manifest
    carries the exact current provider update timestamp admitted from its
    matching two-read inventory. A missing or different admitted timestamp

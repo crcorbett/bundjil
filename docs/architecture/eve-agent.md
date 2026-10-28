@@ -41,7 +41,7 @@ The source supports two model selections:
 Eve HTTP/API -> apps/agent/agent/agent.ts -> agent/config.ts
   -> gateway model string
   |  codex-proxy LanguageModel
-       -> agent/instrumentation.ts records no inputs/outputs
+       -> agent/instrumentation/vercel.ts records no inputs/outputs
        -> W3C trace context to the configured private proxy origin only
        -> apps/codex-proxy /v1/chat/completions
        -> proxy continues the trace until its SSE response settles
@@ -67,7 +67,7 @@ not supported architecture paths. This enhancement is not required for the
 completed Terra/high rollout; its future proof gate lives in the
 [Codex Terra SPEC](../product-specs/codex-terra-high-reasoning.md).
 
-As of the installed Eve `0.29.5`, that enhancement prerequisite is unavailable.
+As of the installed Eve `0.84.1`, that enhancement prerequisite is unavailable.
 `defineDynamic` can select a live model at `step.started`, but the public
 resolver receives `event: unknown` and a session-level context, not a stable
 turn, step, or attempt identity. The documented stream `meta.id` exists only
@@ -82,7 +82,7 @@ standalone receipt that cannot meet the required correlation contract.
 - `agent/config.ts` decodes model-provider configuration through Effect Config
   and Schemas; secrets are redacted. `model-provider.ts` owns model
   construction.
-- `agent/instrumentation.ts` is an Eve-owned telemetry boundary, not a model
+- `agent/instrumentation/vercel.ts` is an Eve-owned telemetry boundary, not a model
   wrapper. It uses the already-decoded selected provider configuration to
   restrict Vercel OpenTelemetry fetch propagation to the private Codex proxy
   origin and disables AI SDK input/output capture. The trace exists for the
@@ -223,48 +223,43 @@ acceptance or durable execution. Current local build proof loads both provider
 roots; future bundle splitting, warm-instance reuse, scale-out, freeze, and
 shutdown remain deployment readback questions.
 
-Pinned and lock-resolved Eve `0.29.5` owns the durable boundary behind
-the route-owned `send()` operation. `send()` first awaits
-`runtime.deliver()`, whose Workflow runtime awaits `resumeHook` and returns the
-owning run identity. On any delivery rejection, including but not limited to
-Eve's no-active-session error, `send()` can fall through to `runtime.run()`;
-that operation awaits `startWorkflowPreferLatest` for Eve's session
-`workflowEntry`. The session driver dispatches each logical turn through
-`startWorkflowPreferLatest(turnWorkflowReference)`.
+Pinned and lock-resolved Eve `0.84.1` owns the durable boundary behind
+`from(continuationToken).send(message, options)`. Its channel address resolves
+the current owner and returns a delivery receipt with `sessionId` and
+`deliveryId`. Bundjil checks that receipt's session identity against its atomic
+continuity record before acknowledging ingress.
 
 ```text
 Channel webhook
   -> EveChannelDispatch
-  -> Eve send()
-     -> deliver() -> resumeHook -> existing owner run
-     |  any delivery rejection -> run() -> startWorkflowPreferLatest
-        -> workflowEntry session driver
-        -> dispatchAndAwaitTurn
-        -> startWorkflowPreferLatest(turnWorkflowReference)
+  -> Eve from(continuationToken).send()
+     -> native channel-address delivery and durable session ownership
+     -> Delivery.sessionId
+     -> Channel.acceptInbound continuity fence
+     -> 202 after acceptance, or 503 for uncertainty
 ```
 
-Bundjil must not add an app-owned Workflow, raw Workflow client, queue
-fallback, or mirrored runtime service around this call graph. Resolution of
-`send()` is the earliest source-level Workflow acceptance boundary, but an
-established continuation still requires intended/accepted run convergence:
-Eve's all-error fallback can otherwise resolve through a different new run.
-Source inspection alone does not prove that hosted convergence.
+Bundjil adds no app-owned Workflow, raw Workflow client, queue fallback or
+mirrored runtime service. A resolved delivery is the source-level acceptance
+boundary; provider readback and an application journey remain separate hosted
+checks.
 
 When `VERCEL=1`, Eve directly creates Nitro with the Vercel preset. Eve
-`0.29.5` supplies Build Output framework metadata but exposes no
+`0.84.1` supplies Build Output framework metadata but exposes no
 Bundjil-facing `vercel.functions` option for the ordinary generated
 `__server`. Eve separately patches the generated Workflow `flow` function to
 Node 24, its namespaced queue trigger, and `maxDuration: "max"`. Bundjil
 preserves those owners and does not guess a `vercel.json` source glob or patch
-generated output. The agent test command creates both ordinary local output
-and Vercel Build Output, then Schema-decodes the generated route/function
-contracts. These are local artifact assertions only; an immutable hosted
+generated output. The agent test command creates ordinary local output
+and Vercel Build Output with sandbox prewarming skipped, then Schema-decodes the generated route/function
+contracts. These are local artifact assertions only, and the skipped-prewarm output must
+not be deployed. An immutable hosted
 deployment must read back its own mapping and effective durations.
 
 Vercel's supported Nitro configuration owner is
 `defineNitroConfig({ vercel: { functions: { maxDuration }}})`. Because Eve
 creates Nitro internally and exposes no application input for that object in
-`0.29.5`, Bundjil cannot use the supported seam without an upstream Eve
+`0.84.1`, Bundjil cannot use the supported seam without an upstream Eve
 change. A source `vercel.json` glob must name a real source entrypoint and
 therefore cannot safely target the generated `__server`. Until measurements
 show a need and a supported Eve seam exists, retain the effective project
@@ -273,13 +268,14 @@ default as an explicit hosted blocker rather than patching Build Output.
 Eve events use the same Channel service:
 
 ```text
-turn.started / authorization.completed
+turn.started / interaction.settled accepted
   -> Schema.decodeEffect(ChannelAdapterState)
   -> Channel.handleEvent(PresenceRequested start)
   -> ChannelTransport.setPresence
   -> Schema.encodeEffect(ChannelAdapterState)
 
-message.completed
+content.completed (text reply)
+  -> stream line + fact index + session/turn identity
   -> ChannelReplay.claimOutbound
   -> ChannelTransport.sendMessage
   -> accepted -> owner-fenced complete record
@@ -288,8 +284,8 @@ message.completed
   -> immutable ChannelStateV1 -> encoded Eve snapshot
 ```
 
-Presence stops on authorization-required, input-requested, waiting, terminal
-turn, and terminal session events. Terminal session events also fingerprint
+Presence stops on `interaction.opened`, declined/failed interaction settlement,
+`turn.paused`, `turn.settled`, and `session.ended`. Terminal session events also fingerprint
 the Eve session identity and owner-fence continuity retirement. Persisted Eve
 state remains only the immutable conversation snapshot; replay storage owns
 the separate continuity/failure records. Provider typing state is not

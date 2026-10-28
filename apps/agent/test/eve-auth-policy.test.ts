@@ -10,6 +10,7 @@ describe("Eve auth policy", () => {
   });
 
   it("authors the installed Vercel OIDC and localhost-only local development policy", () => {
+    vi.stubEnv("EVE_DEV", "1");
     expect(eveChannel).toBeDefined();
     expect(
       localDev()(new Request("http://127.0.0.1/eve/v1/session"))

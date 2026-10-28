@@ -10,13 +10,13 @@ import {
 import { runChannelTransportConformance } from "@bundjil/channel/testing";
 import { assert, it } from "@effect/vitest";
 import { Deferred, Effect, Fiber, Layer, Redacted, Ref, Schema } from "effect";
-import * as TestClock from "effect/testing/TestClock";
 import {
   HttpClient,
   HttpClientError,
   HttpClientRequest,
   HttpClientResponse,
-} from "effect/unstable/http";
+} from "effect/http";
+import * as TestClock from "effect/testing/TestClock";
 import { vi } from "vitest";
 
 import { layerLive } from "../src/live.layer.js";
@@ -360,7 +360,7 @@ it.effect(
     Effect.gen(function* testProviderResponseFailures() {
       const fixture = yield* fixtures;
       const errorBody = yield* Schema.encodeEffect(
-        Schema.UnknownFromJsonString
+        Schema.fromJsonString(Schema.Unknown)
       )({
         message: "private provider detail",
       });

@@ -578,7 +578,7 @@ Parent audit:
    across all six workspaces. The tests cover proactive/forced refresh,
    fencing, no-mutation errors, legacy refusal, one 401 replay, readiness,
    error contracts, local/mock preservation, and leak safety. `git diff
---check` and task JSON validation passed.
+   --check` and task JSON validation passed.
 
 Remaining gap: the later hosted preview proof task has not run. This accepted
 implementation made no deployment, remote configuration change, production

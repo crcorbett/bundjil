@@ -14,7 +14,8 @@ import {
   HttpClientRequest,
   HttpClientResponse,
   HttpServer,
-} from "effect/unstable/http";
+} from "effect/http";
+import { NetAddress } from "effect/net";
 
 import { CodexOAuthProviderErrorCode } from "../src/auth/contracts.js";
 import {
@@ -142,9 +143,9 @@ it.effect(
 
 const encodeJwt = (claims: unknown) =>
   Effect.gen(function* encodeTestJwt() {
-    const json = yield* Schema.encodeEffect(Schema.UnknownFromJsonString)(
-      claims
-    );
+    const json = yield* Schema.encodeEffect(
+      Schema.fromJsonString(Schema.Unknown)
+    )(claims);
     const payload = yield* Schema.encodeEffect(Schema.Uint8ArrayFromBase64Url)(
       new TextEncoder().encode(json)
     );
@@ -383,11 +384,10 @@ it.effect(
                       `http://localhost:${port}/auth/callback`
                     ),
                     server: HttpServer.make({
-                      address: {
-                        _tag: "TcpAddress",
-                        hostname: "127.0.0.1",
-                        port,
-                      },
+                      address: NetAddress.inetAddressUnsafe(
+                        NetAddress.ipv4Loopback,
+                        port
+                      ),
                       serve: () => Effect.void,
                     }),
                   })

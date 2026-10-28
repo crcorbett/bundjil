@@ -16,13 +16,6 @@ export {
   CodexProfileSchemaBoundary,
   CodexProfileStorageOperation,
 } from "./error-contracts.js";
-export type {
-  CodexOAuthProfileCipherOperation as CodexOAuthProfileCipherOperationType,
-  CodexOAuthRefreshLockFailureReason as CodexOAuthRefreshLockFailureReasonType,
-  CodexOAuthRefreshLockOperation as CodexOAuthRefreshLockOperationType,
-  CodexProfileSchemaBoundary as CodexProfileSchemaBoundaryType,
-  CodexProfileStorageOperation as CodexProfileStorageOperationType,
-} from "./error-contracts.js";
 export { CodexOAuthProfileCipherError } from "./errors/codex-oauth-profile-cipher-error.js";
 export { CodexOAuthProfileCommitConflict } from "./errors/codex-oauth-profile-commit-conflict.js";
 export { CodexOAuthProfileCommitError } from "./errors/codex-oauth-profile-commit-error.js";

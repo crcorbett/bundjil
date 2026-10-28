@@ -8,8 +8,8 @@ import {
   Schema,
   Stream,
 } from "effect";
+import { HttpClient, HttpClientResponse } from "effect/http";
 import { TestClock } from "effect/testing";
-import { HttpClient, HttpClientResponse } from "effect/unstable/http";
 
 import {
   CodexDirectProviderInput,

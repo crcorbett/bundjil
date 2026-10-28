@@ -414,7 +414,7 @@ const makeLayer = (options: ChannelReplayOptions) =>
         claimOutbound: Effect.fn("ChannelReplay.claimOutbound")(
           function* (coordinates) {
             const key = yield* Schema.decodeEffect(ChannelReplayKey)(
-              `${options.prefix}outbound:${coordinates.sessionId}:${coordinates.turnId}:${coordinates.sequence}`
+              `${options.prefix}outbound:${coordinates.sessionId}:${coordinates.turnId}:${coordinates.sequence}${coordinates.eventIndex === undefined ? "" : `:${coordinates.eventIndex}`}`
             ).pipe(
               Effect.mapError(
                 () => new ChannelReplayError({ operation: "claim" })

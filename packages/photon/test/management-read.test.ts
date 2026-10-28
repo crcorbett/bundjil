@@ -1,7 +1,7 @@
 import { assert, it } from "@effect/vitest";
 import { Effect, Fiber, Layer, Redacted, Schema } from "effect";
+import { HttpClient, HttpClientResponse, UrlParams } from "effect/http";
 import * as TestClock from "effect/testing/TestClock";
-import { HttpClient, HttpClientResponse } from "effect/unstable/http";
 
 import {
   DiscoverPhotonSharedUser,
@@ -129,7 +129,9 @@ it.effect(
         readonly params: readonly (readonly [string, string])[];
       }[] = [];
       const client = HttpClient.make((request) => {
-        const params = [...request.urlParams];
+        const params = [
+          ...new URLSearchParams(UrlParams.toString(request.urlParams)),
+        ];
         requests.push({
           method: request.method,
           url: request.url,
@@ -307,9 +309,9 @@ it.effect(
         ),
         true
       );
-      const encoded = yield* Schema.encodeEffect(Schema.UnknownFromJsonString)(
-        observations
-      );
+      const encoded = yield* Schema.encodeEffect(
+        Schema.fromJsonString(Schema.Unknown)
+      )(observations);
       for (const sentinel of [
         "test-project-secret-sentinel",
         fixture.phone,
@@ -384,7 +386,7 @@ it.effect(
         assert.strictEqual(failure.reason, expected);
         assert.strictEqual(requestCount, status === 409 ? 1 : 3);
         const encodedFailure = yield* Schema.encodeEffect(
-          Schema.UnknownFromJsonString
+          Schema.fromJsonString(Schema.Unknown)
         )(failure);
         assert.strictEqual(encodedFailure.includes("sentinel"), false);
       }

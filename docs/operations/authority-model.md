@@ -10,7 +10,9 @@ on an identity mismatch. A successful read proves only what was observed then.
 
 Production is owned by `.github/workflows/production.yml` and the infrastructure
 package's deployment service. Only successful same-repository CI for a push to
-main can start it. Preserve its single-writer queue, exact source checks,
+main can start the hosted workflow. An explicitly requested local release
+uses the same deployment service after the runbook's merge and single-writer
+checks. Preserve its single-writer queue, exact source checks,
 project-scoped credentials, proxy/agent/callback order, health checks, deadlines
 and reverse-order rollback. Never bypass branch protection or race a local
 release against the hosted workflow.

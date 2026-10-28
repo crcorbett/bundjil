@@ -82,7 +82,8 @@ const StateMigrationBlockedReason = Schema.Union([
 const StateMigrationDiagnosticCount = Schema.Int.pipe(
   Schema.check(Schema.isGreaterThanOrEqualTo(0))
 );
-class StateMigrationCommandError extends Schema.TaggedErrorClass<StateMigrationCommandError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+class StateMigrationCommandError extends Schema.TaggedError<StateMigrationCommandError>()(
   "StateMigrationCommandError",
   {
     reason: StateMigrationBlockedReason,

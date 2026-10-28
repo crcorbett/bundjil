@@ -185,6 +185,8 @@ export default defineConfig({
       files: [
         "packages/codex/src/runtime.ts",
         "packages/codex/src/testing/index.ts",
+        // The state Layer is the R2 adapter's owning composition root.
+        "packages/infrastructure/src/state/r2-state.ts",
       ],
       rules: {
         "anti-slop-effect/no-service-constructor-imports": "off",

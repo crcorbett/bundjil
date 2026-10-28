@@ -40,7 +40,8 @@ export const CodexSubscriptionAuthFailureReason = Schema.Literals([
 export type CodexSubscriptionAuthFailureReason =
   typeof CodexSubscriptionAuthFailureReason.Type;
 
-export class CodexSubscriptionAuthError extends Schema.TaggedErrorClass<CodexSubscriptionAuthError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class CodexSubscriptionAuthError extends Schema.TaggedError<CodexSubscriptionAuthError>()(
   "CodexSubscriptionAuthError",
   {
     operation: CodexSubscriptionAuthOperation,

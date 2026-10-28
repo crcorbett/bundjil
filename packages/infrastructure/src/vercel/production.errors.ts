@@ -47,7 +47,8 @@ export const AutomaticProductionBlockedReceiptJson = Schema.fromJsonString(
   AutomaticProductionBlockedReceipt
 );
 
-export class ProductionDeploymentError extends Schema.TaggedErrorClass<ProductionDeploymentError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class ProductionDeploymentError extends Schema.TaggedError<ProductionDeploymentError>()(
   "ProductionDeploymentError",
   {
     operation: ProductionDeploymentOperation,

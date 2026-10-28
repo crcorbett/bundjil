@@ -20,7 +20,7 @@ it.effect(
         {
           issues: [
             {
-              message: 'Expected a value with a length of at least 1, got ""',
+              message: "Expected a value with a length of at least 1",
               path: ["question"],
             },
           ],
@@ -32,33 +32,21 @@ it.effect(
           target: "draft-2020-12",
         }),
         {
-          additionalProperties: false,
+          additionalProperties: true,
           properties: {
             agentSummary: {
-              allOf: [
-                {
-                  minLength: 1,
-                },
-              ],
+              minLength: 1,
               type: "string",
             },
             packageNames: {
               items: {
-                allOf: [
-                  {
-                    minLength: 1,
-                  },
-                ],
+                minLength: 1,
                 type: "string",
               },
               type: "array",
             },
             workspaceName: {
-              allOf: [
-                {
-                  minLength: 1,
-                },
-              ],
+              minLength: 1,
               type: "string",
             },
           },

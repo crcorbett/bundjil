@@ -11,17 +11,8 @@ export {
   CodexHttpClientOperation,
   CodexRequestMapperOperation,
   CodexResponsesSchemaBoundary,
-  CodexResponsesStreamOperation,
   CodexStreamMapperOperation,
   OpenAICompatibleProxyOperation,
-} from "./error-contracts.js";
-export type {
-  CodexHttpClientOperation as CodexHttpClientOperationType,
-  CodexRequestMapperOperation as CodexRequestMapperOperationType,
-  CodexResponsesSchemaBoundary as CodexResponsesSchemaBoundaryType,
-  CodexResponsesStreamOperation as CodexResponsesStreamOperationType,
-  CodexStreamMapperOperation as CodexStreamMapperOperationType,
-  OpenAICompatibleProxyOperation as OpenAICompatibleProxyOperationType,
 } from "./error-contracts.js";
 export { CodexHttpNetworkError } from "./errors/codex-http-network-error.js";
 export { CodexHttpStatusError } from "./errors/codex-http-status-error.js";

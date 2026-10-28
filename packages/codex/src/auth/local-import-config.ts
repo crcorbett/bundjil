@@ -48,7 +48,7 @@ const profileIdConfig = Config.schema(
   "BUNDJIL_CODEX_PROFILE_ID"
 );
 
-const accessTokenTtlConfig = Config.duration(
+const accessTokenTtlConfig = Config.Duration(
   "BUNDJIL_CODEX_LOCAL_ACCESS_TOKEN_TTL"
 ).pipe(Config.withDefault(Duration.hours(1)));
 

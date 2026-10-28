@@ -4,7 +4,10 @@ import { assert } from "@effect/vitest";
 import { Schema } from "effect";
 import { describe, it } from "vitest";
 
-const outputFile = new URL("../.output/server/index.mjs", import.meta.url);
+const outputFile = new URL(
+  "../.output/server/_chunks/node-server.mjs",
+  import.meta.url
+);
 const compiledManifestFile = new URL(
   "../.output/.eve/compile/compiled-agent-manifest.json",
   import.meta.url
@@ -66,9 +69,9 @@ describe("Channel build routes", () => {
         "nice-grpc-common": tracedPackage.dependencies?.["nice-grpc-common"],
       },
       {
-        "@grpc/grpc-js": "1.14.4",
-        "nice-grpc": "2.1.16",
-        "nice-grpc-common": "2.0.3",
+        "@grpc/grpc-js": "1.14.6",
+        "nice-grpc": "2.1.18",
+        "nice-grpc-common": "2.0.4",
       }
     );
   });

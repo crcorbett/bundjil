@@ -1,6 +1,7 @@
 import { Schema } from "effect";
 
-export class ChannelReplayError extends Schema.TaggedErrorClass<ChannelReplayError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class ChannelReplayError extends Schema.TaggedError<ChannelReplayError>()(
   "ChannelReplayError",
   {
     operation: Schema.Literals([

@@ -348,7 +348,7 @@ task ledger after parent acceptance. The one-task prompt must include this:
 1. **Ownership and call graph:** accepted after inspecting Eve's public MCP
    definition and Executor's host/toolkit sources plus the live personal MCP
    surface. The supported path is exactly `apps/agent -> Eve native MCP client
--> isolated Executor toolkit`; no shared package, SDK, proxy, custom MCP
+   -> isolated Executor toolkit`; no shared package, SDK, proxy, custom MCP
    client, remote DTO mirror, or second policy engine is justified. The first
    Preview authority is accepted as three exact GitHub PR read operations and
    one browser-gated disposable comment operation; every other operation and
@@ -617,7 +617,7 @@ ownership/call-graph, Effect/helper-admission, and verification/evidence audit.
 
 1. **Ownership and call graph:** accepted after parent diff inspection. The
    production path remains `apps/agent -> Eve native MCP -> isolated Executor
-toolkit`; only existing app-owned Config and instructions changed. Eve owns
+   toolkit`; only existing app-owned Config and instructions changed. Eve owns
    turn continuity, Executor owns paused state/policy, and no new runtime or UI
    boundary exists.
 2. **Implementation quality and helper admission:** accepted. The single new

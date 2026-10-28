@@ -47,7 +47,8 @@ const ReadmissionCommandFailureReason = Schema.Literals([
   "baseArtifactInvalid",
   "inventoryArtifactInvalid",
 ]);
-class ReadmissionCommandError extends Schema.TaggedErrorClass<ReadmissionCommandError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+class ReadmissionCommandError extends Schema.TaggedError<ReadmissionCommandError>()(
   "ReadmissionCommandError",
   { reason: ReadmissionCommandFailureReason }
 ) {}

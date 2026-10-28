@@ -46,7 +46,8 @@ Preserve unrelated work.
 ## Deployment and permissions
 
 Use the [agent deployment runbook](apps/agent/runbooks/deploy-promote.md).
-Production follows successful CI for the exact main commit. Keep the single
+Production normally follows successful CI for the exact main commit. An
+explicitly requested local release follows the runbook's local procedure. Keep the single
 writer, exact team/project/source checks, private credentials, proxy then agent
 then callback order, health checks, time limits and reverse-order rollback.
 Never bypass branch protection or run competing local and hosted deployments.

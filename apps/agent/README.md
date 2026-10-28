@@ -38,8 +38,8 @@ ignored/duplicate ingress returns `204`; authentication, payload, and
 routing/replay failures map to `401`, `400`, and `503` respectively.
 
 The shared Eve adapter prepares a request with the concrete provider runtime
-and awaits the exact Eve `send()` Promise before acknowledging. It returns
-`202` only after a Schema-owned safe session acceptance and an atomic
+and awaits the exact Eve `from(address).send()` Promise before acknowledging. It returns
+`202` only after a Schema-owned safe delivery-receipt session identity and an atomic
 continuity fence classify the result as a new owner or intended-session
 resume. A different fallback session, rejected send, or bounded handoff
 timeout returns `503` and retains the inbound identity as uncertain; an exact
@@ -54,8 +54,8 @@ or disposes a runtime per request, adds no Channel-wide retry, and does not
 treat a safe fingerprint as hosted durability proof. Local Build Output and a
 named deployment readback remain separate proof classes.
 
-Pinned Eve `0.29.5` owns durable session start/resume and turn child workflows
-behind its route-owned `send()` operation. Bundjil adds no second Workflow or
+Pinned Eve `0.84.1` owns durable session start/resume and turn child workflows
+behind its route-owned `from(address).send()` operation. Bundjil adds no second Workflow or
 raw Workflow client. The root/Turbo test command generates ordinary and Vercel Build
 Output and verifies Eve's generated Workflow `max` separately from the
 ordinary function's unset duration; it makes no hosted claim. Eve creates
@@ -93,6 +93,12 @@ exists in source or builds. A provider-selection and Production-promotion SPEC
 must be accepted before deployment, environment binding, webhook cutover, or
 legacy deployment retirement.
 
+Eve events use `content.completed` reply facts, `interaction.opened`/`settled`,
+`turn.paused`/`settled`, and `session.ended`. Outbound replay keys include the
+stream line and fact index, so two replies in one commit remain distinct while
+redelivery of the same fact is suppressed. Telemetry lives at
+`agent/instrumentation/vercel.ts` and its trace policy records no inputs or outputs.
+
 ## Public commands
 
 Run from the repository root:
@@ -111,6 +117,10 @@ it does not grant deployment authority or establish current provider state.
 The Turbo test command builds both ordinary Nitro output and Vercel Build
 Output before running fixtures. The package-local `test` script is the leaf
 Vitest command; use the root or Turbo command for fresh generated files.
+The local `build:vercel` check uses Eve's supported `--skip-sandbox-prewarm`
+flag because full Vercel sandbox preparation needs live build credentials. Its
+output is only for route/function inspection and must not be deployed. The
+production `build` command keeps full sandbox preparation enabled on Vercel.
 Generated artifacts remain ignored.
 
 ## Documentation routes

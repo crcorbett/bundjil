@@ -5,7 +5,8 @@ import {
   CodexOAuthClientOperation,
 } from "../error-contracts.js";
 
-export class CodexOAuthUnsupportedRuntimePath extends Schema.TaggedErrorClass<CodexOAuthUnsupportedRuntimePath>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class CodexOAuthUnsupportedRuntimePath extends Schema.TaggedError<CodexOAuthUnsupportedRuntimePath>()(
   "CodexOAuthUnsupportedRuntimePath",
   {
     operation: CodexOAuthClientOperation,

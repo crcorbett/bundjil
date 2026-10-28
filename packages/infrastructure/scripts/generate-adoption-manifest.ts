@@ -43,7 +43,8 @@ const AdoptionManifestCommandFailureReason = Schema.Literals([
   "adoptionPathConflictsWithInventory",
   "inventoryArtifactInvalid",
 ]);
-class AdoptionManifestCommandError extends Schema.TaggedErrorClass<AdoptionManifestCommandError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+class AdoptionManifestCommandError extends Schema.TaggedError<AdoptionManifestCommandError>()(
   "AdoptionManifestCommandError",
   { reason: AdoptionManifestCommandFailureReason }
 ) {}

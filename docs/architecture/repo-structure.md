@@ -399,7 +399,7 @@ Rules:
 - Keep provider-heavy or storage-heavy implementations on explicit subpaths so
   consumers opt into them deliberately.
 - Keep JSON string boundaries on Effect Schema codecs such as
-  `Schema.fromJsonString(...)` and `Schema.UnknownFromJsonString`.
+  `Schema.fromJsonString(...)` and `Schema.fromJsonString(Schema.Unknown)`.
 
 Bundjil packages currently expose `@bundjil/source` conditional exports so
 tests and workspace consumers can resolve TypeScript source during development.

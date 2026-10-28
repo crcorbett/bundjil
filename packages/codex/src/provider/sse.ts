@@ -238,12 +238,10 @@ export const codexResponsesSseData = (
   maximumEvents: number
 ) => {
   const lines = source.pipe(
-    Stream.map(
-      (value): ByteInput => ({
-        _tag: "Bytes",
-        value,
-      })
-    ),
+    Stream.map((value): ByteInput => ({
+      _tag: "Bytes",
+      value,
+    })),
     Stream.concat(Stream.succeed<ByteInput>({ _tag: "End" })),
     Stream.mapAccumEffect(
       (): LineAccumulator => ({

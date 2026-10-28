@@ -7,7 +7,8 @@ import {
   CodexProfileErrorMessage,
 } from "../error-contracts.js";
 
-export class CodexOAuthProfileCipherError extends Schema.TaggedErrorClass<CodexOAuthProfileCipherError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class CodexOAuthProfileCipherError extends Schema.TaggedError<CodexOAuthProfileCipherError>()(
   "CodexOAuthProfileCipherError",
   {
     operation: CodexOAuthProfileCipherOperation,

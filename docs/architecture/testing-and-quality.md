@@ -20,13 +20,16 @@ Turbo runs each build task once in that graph. Agent tests depend on the ordinar
 Eve build and then the Vercel build, so generated-route tests inspect fresh
 outputs. The standalone build/test commands need the same synthetic Executor
 settings or the operator's intended build settings. CI runs the same
-`verification` wrapper as local development.
+`verification` wrapper as local development. The local Vercel artifact check
+uses `eve build --skip-sandbox-prewarm`: it verifies routing and function
+metadata without Vercel credentials. That output is not deployable; the normal
+production build prepares real sandbox templates with the host's identity.
 
 ## Compiler
 
 All workspace type checks and declaration builds use TypeScript `7.0.2`.
-`@effect/tsgo` `0.38.0` patches that compiler and Oxlint; its published support
-matrix covers TypeScript `7.0.2`, Oxlint `1.80.0` and `oxlint-tsgolint` `7.0.2001`.
+`@effect/tsgo` `0.62.0` patches that compiler and Oxlint; its published support
+matrix covers TypeScript `7.0.2`, Oxlint `1.90.0` and `oxlint-tsgolint` `7.0.2005`.
 `bun install` applies the patch, and `check:effect-setup` reapplies it before
 type checking. The existing `@effect/language-service` configuration name is
 also the documented configuration key for this native compiler integration.
@@ -34,7 +37,11 @@ also the documented configuration key for this native compiler integration.
 `tooling/compiler.test.ts` compiles positive and negative examples with the
 installed compiler, including an unrun Effect that must fail. Existing strict
 Effect settings remain enabled. Advisory suggestions are not new blocking lint
-rules.
+rules. The new unstable-API diagnostic is advisory: the selected stable Effect
+release still marks its HTTP, persistence and test modules as unstable.
+The narrow `unicorn/throw-new-error` comments on `Schema.TaggedError` factories
+avoid Oxlint mistaking the curried factory for an error constructor; actual
+error construction remains checked.
 
 The lint boundary checker uses `typescript-compiler-api`, a pinned alias for
 TypeScript `6.0.3`. TypeScript 7 removed the compatible JavaScript compiler API;

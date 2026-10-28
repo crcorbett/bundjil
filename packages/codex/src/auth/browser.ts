@@ -1,5 +1,5 @@
 import { Context, Effect, Layer, Redacted, Schema } from "effect";
-import { ChildProcess, ChildProcessSpawner } from "effect/unstable/process";
+import { ChildProcess, ChildProcessSpawner } from "effect/process";
 
 import { CodexRuntimePlatform } from "./credentials.js";
 import type {

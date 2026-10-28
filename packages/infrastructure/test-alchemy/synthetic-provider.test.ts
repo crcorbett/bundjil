@@ -5,7 +5,7 @@
 import { expect } from "bun:test";
 
 import { adopt } from "alchemy/AdoptPolicy";
-import { sync } from "alchemy/Sync";
+import { detect, repair } from "alchemy/Drift";
 import * as Test from "alchemy/Test/Bun";
 import { Effect, Exit, Inspectable, Layer, Record, Schema } from "effect";
 
@@ -190,21 +190,20 @@ test.provider(
           observedValue: driftedValue,
         })
       );
-      const dryRun = yield* sync(
-        { name: stack.name, stage: "preview" },
-        { dryRun: true }
-      ).pipe(Effect.provide(stack.state));
+      const dryRun = yield* detect({ name: stack.name, stage: "preview" }).pipe(
+        Effect.provide(stack.state)
+      );
       expect(Record.values(dryRun.resources)[0]?.action).toBe("drifted");
 
-      const repaired = yield* sync(
-        { name: stack.name, stage: "preview" },
-        { dryRun: false }
-      ).pipe(Effect.provide(stack.state));
+      const repaired = yield* repair({
+        name: stack.name,
+        stage: "preview",
+      }).pipe(Effect.provide(stack.state));
       expect(Record.values(repaired.resources)[0]?.action).toBe("repaired");
-      const unchanged = yield* sync(
-        { name: stack.name, stage: "preview" },
-        { dryRun: true }
-      ).pipe(Effect.provide(stack.state));
+      const unchanged = yield* detect({
+        name: stack.name,
+        stage: "preview",
+      }).pipe(Effect.provide(stack.state));
       expect(Record.values(unchanged.resources)[0]?.action).toBe("unchanged");
     })
 );

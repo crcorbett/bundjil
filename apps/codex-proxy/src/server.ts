@@ -6,12 +6,8 @@ import {
 } from "@bundjil/codex";
 import type { CodexResponsesStreamError } from "@bundjil/codex";
 import { Effect, Layer, Match, Schema, Stream } from "effect";
-import * as FileSystem from "effect/FileSystem";
-import {
-  HttpRouter,
-  HttpServerRequest,
-  HttpServerResponse,
-} from "effect/unstable/http";
+import * as ByteSize from "effect/ByteSize";
+import { HttpRouter, HttpServerRequest, HttpServerResponse } from "effect/http";
 
 import { CodexProxyConfig, CodexProxyConfigLive } from "./env.js";
 import { CodexProxyRouteError } from "./errors.js";
@@ -31,7 +27,7 @@ import type { CodexProxyErrorCode } from "./schemas.js";
 
 const healthJson = HttpServerResponse.schemaJson(CodexProxyHealthResponse);
 const errorJson = HttpServerResponse.schemaJson(CodexProxyErrorResponse);
-const codexProxyRequestBodyMaxBytes = FileSystem.Size(1024 * 1024);
+const codexProxyRequestBodyMaxBytes = ByteSize.mebibytes(1);
 function observeCodexProxyStreamFailure(error: CodexResponsesStreamError) {
   return Effect.logError("CodexProxyStreamFailure", {
     operation: error.operation,

@@ -29,3 +29,8 @@ bun run --filter @bundjil/eve build
 - [Eve agent architecture](../../docs/architecture/eve-agent.md)
 - [Testing and quality](../../docs/architecture/testing-and-quality.md)
 - [Repository structure](../../docs/architecture/repo-structure.md)
+
+`toEveSchema` exposes a plain Standard Schema object with Effect's native
+validator and JSON Schema emitters. Effect 4 schemas can be callable, while
+Eve 0.84 accepts object adapters. The wrapper keeps the owning Schema inside
+Effect and supplies only its standard interface at the Eve boundary.

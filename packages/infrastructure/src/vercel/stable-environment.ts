@@ -135,12 +135,14 @@ const VercelStableEnvironmentErrorFields = {
   message: VercelStableEnvironmentErrorMessage,
 };
 
-export class VercelStableEnvironmentReadError extends Schema.TaggedErrorClass<VercelStableEnvironmentReadError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class VercelStableEnvironmentReadError extends Schema.TaggedError<VercelStableEnvironmentReadError>()(
   "VercelStableEnvironmentReadError",
   VercelStableEnvironmentErrorFields
 ) {}
 
-export class VercelStableEnvironmentWriteError extends Schema.TaggedErrorClass<VercelStableEnvironmentWriteError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class VercelStableEnvironmentWriteError extends Schema.TaggedError<VercelStableEnvironmentWriteError>()(
   "VercelStableEnvironmentWriteError",
   VercelStableEnvironmentErrorFields
 ) {}

@@ -184,7 +184,8 @@ export const PreviewStateMigrationPolicy = Schema.Struct({
 export type PreviewStateMigrationPolicy =
   typeof PreviewStateMigrationPolicy.Type;
 
-export class PreviewStateMigrationError extends Schema.TaggedErrorClass<PreviewStateMigrationError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+export class PreviewStateMigrationError extends Schema.TaggedError<PreviewStateMigrationError>()(
   "PreviewStateMigrationError",
   {
     reason: PreviewStateMigrationFailureReason,

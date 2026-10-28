@@ -7,11 +7,12 @@ import nodePath from "node:path";
 import { Ajv2020 } from "ajv/dist/2020.js";
 import { AlchemyContextLive } from "alchemy/AlchemyContext";
 import { ArtifactStore, createArtifactStore } from "alchemy/Artifacts";
-import { selectCli } from "alchemy/Cli/selectCli";
+import { LoggingCli } from "alchemy/Cli/LoggingCli";
+import * as AlchemySync from "alchemy/Drift";
+import { layerNonInteractive } from "alchemy/Interaction";
 import * as AlchemyPlan from "alchemy/Plan";
 import * as AlchemyStack from "alchemy/Stack";
 import { State } from "alchemy/State";
-import * as AlchemySync from "alchemy/Sync";
 import { PlatformServices } from "alchemy/Util/PlatformServices";
 import {
   Cause,
@@ -27,7 +28,7 @@ import {
   Record,
   Schema,
 } from "effect";
-import * as FetchHttpClient from "effect/unstable/http/FetchHttpClient";
+import * as FetchHttpClient from "effect/http/FetchHttpClient";
 
 import { buildStableInfrastructureDriftStack } from "../../../alchemy.stable.run.js";
 import authorityEnvelopeSchema from "../../../tooling/schemas/authority-envelope.schema.json" with { type: "json" };
@@ -85,14 +86,14 @@ const NativeSyncResult = Schema.Struct({
   resources: Schema.Record(Schema.String, NativeSyncResource),
 });
 const NativeDesiredPlanResource = Schema.Struct({
-  action: Schema.Literals(["create", "update", "replace", "noop"]),
+  action: Schema.Literals(["create", "update", "adopted", "replace", "noop"]),
   resource: Schema.Struct({
     LogicalId: Schema.NonEmptyString,
     Type: Schema.NonEmptyString,
   }),
 });
 const NativeDesiredPlanDeletion = Schema.Struct({
-  action: Schema.Literal("delete"),
+  action: Schema.Literals(["delete", "orphaned"]),
   resource: Schema.Struct({
     LogicalId: Schema.NonEmptyString,
     RemovalPolicy: Schema.optional(Schema.Literals(["destroy", "retain"])),
@@ -149,7 +150,8 @@ const InfrastructureDriftNativeProviderFailureError = Schema.Struct({
 });
 type InfrastructureDriftNativeProviderFailureError =
   typeof InfrastructureDriftNativeProviderFailureError.Type;
-class InfrastructureDriftNativeBoundaryError extends Schema.TaggedErrorClass<InfrastructureDriftNativeBoundaryError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+class InfrastructureDriftNativeBoundaryError extends Schema.TaggedError<InfrastructureDriftNativeBoundaryError>()(
   "InfrastructureDriftNativeBoundaryError",
   {
     phase: InfrastructureDriftNativePhase,
@@ -165,7 +167,8 @@ const InfrastructureDriftCommandFailureReason = Schema.Literals([
   "productionTargetRejected",
   "receiptIncompatible",
 ]);
-class InfrastructureDriftCommandError extends Schema.TaggedErrorClass<InfrastructureDriftCommandError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+class InfrastructureDriftCommandError extends Schema.TaggedError<InfrastructureDriftCommandError>()(
   "InfrastructureDriftCommandError",
   { reason: InfrastructureDriftCommandFailureReason }
 ) {}
@@ -179,7 +182,8 @@ const InfrastructureDriftBoundaryFailureReason = Schema.Literals([
   "stateConfigurationInvalid",
   "stateInitializationFailed",
 ]);
-class InfrastructureDriftBoundaryError extends Schema.TaggedErrorClass<InfrastructureDriftBoundaryError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+class InfrastructureDriftBoundaryError extends Schema.TaggedError<InfrastructureDriftBoundaryError>()(
   "InfrastructureDriftBoundaryError",
   { reason: InfrastructureDriftBoundaryFailureReason }
 ) {}
@@ -430,7 +434,7 @@ const toPlanObservation = Effect.fn(
   fqn: string,
   logicalId: string,
   resourceType: string,
-  action: "create" | "update" | "replace" | "delete",
+  action: "create" | "update" | "adopted" | "replace" | "delete" | "orphaned",
   removalPolicy: "destroy" | "retain" | undefined
 ) => {
   const manifestResource = manifest.resources.find(
@@ -444,6 +448,8 @@ const toPlanObservation = Effect.fn(
       certainty: { _tag: "Known" },
       diffClass: Match.value(action).pipe(
         Match.when("update", () => "update" as const),
+        Match.when("adopted", () => "update" as const),
+        Match.when("orphaned", () => "update" as const),
         Match.when(
           (value) =>
             value === "replace" ||
@@ -817,7 +823,8 @@ const runtime = Layer.mergeAll(
   FetchHttpClient.layer,
   Layer.provideMerge(AlchemyContextLive, PlatformServices),
   Layer.succeed(ArtifactStore, createArtifactStore()),
-  selectCli(),
+  LoggingCli.pipe(Layer.provide(PlatformServices)),
+  layerNonInteractive(),
   driftStateLayer,
   ConfigProvider.layer(ConfigProvider.fromEnv())
 );

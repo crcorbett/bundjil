@@ -90,7 +90,8 @@ const PhotonPreviewWebhookBindingFailureReason = Schema.Literals([
   "bindingFileRetained",
   "bindingReadbackInvalid",
 ]);
-class PhotonPreviewWebhookBindingError extends Schema.TaggedErrorClass<PhotonPreviewWebhookBindingError>()(
+// oxlint-disable-next-line unicorn/throw-new-error -- Schema.TaggedError is a curried class factory.
+class PhotonPreviewWebhookBindingError extends Schema.TaggedError<PhotonPreviewWebhookBindingError>()(
   "PhotonPreviewWebhookBindingError",
   { reason: PhotonPreviewWebhookBindingFailureReason }
 ) {}
