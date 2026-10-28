@@ -156,6 +156,7 @@ export const runAutomaticProduction = Effect.fn("runAutomaticProduction")(
         candidateAgent,
         sourceSha
       );
+      yield* deployments.probeAgentHealth;
       yield* deployments.probeProxyHealth;
     });
 

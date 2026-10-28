@@ -14,6 +14,7 @@ export default defineAgent({
   build: {
     externalDependencies: [
       "@bundjil/photon",
+      "@opentelemetry/api",
       "@grpc/grpc-js",
       "nice-grpc",
       "nice-grpc-common",
