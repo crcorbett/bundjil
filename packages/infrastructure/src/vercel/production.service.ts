@@ -35,6 +35,7 @@ export interface ProductionDeploymentsContract {
     deployment: ProductionDeployment
   ) => Effect.Effect<void, ProductionDeploymentError>;
   readonly readMainSha: Effect.Effect<VercelGitSha, ProductionDeploymentError>;
+  readonly probeAgentHealth: Effect.Effect<void, ProductionDeploymentError>;
   readonly probeProxyHealth: Effect.Effect<
     ProductionProxyHealth,
     ProductionDeploymentError

@@ -121,6 +121,61 @@ const runExitWithSnapshot = (failure: ProductionMemoryFailure) =>
   );
 
 describe("automatic Production deployment", () => {
+  it.each([
+    [
+      "401",
+      '{"ok":false,"code":"unauthorized","error":"Authorization is required."}',
+      true,
+    ],
+    [
+      "500",
+      '{"ok":false,"code":"unauthorized","error":"Authorization is required."}',
+      false,
+    ],
+    ["401", "<html>Vercel authentication required</html>", false],
+    [
+      "200",
+      '{"ok":false,"code":"unauthorized","error":"Authorization is required."}',
+      false,
+    ],
+  ])(
+    "checks the agent application response with HTTP %s",
+    async (status, body, accepted) => {
+      const commands: ChildProcess.Command[] = [];
+      const spawner = ChildProcessSpawner.make((command) => {
+        commands.push(command);
+        return Effect.succeed(processHandle(`${body}\n${status}`));
+      });
+      const exit = await Effect.runPromise(
+        Effect.gen(function* probeAgent() {
+          const deployments = yield* ProductionDeployments;
+          return yield* deployments.probeAgentHealth;
+        }).pipe(
+          Effect.provide(
+            ProductionDeploymentsLive.pipe(
+              Layer.provide(productionConfig),
+              Layer.provide(
+                Layer.succeed(ChildProcessSpawner.ChildProcessSpawner, spawner)
+              )
+            )
+          ),
+          Effect.exit
+        )
+      );
+      expect(Exit.isSuccess(exit)).toBe(accepted);
+      expect(commands).toHaveLength(1);
+      const [command] = commands;
+      if (command?._tag !== "StandardCommand") {
+        throw new Error("Expected one read-only health command.");
+      }
+      expect(command.command).toBe("curl");
+      expect(command.args).toContain(
+        "https://bundjil-agent-personal.vercel.app/eve/v1/info"
+      );
+      expect(command.options.env).toBeUndefined();
+    }
+  );
+
   it("encodes a secret-negative deployment failure receipt", () => {
     const encoded = Schema.encodeUnknownSync(
       AutomaticProductionBlockedReceiptJson
@@ -809,21 +864,24 @@ describe("automatic Production deployment", () => {
     }
   );
 
-  it("restores callback, agent and proxy when stable health fails", async () => {
-    const result = await Effect.runPromise(runExitWithSnapshot("health"));
-    expect(Exit.isFailure(result.exit)).toBeTruthy();
-    expect(result.snapshot.promotions).toStrictEqual(["proxy", "agent"]);
-    expect(result.snapshot.callbackAssignments).toStrictEqual([
-      "dpl_agent_candidate",
-    ]);
-    expect(result.snapshot.callbackRollbacks).toStrictEqual([
-      "dpl_agent_previous",
-    ]);
-    expect(result.snapshot.rollbacks).toStrictEqual(["agent", "proxy"]);
-    expect(result.snapshot.currentAgentCallback.sourceSha).toBe(previousSha);
-    expect(result.snapshot.currentAgent.sourceSha).toBe(previousSha);
-    expect(result.snapshot.currentProxy.sourceSha).toBe(previousSha);
-  });
+  it.each(["health", "agent-health"] as const)(
+    "restores callback, agent and proxy when %s fails",
+    async (failure) => {
+      const result = await Effect.runPromise(runExitWithSnapshot(failure));
+      expect(Exit.isFailure(result.exit)).toBeTruthy();
+      expect(result.snapshot.promotions).toStrictEqual(["proxy", "agent"]);
+      expect(result.snapshot.callbackAssignments).toStrictEqual([
+        "dpl_agent_candidate",
+      ]);
+      expect(result.snapshot.callbackRollbacks).toStrictEqual([
+        "dpl_agent_previous",
+      ]);
+      expect(result.snapshot.rollbacks).toStrictEqual(["agent", "proxy"]);
+      expect(result.snapshot.currentAgentCallback.sourceSha).toBe(previousSha);
+      expect(result.snapshot.currentAgent.sourceSha).toBe(previousSha);
+      expect(result.snapshot.currentProxy.sourceSha).toBe(previousSha);
+    }
+  );
 
   it("surfaces rollback failure without claiming restoration", async () => {
     const result = await Effect.runPromise(

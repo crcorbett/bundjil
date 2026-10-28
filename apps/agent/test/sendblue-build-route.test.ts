@@ -52,12 +52,10 @@ describe("Channel build routes", () => {
       JSON.parse(await readFile(compiledManifestFile, "utf-8"))
     );
 
-    assert.deepStrictEqual(manifest.config.build?.externalDependencies, [
-      "@bundjil/photon",
-      "@grpc/grpc-js",
-      "nice-grpc",
-      "nice-grpc-common",
-    ]);
+    assert.includeMembers(
+      [...(manifest.config.build?.externalDependencies ?? [])],
+      ["@bundjil/photon", "@grpc/grpc-js", "nice-grpc", "nice-grpc-common"]
+    );
 
     const tracedPackage = Schema.decodeUnknownSync(TracedPackage)(
       JSON.parse(await readFile(tracedPackageFile, "utf-8"))

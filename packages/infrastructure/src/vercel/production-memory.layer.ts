@@ -26,6 +26,7 @@ export const ProductionMemoryFailure = Schema.Literals([
   "callback-rollback",
   "callback-rollback-stall",
   "health",
+  "agent-health",
   "health-rollback",
   "health-stall",
 ]);
@@ -251,6 +252,10 @@ export const makeProductionDeploymentsMemory = (
           }));
         }),
         readMainSha: Effect.succeed(config.mainSha),
+        probeAgentHealth:
+          config.failure === "agent-health"
+            ? Effect.fail(memoryError("probe", "agent", "healthFailed"))
+            : Effect.void,
         probeProxyHealth: Effect.gen(function* probeProxyHealth() {
           if (config.failure === "health-stall") {
             return yield* Effect.never;

@@ -199,7 +199,8 @@ exports, provider logs containing payloads, or `.vercel`/environment files.
    --skip-domain`, validates each immutable project/SHA/READY identity, and
    re-reads `origin/main` before any promote. A stale candidate is an explicit
    no-op. It promotes proxy, public agent, then the callback alias, validates
-   each target and probes proxy health. Any uncertain or partial failure
+   each target, checks the agent callback returns its anonymous 401 JSON response,
+   and probes proxy health. Any uncertain or partial failure
    restores callback, agent and proxy in reverse order as applicable and
    verifies each restored target. If both public apps already match `main` but
    the callback is stale, it re-reads `main` and moves only the callback. An
@@ -312,8 +313,10 @@ proxy-agent-callback order, deadlines and reverse-order rollback still apply.
 Never print the fetched values or write them into the checkout.
 
 Read back both immutable deployments and all three stable targets, and check
-proxy health plus anonymous-request rejection. Keep the prior deployment IDs
-in the PR or task for rollback. Local release results do not establish an
+proxy health plus the agent callback's anonymous 401 JSON response. A
+failed agent startup or an upstream authentication page fails the release and
+restores the previous callback, agent and proxy deployments. Keep the prior
+deployment IDs in the PR or task for rollback. Local release results do not establish an
 outbound message or handset-delivery journey.
 
 ## Evidence and postcondition

@@ -159,6 +159,17 @@ const ProviderAliasAssignment = Schema.Struct({
   uid: Schema.NonEmptyString,
 });
 
+const AgentHealthProbe = Schema.Struct({
+  status: Schema.Literal("401"),
+  body: Schema.fromJsonString(
+    Schema.Struct({
+      code: Schema.Literal("unauthorized"),
+      ok: Schema.Literal(false),
+      error: Schema.NonEmptyString,
+    })
+  ),
+});
+
 const repositoryDirectory = fileURLToPath(
   new URL("../../../../", import.meta.url)
 );
@@ -613,6 +624,30 @@ export const ProductionDeploymentsLive = Layer.effect(
           )
         ),
         Effect.mapError(() => commandError("probe", "proxy", "healthFailed"))
+      ),
+      probeAgentHealth: runCommand(
+        [
+          "curl",
+          "--disable",
+          "--silent",
+          "--show-error",
+          "--write-out",
+          "\n%{http_code}",
+          `https://${config.agentCallbackAlias}/eve/v1/info`,
+        ],
+        null,
+        "probe",
+        "agent"
+      ).pipe(
+        Effect.flatMap((output) => {
+          const separator = output.lastIndexOf("\n");
+          return Schema.decodeUnknownEffect(AgentHealthProbe)({
+            status: output.slice(separator + 1),
+            body: output.slice(0, separator),
+          });
+        }),
+        Effect.asVoid,
+        Effect.mapError(() => commandError("probe", "agent", "healthFailed"))
       ),
     });
   })

@@ -96,8 +96,10 @@ legacy deployment retirement.
 Eve events use `content.completed` reply facts, `interaction.opened`/`settled`,
 `turn.paused`/`settled`, and `session.ended`. Outbound replay keys include the
 stream line and fact index, so two replies in one commit remain distinct while
-redelivery of the same fact is suppressed. Telemetry lives at
-`agent/instrumentation/vercel.ts` and its trace policy records no inputs or outputs.
+redelivery of the same fact is suppressed. `agent/instrumentation/otel.ts`
+declares Eve's single telemetry pipeline. Its fetch instrumentation propagates
+context to the selected proxy origin, and its trace policy records no inputs or
+outputs. Application instrumentation must not register another global provider.
 
 ## Public commands
 

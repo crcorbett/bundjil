@@ -41,7 +41,7 @@ The source supports two model selections:
 Eve HTTP/API -> apps/agent/agent/agent.ts -> agent/config.ts
   -> gateway model string
   |  codex-proxy LanguageModel
-       -> agent/instrumentation/vercel.ts records no inputs/outputs
+       -> agent/instrumentation/otel.ts records no inputs/outputs
        -> W3C trace context to the configured private proxy origin only
        -> apps/codex-proxy /v1/chat/completions
        -> proxy continues the trace until its SSE response settles
@@ -82,11 +82,15 @@ standalone receipt that cannot meet the required correlation contract.
 - `agent/config.ts` decodes model-provider configuration through Effect Config
   and Schemas; secrets are redacted. `model-provider.ts` owns model
   construction.
-- `agent/instrumentation/vercel.ts` is an Eve-owned telemetry boundary, not a model
+- `agent/instrumentation/otel.ts` is an Eve-owned telemetry boundary, not a model
   wrapper. It uses the already-decoded selected provider configuration to
   restrict Vercel OpenTelemetry fetch propagation to the private Codex proxy
-  origin and disables AI SDK input/output capture. The trace exists for the
-  operator's restricted observability only; Bundjil never retains raw session/turn IDs,
+  origin and disables AI SDK input/output capture. Eve registers the single
+  global pipeline. Keep `@opentelemetry/api` external in hosted builds so its
+  Node exports retain their package identity alongside Eve's compiled API.
+  The generated Vercel server is boot-tested with production runtime markers.
+  The trace exists for the operator's restricted observability only; Bundjil
+  never retains raw session/turn IDs,
   prompts, responses, tokens, tools, or reasoning in a repository receipt.
 - `workspace_status` bridges Effect Schema once at the Eve edge, delegates to
   `WorkspaceOperations`, and encodes its result at the outward edge.

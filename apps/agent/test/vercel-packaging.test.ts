@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 
 import { Effect, Schema } from "effect";
@@ -73,6 +74,38 @@ const FunctionConfig = Schema.Struct({
 });
 
 describe("Vercel packaging", () => {
+  it("boots the generated server with the Vercel runtime enabled", () => {
+    const child = spawnSync(
+      process.execPath,
+      [
+        "--input-type=module",
+        "--eval",
+        "await import(process.argv[1]);",
+        new URL("functions/__server.func/index.mjs", generatedOutputDirectory)
+          .href,
+      ],
+      {
+        cwd: appDirectory,
+        encoding: "utf-8",
+        env: {
+          NODE_ENV: "production",
+          VERCEL: "1",
+          BUNDJIL_EXECUTOR_MCP_URL:
+            "https://executor.sh/mcp/toolkits/bundjil-ci?elicitation_mode=model",
+          BUNDJIL_EXECUTOR_API_KEY: "executor-ci-synthetic-key",
+        },
+        timeout: 10_000,
+      }
+    );
+
+    expect(child.error).toBeUndefined();
+    if (child.status !== 0) {
+      throw new Error(
+        `The generated Vercel server failed to boot: ${child.stderr}`
+      );
+    }
+  });
+
   it("pins the lock-resolved Eve lifecycle owner", async () => {
     const packageConfig = await Effect.runPromise(
       Schema.decodeUnknownEffect(Schema.fromJsonString(AgentPackage))(
