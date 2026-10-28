@@ -30,8 +30,6 @@ import {
   CodexProxyVercelProtectionBypass,
 } from "../src/schemas.js";
 
-const { dirname, relative, resolve } = nodePath;
-
 type ProofClassification =
   | "assertion_failed"
   | "config_failed"
@@ -225,7 +223,7 @@ const writeJsonAtomically = Effect.fn("PreviewProof.writeJsonAtomically")(
     const content = `${encodedJson}\n`;
     const temporaryPath = `${path}.tmp`;
     return yield* fileSystem
-      .makeDirectory(dirname(path), { recursive: true, mode: 0o700 })
+      .makeDirectory(nodePath.dirname(path), { recursive: true, mode: 0o700 })
       .pipe(
         Effect.andThen(
           fileSystem.writeFileString(temporaryPath, content, { mode: 0o600 })
@@ -310,15 +308,15 @@ const context = Effect.gen(function* loadContext() {
       () => new PreviewProofFailure({ classification: "config_failed" })
     )
   );
-  const outputRoot = resolve(process.cwd(), outputDirectory);
-  if (relative(process.cwd(), outputRoot).startsWith("..")) {
+  const outputRoot = nodePath.resolve(process.cwd(), outputDirectory);
+  if (nodePath.relative(process.cwd(), outputRoot).startsWith("..")) {
     return yield* new PreviewProofFailure({ classification: "config_failed" });
   }
   const identity = PreviewProofIdentity.make({ candidateId, packetId });
   const artifactBase = `${candidateId}--${packetId}`;
   return {
-    attemptPath: resolve(outputRoot, `${artifactBase}.attempt.json`),
-    detailPath: resolve(outputRoot, `${artifactBase}.detail.json`),
+    attemptPath: nodePath.resolve(outputRoot, `${artifactBase}.attempt.json`),
+    detailPath: nodePath.resolve(outputRoot, `${artifactBase}.detail.json`),
     identity,
   };
 }).pipe(Effect.provide(ConfigProvider.layer(ConfigProvider.fromEnv())));
@@ -384,7 +382,7 @@ const runProof = (
       return yield* new PreviewProofFailure({
         classification: "rerun_avoided",
         retainedDetail: {
-          path: relative(process.cwd(), detailPath),
+          path: nodePath.relative(process.cwd(), detailPath),
           sha256: sha256(retainedDetailContent),
         },
       });
@@ -647,7 +645,7 @@ const main = Effect.gen(function* renderPreviewProof() {
     )(detailValue);
     detail = yield* writeJsonAtomically(proof.detailPath, encodedDetail).pipe(
       Effect.map(({ sha256: artifactSha256 }) => ({
-        path: relative(process.cwd(), proof.detailPath),
+        path: nodePath.relative(process.cwd(), proof.detailPath),
         sha256: artifactSha256,
       }))
     );
@@ -705,7 +703,7 @@ const main = Effect.gen(function* renderPreviewProof() {
       encodedOutputClosedDetail
     ).pipe(
       Effect.map(({ sha256: artifactSha256 }) => ({
-        path: relative(process.cwd(), outputClosedDetailPath),
+        path: nodePath.relative(process.cwd(), outputClosedDetailPath),
         sha256: artifactSha256,
       }))
     );

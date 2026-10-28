@@ -21,8 +21,6 @@ import {
   InfrastructureStage,
 } from "../schemas.js";
 
-const { dirname, isAbsolute } = nodePath;
-
 const sha256 = (value: string) =>
   createHash("sha256").update(value).digest("hex");
 
@@ -39,7 +37,7 @@ export const PreviewStateBackupPath = Schema.String.pipe(
       value.length > 0 &&
       value.length <= 240 &&
       /^[A-Za-z0-9._/-]+$/u.test(value) &&
-      !isAbsolute(value) &&
+      !nodePath.isAbsolute(value) &&
       !value.split("/").includes("..")
         ? undefined
         : "Preview state backup path must be repository-relative and bounded."
@@ -826,7 +824,7 @@ export const buildPreviewStateBackupStoreLive = (
               );
             }
             return yield* fileSystem
-              .makeDirectory(dirname(path), {
+              .makeDirectory(nodePath.dirname(path), {
                 recursive: true,
                 mode: 0o700,
               })

@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { Buffer } from "node:buffer";
 import { spawn } from "node:child_process";
 import { chmod, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -10,8 +9,6 @@ import { Schema } from "effect";
 import { describe, it } from "vitest";
 
 import { ProductionPreflightReceipt } from "../agent/production-preflight.js";
-
-const { join } = nodePath;
 
 const fingerprint = (character: string) => character.repeat(64);
 const sourceSha = "0f30d3b000000000000000000000000000000000";
@@ -92,8 +89,8 @@ const runPreflight = async (
   snapshot: string,
   options: { readonly detailPath?: string; readonly mode?: number } = {}
 ) => {
-  const cwd = await mkdtemp(join(tmpdir(), "bundjil-preflight-"));
-  const snapshotPath = join(cwd, "snapshot.json");
+  const cwd = await mkdtemp(nodePath.join(tmpdir(), "bundjil-preflight-"));
+  const snapshotPath = nodePath.join(cwd, "snapshot.json");
   await writeFile(snapshotPath, snapshot, { mode: options.mode ?? 0o600 });
   await chmod(snapshotPath, options.mode ?? 0o600);
   const child = spawn(
@@ -112,12 +109,14 @@ const runPreflight = async (
   if (child.stderr === null || child.stdout === null) {
     throw new Error("Production preflight did not create output streams.");
   }
-  const stderr: Buffer[] = [];
-  const stdout: Buffer[] = [];
-  child.stderr.on("data", (chunk: Buffer) => {
+  child.stderr.setEncoding("utf-8");
+  child.stdout.setEncoding("utf-8");
+  const stderr: string[] = [];
+  const stdout: string[] = [];
+  child.stderr.on("data", (chunk: string) => {
     stderr.push(chunk);
   });
-  child.stdout.on("data", (chunk: Buffer) => {
+  child.stdout.on("data", (chunk: string) => {
     stdout.push(chunk);
   });
   const exit = Promise.withResolvers<number | null>();
@@ -128,8 +127,8 @@ const runPreflight = async (
     cleanup: () => rm(cwd, { force: true, recursive: true }),
     cwd,
     exitCode,
-    stderr: Buffer.concat(stderr).toString(),
-    stdout: Buffer.concat(stdout).toString(),
+    stderr: stderr.join(""),
+    stdout: stdout.join(""),
   };
 };
 
@@ -150,7 +149,7 @@ describe("Production preflight command", () => {
       assert.equal(receipt.detailArtifact.state, "available");
       assert.match(receipt.nonClaim, /never mutation authority/u);
       const detail = await readFile(
-        join(result.cwd, receipt.detailArtifact.path),
+        nodePath.join(result.cwd, receipt.detailArtifact.path),
         "utf-8"
       );
       assert.match(detail, /"go":true/u);

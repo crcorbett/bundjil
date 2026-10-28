@@ -560,6 +560,94 @@ describe("automatic Production deployment", () => {
     );
   });
 
+  it.each([
+    [
+      '{"ok":false,"code":"unauthorized","error":"Authorization is required."}\n401',
+      true,
+    ],
+    ["FUNCTION_INVOCATION_FAILED\n500", false],
+  ])(
+    "checks the immutable agent before accepting a staged candidate",
+    async (response, accepted) => {
+      const commands: ChildProcess.Command[] = [];
+      const spawner = ChildProcessSpawner.make((command) => {
+        commands.push(command);
+        const args = command._tag === "StandardCommand" ? command.args : [];
+        if (args.includes("curl")) {
+          return Effect.succeed(processHandle(response));
+        }
+        return Effect.succeed(
+          processHandle(
+            Schema.encodeUnknownSync(Schema.fromJsonString(Schema.Unknown))(
+              args.includes("deploy")
+                ? {
+                    id: "dpl_agent_candidate",
+                    readyState: "READY",
+                    target: "production",
+                    url: "https://bundjil-agent-candidate.vercel.app",
+                  }
+                : {
+                    id: "dpl_agent_candidate",
+                    projectId: "prj_agent",
+                    meta: { gitCommitSha: candidateSha },
+                    readyState: "READY",
+                    target: "production",
+                    url: "bundjil-agent-candidate.vercel.app",
+                  }
+            )
+          )
+        );
+      });
+      const exit = await Effect.runPromise(
+        Effect.gen(function* stageAgent() {
+          const deployments = yield* ProductionDeployments;
+          return yield* deployments.stage({
+            project: "agent",
+            sourceSha: candidateSha,
+          });
+        }).pipe(
+          Effect.provide(
+            ProductionDeploymentsLive.pipe(
+              Layer.provide(productionConfig),
+              Layer.provide(
+                Layer.succeed(ChildProcessSpawner.ChildProcessSpawner, spawner)
+              )
+            )
+          ),
+          Effect.exit
+        )
+      );
+      expect(Exit.isSuccess(exit)).toBe(accepted);
+      const [deployCommand, inspectCommand, probeCommand] = commands;
+      if (
+        deployCommand?._tag !== "StandardCommand" ||
+        inspectCommand?._tag !== "StandardCommand" ||
+        probeCommand?._tag !== "StandardCommand"
+      ) {
+        throw new Error(
+          "Expected deploy, immutable inspection and a protected health request."
+        );
+      }
+      expect(commands).toHaveLength(3);
+      expect(deployCommand.args).toContain("--skip-domain");
+      expect(inspectCommand.args).toContain(
+        "/v13/deployments/dpl_agent_candidate?teamId=team_personal"
+      );
+      expect(probeCommand.args).toStrictEqual(
+        expect.arrayContaining([
+          "curl",
+          "/eve/v1/info",
+          "--deployment",
+          "https://bundjil-agent-candidate.vercel.app",
+        ])
+      );
+      expect(probeCommand.options.env).toMatchObject({
+        VERCEL_PROJECT_ID: "prj_agent",
+        VERCEL_TOKEN: "agent-token",
+      });
+    }
+  );
+
   it("promotes and rolls back through project-scoped API routes", async () => {
     const commands: ChildProcess.Command[] = [];
     let stableVersion: "previous" | "candidate" = "previous";
@@ -567,11 +655,9 @@ describe("automatic Production deployment", () => {
       commands.push(command);
       const args = command._tag === "StandardCommand" ? command.args : [];
       if (args.some((arg) => arg.includes("/promote/"))) {
-        stableVersion = "candidate";
-        return Effect.succeed(processHandle("{}"));
-      }
-      if (args.some((arg) => arg.includes("/rollback/"))) {
-        stableVersion = "previous";
+        stableVersion = args.some((arg) => arg.includes("dpl_proxy_previous"))
+          ? "previous"
+          : "candidate";
         return Effect.succeed(processHandle("{}"));
       }
       return Effect.succeed(
@@ -625,7 +711,7 @@ describe("automatic Production deployment", () => {
     expect(
       standardCommands.some((command) =>
         command.args.includes(
-          "/v9/projects/prj_proxy/rollback/dpl_proxy_previous?teamId=team_personal"
+          "/v10/projects/prj_proxy/promote/dpl_proxy_previous?teamId=team_personal"
         )
       )
     ).toBeTruthy();

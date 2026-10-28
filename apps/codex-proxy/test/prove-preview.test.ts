@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { Buffer } from "node:buffer";
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { once } from "node:events";
@@ -26,8 +25,6 @@ import {
   CodexProxyErrorResponse,
   CodexProxyHealthResponse,
 } from "../src/schemas.js";
-
-const { join, relative } = nodePath;
 
 const encodeHealthResponse = Schema.encodeSync(
   Schema.fromJsonString(CodexProxyHealthResponse)
@@ -99,8 +96,9 @@ const runProofFixture = async (
   const bypassHeaders: (string | undefined)[] = [];
   const requestBodies: string[] = [];
   const server = createServer((request, response) => {
-    const chunks: Buffer[] = [];
-    request.on("data", (chunk: Buffer) => {
+    request.setEncoding("utf-8");
+    const chunks: string[] = [];
+    request.on("data", (chunk: string) => {
       chunks.push(chunk);
     });
     request.on("end", () => {
@@ -109,7 +107,7 @@ const runProofFixture = async (
       bypassHeaders.push(
         Array.isArray(bypassHeader) ? bypassHeader.at(0) : bypassHeader
       );
-      requestBodies.push(Buffer.concat(chunks).toString());
+      requestBodies.push(chunks.join(""));
 
       if (url.pathname === "/health") {
         response.writeHead(200, { "content-type": "application/json" });
@@ -157,18 +155,22 @@ const runProofFixture = async (
     throw new Error("Preview proof fixture did not bind a TCP port.");
   }
 
-  const fixtureRoot = join(process.cwd(), "tmp");
+  const fixtureRoot = nodePath.join(process.cwd(), "tmp");
   if (existingOutputDirectory === undefined) {
     mkdirSync(fixtureRoot, { recursive: true });
   }
   const outputDirectory =
-    existingOutputDirectory ?? mkdtempSync(join(fixtureRoot, "preview-proof-"));
+    existingOutputDirectory ??
+    mkdtempSync(nodePath.join(fixtureRoot, "preview-proof-"));
   const env: typeof process.env = {
     ...process.env,
     BUNDJIL_CODEX_PROXY_INTERNAL_TOKEN: internalToken,
     BUNDJIL_CODEX_PROXY_PREVIEW_URL: `http://127.0.0.1:${address.port}`,
     BUNDJIL_PROOF_CANDIDATE_ID: "candidate-preview-proof",
-    BUNDJIL_PROOF_OUTPUT_DIRECTORY: relative(process.cwd(), outputDirectory),
+    BUNDJIL_PROOF_OUTPUT_DIRECTORY: nodePath.relative(
+      process.cwd(),
+      outputDirectory
+    ),
     BUNDJIL_PROOF_PACKET_ID: "packet-preview-proof",
   };
   delete env["BUNDJIL_CODEX_PROXY_VERCEL_BYPASS"];
@@ -199,12 +201,14 @@ const runProofFixture = async (
     child.kill("SIGTERM");
   };
 
-  const stderrChunks: Buffer[] = [];
-  const stdoutChunks: Buffer[] = [];
-  child.stderr.on("data", (chunk: Buffer) => {
+  child.stderr.setEncoding("utf-8");
+  child.stdout.setEncoding("utf-8");
+  const stderrChunks: string[] = [];
+  const stdoutChunks: string[] = [];
+  child.stderr.on("data", (chunk: string) => {
     stderrChunks.push(chunk);
   });
-  child.stdout.on("data", (chunk: Buffer) => {
+  child.stdout.on("data", (chunk: string) => {
     stdoutChunks.push(chunk);
   });
 
@@ -212,8 +216,8 @@ const runProofFixture = async (
   child.once("error", exit.reject);
   child.once("close", exit.resolve);
   const exitCode = await exit.promise;
-  const stderr = Buffer.concat(stderrChunks).toString();
-  const stdout = Buffer.concat(stdoutChunks).toString();
+  const stderr = stderrChunks.join("");
+  const stdout = stdoutChunks.join("");
   const closed = once(server, "close");
   server.close();
   await closed;
@@ -280,7 +284,7 @@ describe("preview proof", () => {
       assert.equal(payload.model, "gpt-5.6-terra");
       assert.doesNotMatch(body, /"reasoning"/u);
     }
-    const detailPath = join(
+    const detailPath = nodePath.join(
       result.outputDirectory,
       "candidate-preview-proof--packet-preview-proof.detail.json"
     );
@@ -339,7 +343,7 @@ describe("preview proof", () => {
 
   it("does not repeat a completed request identity when a receipt must be retried", async () => {
     const first = await runProofFixture(200);
-    const detailPath = join(
+    const detailPath = nodePath.join(
       first.outputDirectory,
       "candidate-preview-proof--packet-preview-proof.detail.json"
     );
@@ -400,7 +404,7 @@ describe("preview proof", () => {
 
   it("blocks a missing or corrupt retained detail without repeating the model request", async () => {
     const first = await runProofFixture(200);
-    const detailPath = join(
+    const detailPath = nodePath.join(
       first.outputDirectory,
       "candidate-preview-proof--packet-preview-proof.detail.json"
     );
@@ -442,7 +446,7 @@ describe("preview proof", () => {
     assert.equal(result.stdout, "");
     assert.match(result.stderr, /"classification":"request_failed"/u);
     assert.doesNotMatch(result.stderr, /fixture model body/u);
-    const detailPath = join(
+    const detailPath = nodePath.join(
       result.outputDirectory,
       "candidate-preview-proof--packet-preview-proof.detail.json"
     );
@@ -469,14 +473,14 @@ describe("preview proof", () => {
     assert.match(result.stderr, /"journeyId":"BND-J03-proxy-health-auth-sse"/u);
     assert.match(result.stderr, /"observedExitCode":1/u);
     assert.doesNotMatch(result.stderr, /fixture model body/u);
-    const detailPath = join(
+    const detailPath = nodePath.join(
       result.outputDirectory,
       "candidate-preview-proof--packet-preview-proof.detail.json"
     );
     const retainedProof = readFileSync(detailPath, "utf-8");
     assert.match(retainedProof, /"classification":"proved"/u);
     const outputClosedDetail = readFileSync(
-      join(
+      nodePath.join(
         result.outputDirectory,
         "candidate-preview-proof--packet-preview-proof.output-closed.detail.json"
       ),
@@ -511,7 +515,7 @@ describe("preview proof", () => {
     assert.match(result.stderr, /"journeyId":"BND-J03-proxy-health-auth-sse"/u);
     assert.match(result.stderr, /"intendedExitCode":1/u);
     assert.doesNotMatch(result.stderr, /fixture model body|Reply only: OK\./u);
-    const detailPath = join(
+    const detailPath = nodePath.join(
       result.outputDirectory,
       "candidate-preview-proof--packet-preview-proof.detail.json"
     );

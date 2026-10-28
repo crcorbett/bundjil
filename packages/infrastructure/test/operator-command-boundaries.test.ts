@@ -4,9 +4,7 @@ import nodePath from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-const { dirname, join, relative } = nodePath;
-
-const packageRoot = dirname(import.meta.dirname);
+const packageRoot = nodePath.dirname(import.meta.dirname);
 const commandFixtureTimeoutMilliseconds = 120_000;
 
 const runCommand = (
@@ -133,9 +131,11 @@ describe("infrastructure operator command boundaries", () => {
   );
 
   it("rejects invalid authority and Photon binding files before provider reads", () => {
-    const directory = mkdtempSync(join(packageRoot, "tmp-command-boundary-"));
-    const authorityPath = join(directory, "authority.json");
-    const bindingPath = join(directory, "binding.json");
+    const directory = mkdtempSync(
+      nodePath.join(packageRoot, "tmp-command-boundary-")
+    );
+    const authorityPath = nodePath.join(directory, "authority.json");
+    const bindingPath = nodePath.join(directory, "binding.json");
     writeFileSync(authorityPath, "{}");
     writeFileSync(bindingPath, "{}");
     chmodSync(authorityPath, 0o644);
@@ -143,7 +143,7 @@ describe("infrastructure operator command boundaries", () => {
 
     try {
       const authority = runCommand("validate-vercel-git-link-authority.ts", {
-        BUNDJIL_VERCEL_GIT_LINK_AUTHORITY_PATH: relative(
+        BUNDJIL_VERCEL_GIT_LINK_AUTHORITY_PATH: nodePath.relative(
           packageRoot,
           authorityPath
         ),

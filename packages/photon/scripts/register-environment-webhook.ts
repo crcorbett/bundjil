@@ -31,14 +31,12 @@ import { PhotonProviderProofError } from "../src/provider-proof.error.js";
 import { loadPhotonEnvironmentWebhookProviderConfig } from "../src/provider-proof.js";
 import { PhotonWebhookId } from "../src/schemas.js";
 
-const { dirname, isAbsolute } = nodePath;
-
 declare const process: { exitCode: number | undefined };
 
 const PhotonWebhookBindingPath = Schema.NonEmptyString.pipe(
   Schema.check(
     Schema.makeFilter((value) =>
-      isAbsolute(value) ? undefined : "Binding path must be absolute."
+      nodePath.isAbsolute(value) ? undefined : "Binding path must be absolute."
     )
   ),
   Schema.brand("@bundjil/photon/PhotonWebhookBindingPath")
@@ -50,7 +48,7 @@ const PhotonWebhookAuthorityPath = Schema.String.pipe(
       value.length > 0 &&
       value.length <= 240 &&
       /^[A-Za-z0-9._/-]+$/u.test(value) &&
-      !isAbsolute(value) &&
+      !nodePath.isAbsolute(value) &&
       !value.split("/").includes("..")
         ? undefined
         : "Photon webhook authority path must be safe and repository-relative."
@@ -220,7 +218,7 @@ const command = Effect.gen(function* registerEnvironmentWebhookCommand() {
   });
   const persisted = yield* Effect.exit(
     fileSystem
-      .makeDirectory(dirname(bindingPath), {
+      .makeDirectory(nodePath.dirname(bindingPath), {
         mode: 0o700,
         recursive: true,
       })

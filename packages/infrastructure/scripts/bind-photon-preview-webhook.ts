@@ -39,8 +39,6 @@ import {
 } from "../src/vercel/index.js";
 import type { VercelEnvironmentVariableAttributes } from "../src/vercel/index.js";
 
-const { isAbsolute } = nodePath;
-
 declare const process: {
   exitCode: number | undefined;
 };
@@ -48,7 +46,7 @@ declare const process: {
 const PhotonWebhookBindingPath = Schema.NonEmptyString.pipe(
   Schema.check(
     Schema.makeFilter((value) =>
-      isAbsolute(value) ? undefined : "Binding path must be absolute."
+      nodePath.isAbsolute(value) ? undefined : "Binding path must be absolute."
     )
   ),
   Schema.brand("@bundjil/infrastructure/PhotonWebhookBindingPath")

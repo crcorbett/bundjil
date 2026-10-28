@@ -19,8 +19,6 @@ import {
 } from "../src/adoption-manifest.js";
 import { InfrastructureInventoryArtifactJson } from "../src/inventory.js";
 
-const { dirname, isAbsolute } = nodePath;
-
 declare const process: {
   exitCode: number | undefined;
 };
@@ -31,7 +29,7 @@ const AdoptionArtifactPath = Schema.String.pipe(
       value.length > 0 &&
       value.length <= 240 &&
       /^[A-Za-z0-9._/-]+$/u.test(value) &&
-      !isAbsolute(value) &&
+      !nodePath.isAbsolute(value) &&
       !value.split("/").includes("..")
         ? undefined
         : "Adoption artifact path must be a safe repository-relative path."
@@ -89,7 +87,7 @@ const generateAdoptionManifest = Effect.gen(
     const manifest = yield* buildAdoptionManifest(inventory, bindingProfile);
     const manifestText =
       yield* Schema.encodeEffect(AdoptionManifestJson)(manifest);
-    yield* fileSystem.makeDirectory(dirname(adoptionPath), {
+    yield* fileSystem.makeDirectory(nodePath.dirname(adoptionPath), {
       recursive: true,
       mode: 0o700,
     });

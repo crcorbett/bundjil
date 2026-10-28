@@ -170,6 +170,14 @@ const AgentHealthProbe = Schema.Struct({
   ),
 });
 
+const decodeAgentHealth = (output: string) => {
+  const separator = output.lastIndexOf("\n");
+  return Schema.decodeUnknownEffect(AgentHealthProbe)({
+    status: output.slice(separator + 1),
+    body: output.slice(0, separator),
+  }).pipe(Effect.asVoid);
+};
+
 const repositoryDirectory = fileURLToPath(
   new URL("../../../../", import.meta.url)
 );
@@ -499,10 +507,39 @@ export const ProductionDeploymentsLive = Layer.effect(
         );
         const deployment =
           "deployment" in decoded ? decoded.deployment : decoded;
-        return yield* inspect({
+        const inspected = yield* inspect({
           project: input.project,
           deploymentId: deployment.id,
         });
+        if (input.project === "agent") {
+          yield* runCommand(
+            [
+              "bunx",
+              "--bun",
+              "vercel",
+              "curl",
+              "/eve/v1/info",
+              "--deployment",
+              inspected.url,
+              "--yes",
+              "--",
+              "--silent",
+              "--show-error",
+              "--no-fail",
+              "--write-out",
+              "\n%{http_code}",
+            ],
+            selected,
+            "probe",
+            "agent"
+          ).pipe(
+            Effect.flatMap(decodeAgentHealth),
+            Effect.mapError(() =>
+              commandError("probe", "agent", "healthFailed")
+            )
+          );
+        }
+        return inspected;
       }),
       promote: Effect.fn("ProductionDeploymentsLive.promote")(function* (
         deployment: ProductionDeployment
@@ -586,7 +623,8 @@ export const ProductionDeploymentsLive = Layer.effect(
             "--bun",
             "vercel",
             "api",
-            `/v9/projects/${deployment.projectId}/rollback/${deployment.deploymentId}?teamId=${config.teamId}`,
+            // Promoting the prior deployment restores its public aliases too.
+            `/v10/projects/${deployment.projectId}/promote/${deployment.deploymentId}?teamId=${config.teamId}`,
             "--method",
             "POST",
             "--input",
@@ -639,14 +677,7 @@ export const ProductionDeploymentsLive = Layer.effect(
         "probe",
         "agent"
       ).pipe(
-        Effect.flatMap((output) => {
-          const separator = output.lastIndexOf("\n");
-          return Schema.decodeUnknownEffect(AgentHealthProbe)({
-            status: output.slice(separator + 1),
-            body: output.slice(0, separator),
-          });
-        }),
-        Effect.asVoid,
+        Effect.flatMap(decodeAgentHealth),
         Effect.mapError(() => commandError("probe", "agent", "healthFailed"))
       ),
     });

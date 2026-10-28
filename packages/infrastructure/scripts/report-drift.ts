@@ -62,8 +62,6 @@ import { validateStableAdoptionCommand } from "../src/stable-adoption-command.js
 import { layerAlchemyR2State } from "../src/state/r2-state.js";
 import { VercelEnvironmentVariableUpdatedAt } from "../src/vercel/index.js";
 
-const { dirname } = nodePath;
-
 declare const process: {
   exitCode: number | undefined;
 };
@@ -649,13 +647,13 @@ const persistReport = Effect.fn("InfrastructureDriftReport.persist")(function* (
     });
   }
   const fileSystem = yield* FileSystem.FileSystem;
-  yield* fileSystem.makeDirectory(dirname(reportPath), {
+  yield* fileSystem.makeDirectory(nodePath.dirname(reportPath), {
     recursive: true,
     mode: 0o700,
   });
   yield* fileSystem.writeFileString(reportPath, driftJson, { mode: 0o600 });
   yield* fileSystem.chmod(reportPath, 0o600);
-  yield* fileSystem.makeDirectory(dirname(receiptPath), {
+  yield* fileSystem.makeDirectory(nodePath.dirname(receiptPath), {
     recursive: true,
     mode: 0o700,
   });

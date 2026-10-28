@@ -25,8 +25,6 @@ import {
   ProductionPreflightSnapshotPath,
 } from "../agent/production-preflight.js";
 
-const { dirname, isAbsolute } = nodePath;
-
 declare const process: {
   exitCode: number | undefined;
 };
@@ -37,7 +35,7 @@ const SafeDetailPath = Schema.String.pipe(
       value.length > 0 &&
       value.length <= 200 &&
       /^[A-Za-z0-9._/-]+$/u.test(value) &&
-      !isAbsolute(value) &&
+      !nodePath.isAbsolute(value) &&
       !value.split("/").includes("..")
         ? undefined
         : "Production preflight detail path must be a bounded safe repository-relative path."
@@ -203,7 +201,10 @@ const main = Effect.gen(function* renderProductionPreflight() {
   const detailDigest = sha256(encodedDetail);
   const fileSystem = yield* FileSystem.FileSystem;
   const persisted = yield* fileSystem
-    .makeDirectory(dirname(outputDetailPath), { mode: 0o700, recursive: true })
+    .makeDirectory(nodePath.dirname(outputDetailPath), {
+      mode: 0o700,
+      recursive: true,
+    })
     .pipe(
       Effect.andThen(
         fileSystem.writeFileString(outputDetailPath, encodedDetail, {

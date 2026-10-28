@@ -50,8 +50,6 @@ import {
   VercelTeamId,
 } from "../src/vercel/index.js";
 
-const { dirname, isAbsolute } = nodePath;
-
 declare const process: {
   exitCode: number | undefined;
 };
@@ -62,7 +60,7 @@ const InventoryArtifactPath = Schema.String.pipe(
       value.length > 0 &&
       value.length <= 240 &&
       /^[A-Za-z0-9._/-]+$/u.test(value) &&
-      !isAbsolute(value) &&
+      !nodePath.isAbsolute(value) &&
       !value.split("/").includes("..")
         ? undefined
         : "Inventory artifact path must be a safe repository-relative path."
@@ -270,7 +268,7 @@ const runInventory = Effect.gen(
       });
     }
     const fileSystem = yield* FileSystem.FileSystem;
-    yield* fileSystem.makeDirectory(dirname(artifactPath), {
+    yield* fileSystem.makeDirectory(nodePath.dirname(artifactPath), {
       recursive: true,
       mode: 0o700,
     });
@@ -278,7 +276,7 @@ const runInventory = Effect.gen(
       mode: 0o600,
     });
     yield* fileSystem.chmod(artifactPath, 0o600);
-    yield* fileSystem.makeDirectory(dirname(receiptPath), {
+    yield* fileSystem.makeDirectory(nodePath.dirname(receiptPath), {
       recursive: true,
       mode: 0o700,
     });
